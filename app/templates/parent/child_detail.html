@@ -46,10 +46,10 @@
     <div class="h-3 rounded-full bg-slate-100 overflow-hidden mb-2">
       <div
         class="h-full rounded-full bg-gradient-to-r from-red-400 via-green-400 to-blue-400"
-        style="width: {{ member.overall_performance or 0 }}%"
+        style="width: {{ member.computed_overall_performance() }}%"
       ></div>
     </div>
-    <p class="text-sm"><span class="font-bold text-slate-900">{{ member.overall_performance or 0 }}%</span></p>
+    <p class="text-sm"><span class="font-bold text-slate-900">{{ member.computed_overall_performance() }}%</span></p>
   </div>
   <div class="rounded-2xl bg-white border border-slate-200 p-4 shadow-sm">
     <p class="text-sm text-slate-600 mb-2">Caderno — checklist 1 a 30</p>

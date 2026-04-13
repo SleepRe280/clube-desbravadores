@@ -26,9 +26,9 @@
       <p class="text-[10px] text-slate-500 truncate">{{ c.unit or 'Unidade' }}</p>
       <p class="text-[10px] text-amber-800 font-semibold tabular-nums mt-1">{{ duques_by_member.get(c.id, 0) }} duques</p>
       <div class="mt-2 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-        <div class="h-full rounded-full bg-gradient-to-r from-red-400 via-green-400 to-blue-400" style="width: {{ c.overall_performance or 0 }}%"></div>
+        <div class="h-full rounded-full bg-gradient-to-r from-red-400 via-green-400 to-blue-400" style="width: {{ c.computed_overall_performance() }}%"></div>
       </div>
-      <p class="text-[10px] text-slate-500 mt-1">{{ c.overall_performance or 0 }}%</p>
+      <p class="text-[10px] text-slate-500 mt-1">{{ c.computed_overall_performance() }}%</p>
     </a>
     {% endfor %}
   </div>

@@ -33,9 +33,9 @@
         <td class="px-4 py-3">
           <div class="flex items-center gap-2 min-w-[80px]">
             <div class="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
-              <div class="h-full bg-blue-600 rounded-full" style="width: {{ m.overall_performance or 0 }}%"></div>
+              <div class="h-full bg-blue-600 rounded-full" style="width: {{ m.computed_overall_performance() }}%"></div>
             </div>
-            <span class="text-xs text-slate-500">{{ m.overall_performance or 0 }}%</span>
+            <span class="text-xs text-slate-500">{{ m.computed_overall_performance() }}%</span>
           </div>
         </td>
         <td class="px-4 py-3 text-slate-600 text-xs max-w-[160px] truncate" title="{{ m.parent.email if m.parent else '' }}">

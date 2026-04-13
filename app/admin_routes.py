@@ -82,13 +82,6 @@ def format_cpf_display(digits: str) -> str:
     return f"{digits[:3]}.{digits[3:6]}.{digits[6:9]}-{digits[9:]}"
 
 
-def parse_overall_performance(raw):
-    try:
-        return max(0, min(100, int(raw or 0)))
-    except (TypeError, ValueError):
-        return 0
-
-
 def parse_notebook_checklist_from_form(form) -> list[bool]:
     return [form.get(f"nb_{i}") == "1" for i in range(1, 31)]
 
@@ -119,16 +112,17 @@ def apply_member_form(m: Member, form, member_id_exclude=None):
 
     cpf_field = (form.get("cpf") or "").strip()
     if not cpf_field:
-        raise ValueError("CPF é obrigatório.")
-    cpf_raw = normalize_cpf_digits(cpf_field)
-    if not cpf_raw:
-        raise ValueError("CPF inválido. Informe 11 dígitos.")
-    q = Member.query.filter(Member.cpf == cpf_raw)
-    if member_id_exclude:
-        q = q.filter(Member.id != member_id_exclude)
-    if q.first():
-        raise ValueError("CPF já cadastrado para outro membro.")
-    m.cpf = cpf_raw
+        m.cpf = None
+    else:
+        cpf_raw = normalize_cpf_digits(cpf_field)
+        if not cpf_raw:
+            raise ValueError("CPF inválido. Informe 11 dígitos.")
+        q = Member.query.filter(Member.cpf == cpf_raw)
+        if member_id_exclude:
+            q = q.filter(Member.id != member_id_exclude)
+        if q.first():
+            raise ValueError("CPF já cadastrado para outro membro.")
+        m.cpf = cpf_raw
 
     blood = (form.get("blood_type") or "").strip()
     if not blood:
@@ -156,8 +150,8 @@ def apply_member_form(m: Member, form, member_id_exclude=None):
     m.emergency_contact_phone = em_phone
 
     m.notebook_current = (form.get("notebook_current") or "").strip() or None
-    m.overall_performance = parse_overall_performance(form.get("overall_performance"))
     m.parent_id = parse_parent_id(form.get("parent_id"))
+    m.overall_performance = m.computed_overall_performance()
 
 
 @bp.before_request
@@ -522,6 +516,7 @@ def member_activity(id):
             completed=completed,
         )
         db.session.add(rec)
+        m.overall_performance = m.computed_overall_performance()
         db.session.commit()
         flash("Registro do caderno salvo.", "success")
         return redirect(url_for("admin.member_activity", id=m.id))
@@ -573,6 +568,7 @@ def activity_delete(member_id, rec_id):
     m = Member.query.get_or_404(member_id)
     rec = ActivityRecord.query.filter_by(id=rec_id, member_id=m.id).first_or_404()
     db.session.delete(rec)
+    m.overall_performance = m.computed_overall_performance()
     db.session.commit()
     flash("Registro removido.", "info")
     return redirect(url_for("admin.member_activity", id=member_id))
@@ -585,6 +581,7 @@ def activity_toggle_completed(member_id, rec_id):
     rec.completed = request.form.get("completed") == "1"
     if rec.completed and rec.progress_percent < 100:
         rec.progress_percent = 100
+    m.overall_performance = m.computed_overall_performance()
     db.session.commit()
     flash("Status atualizado.", "success")
     return redirect(url_for("admin.member_activity", id=member_id))
@@ -646,6 +643,7 @@ def member_attendance(id):
             note=note,
         )
         db.session.add(row)
+        m.overall_performance = m.computed_overall_performance()
         db.session.commit()
         flash("Presença registrada.", "success")
         return redirect(url_for("admin.member_attendance", id=m.id))
@@ -672,6 +670,7 @@ def attendance_delete(member_id, att_id):
     m = Member.query.get_or_404(member_id)
     row = Attendance.query.filter_by(id=att_id, member_id=m.id).first_or_404()
     db.session.delete(row)
+    m.overall_performance = m.computed_overall_performance()
     db.session.commit()
     flash("Registro de presença excluído.", "info")
     return redirect(url_for("admin.member_attendance", id=member_id))

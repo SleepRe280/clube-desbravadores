@@ -91,6 +91,19 @@ class Member(db.Model):
             return None
         return round(sum(r.progress_percent or 0 for r in rows) / len(rows))
 
+    def computed_overall_performance(self):
+        """Desempenho automático: média entre atividades e presença."""
+        components = []
+        activity_avg = self.activity_progress_avg()
+        if activity_avg is not None:
+            components.append(activity_avg)
+        _, total_att, att_rate = self.attendance_stats()
+        if total_att > 0:
+            components.append(att_rate)
+        if not components:
+            return 0
+        return round(sum(components) / len(components))
+
     def _legacy_ints_to_bools(self, data):
         out = []
         for i in range(30):
