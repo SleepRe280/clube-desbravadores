@@ -1,0 +1,56 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}{% if m %}Editar{% else %}Novo{% endif %} — diretoria{% endblock %}
+{% block content %}
+<h1 class="title-page">{% if m %}Editar líder{% else %}Novo membro da diretoria{% endif %}</h1>
+<p class="subtitle-page">
+  Campos essenciais: identificação, cargo, contatos públicos, texto para o app dos pais e foto.
+</p>
+
+<form method="post" enctype="multipart/form-data" class="mt-8 max-w-2xl space-y-6">
+  <div class="card p-6 space-y-6">
+    <div class="grid-form-2">
+      <div class="span-2 form-stack">
+        <label for="full_name">Nome completo *</label>
+        <input id="full_name" name="full_name" required value="{{ m.full_name if m else '' }}" />
+      </div>
+      <div class="span-2 form-stack">
+        <label for="cargo">Cargo na diretoria *</label>
+        <input id="cargo" name="cargo" required value="{{ m.cargo if m else '' }}" placeholder="Ex.: Diretor, Secretário, Capelão" />
+      </div>
+      <div class="form-stack">
+        <label for="display_order">Ordem na lista</label>
+        <input id="display_order" type="number" name="display_order" value="{{ m.display_order if m else 0 }}" />
+      </div>
+      <div class="form-stack">
+        <label for="phone">Telefone (público)</label>
+        <input id="phone" type="text" name="phone" value="{{ m.phone if m else '' }}" autocomplete="tel" />
+      </div>
+      <div class="span-2 form-stack">
+        <label for="email_public">E-mail (público)</label>
+        <input id="email_public" type="email" name="email_public" value="{{ m.email_public if m else '' }}" autocomplete="email" />
+      </div>
+      <div class="span-2 form-stack">
+        <label for="bio">Sobre / mensagem ao clube (opcional)</label>
+        <textarea id="bio" name="bio" rows="4" placeholder="Breve apresentação ou área de atuação no clube.">{{ m.bio if m else '' }}</textarea>
+      </div>
+    </div>
+
+    <div class="rounded-xl border border-dashed border-slate-300 p-4 bg-slate-50/80">
+      <label class="block text-sm font-medium text-slate-700 mb-2">Foto</label>
+      {% if m and m.photo_filename %}
+      <img src="{{ url_for('uploaded_file', rel_path=m.photo_filename) }}" class="h-24 w-24 rounded-xl object-cover mb-2 border border-white shadow-sm" alt="" />
+      <label class="inline-flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
+        <input type="checkbox" name="remove_photo" value="1" />
+        Remover foto
+      </label>
+      {% endif %}
+      <input type="file" name="photo" accept="image/png,image/jpeg,image/webp" class="mt-3 w-full text-sm" />
+    </div>
+  </div>
+
+  <div class="flex flex-col-reverse sm:flex-row gap-3 sm:items-center">
+    <a href="{{ url_for('admin.directorate_list') }}" class="btn-ghost text-center sm:inline-flex">Cancelar</a>
+    <button type="submit" class="btn-primary">Salvar</button>
+  </div>
+</form>
+{% endblock %}

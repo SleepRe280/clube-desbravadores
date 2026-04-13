@@ -1,0 +1,123 @@
+/**
+ * Camada 3 — Componentes reutilizáveis
+ */
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap-min);
+  padding: 0.625rem 1.25rem;
+  border-radius: var(--radius-lg);
+  font-weight: 600;
+  font-size: var(--text-body);
+  background: #0f172a;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+}
+
+.btn-primary:hover {
+  opacity: 0.92;
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap-min);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-lg);
+  font-weight: 600;
+  font-size: 0.875rem;
+  background: #fff;
+  color: #334155;
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.btn-ghost:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.btn-danger-ghost:hover {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.card {
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 1px 3px rgb(15 23 42 / 0.06);
+}
+
+.form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-stack label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.form-stack input[type="text"],
+.form-stack input[type="email"],
+.form-stack input[type="password"],
+.form-stack input[type="date"],
+.form-stack input[type="number"],
+.form-stack input[type="file"],
+.form-stack select,
+.form-stack textarea {
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+  font-size: 1rem;
+  min-height: 2.75rem;
+}
+
+.form-stack textarea {
+  min-height: 6rem;
+  resize: vertical;
+}
+
+.title-page {
+  font-size: var(--text-title);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.subtitle-page {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-top: 0.35rem;
+}
+
+/* Grade responsiva para formulários */
+.grid-form-2 {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .grid-form-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid-form-2 .span-2 {
+    grid-column: span 2;
+  }
+}

@@ -1,0 +1,28 @@
+{% extends "parent/base_parent.html" %}
+{% block title %}Membros{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold text-slate-900">Desbravadores do clube</h1>
+<p class="text-slate-500 text-sm mt-2 leading-relaxed">
+  Lista social: nome, unidade e foto pública. <strong>Não há acesso à ficha completa</strong> (CPF, saúde, contatos internos) — isso fica apenas com a diretoria.
+</p>
+<div class="mt-6 grid grid-cols-2 gap-3">
+  {% for m in members %}
+  <div class="rounded-2xl bg-white border border-slate-200 p-3 shadow-sm text-center">
+    {% if m.photo_filename %}
+    <img src="{{ url_for('uploaded_file', rel_path=m.photo_filename) }}" class="h-16 w-16 rounded-full object-cover mx-auto border border-slate-100" alt="" />
+    {% else %}
+    <div class="h-16 w-16 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-xl font-bold mx-auto">
+      {{ m.full_name[0]|upper }}
+    </div>
+    {% endif %}
+    <p class="font-semibold text-sm text-slate-800 mt-2 leading-tight line-clamp-2">{{ m.full_name }}</p>
+    <p class="text-xs text-slate-500 mt-1">{{ m.unit or 'Clube' }}</p>
+    {% if m.age_years is not none %}
+    <p class="text-[10px] text-slate-400 mt-0.5">{{ m.age_years }} anos</p>
+    {% endif %}
+  </div>
+  {% else %}
+  <p class="col-span-2 text-slate-500 text-sm text-center py-8">Nenhum membro cadastrado ainda.</p>
+  {% endfor %}
+</div>
+{% endblock %}

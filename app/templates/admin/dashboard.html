@@ -1,0 +1,98 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Início{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold text-slate-900">Mapa do clube</h1>
+<p class="text-slate-600 mt-1">
+  Visão geral para a diretoria: números, distribuição por unidade e acesso rápido à equipe.
+</p>
+
+<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+  <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+    <p class="text-xs font-semibold text-red-600 uppercase">Desbravadores</p>
+    <p class="text-3xl font-bold text-slate-900 mt-1">{{ n_members }}</p>
+    <a href="{{ url_for('admin.members') }}" class="text-sm text-blue-600 mt-2 inline-block hover:underline">Lista completa</a>
+  </div>
+  <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+    <p class="text-xs font-semibold text-green-600 uppercase">Responsáveis</p>
+    <p class="text-3xl font-bold text-slate-900 mt-1">{{ n_parents }}</p>
+    <a href="{{ url_for('admin.parents_list') }}" class="text-sm text-blue-600 mt-2 inline-block hover:underline">Vínculos</a>
+  </div>
+  <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+    <p class="text-xs font-semibold text-violet-600 uppercase">Diretoria</p>
+    <p class="text-3xl font-bold text-slate-900 mt-1">{{ n_dir }}</p>
+    <a href="{{ url_for('admin.directorate_list') }}" class="text-sm text-blue-600 mt-2 inline-block hover:underline">Equipe</a>
+  </div>
+  <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+    <p class="text-xs font-semibold text-sky-600 uppercase">Notícias WD</p>
+    <p class="text-3xl font-bold text-slate-900 mt-1">{{ n_news }}</p>
+    <a href="{{ url_for('admin.club_news_list') }}" class="text-sm text-blue-600 mt-2 inline-block hover:underline">Gerir</a>
+  </div>
+</div>
+
+<div class="grid lg:grid-cols-2 gap-8 mt-10">
+  <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+    <h2 class="font-semibold text-slate-900 mb-4">Desbravadores por unidade</h2>
+    {% if unit_stats %}
+    <div class="space-y-3">
+      {% for u in unit_stats %}
+      <div>
+        <div class="flex justify-between text-sm mb-1">
+          <span class="text-slate-700">{{ u.label }}</span>
+          <span class="font-medium text-slate-900">{{ u.count }}</span>
+        </div>
+        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+          <div
+            class="h-full rounded-full bg-gradient-to-r from-red-400 via-green-400 to-blue-400"
+            style="width: {{ (100 * u.count / max_unit_count) | int }}%"
+          ></div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-slate-500 text-sm">Cadastre desbravadores para ver o gráfico.</p>
+    {% endif %}
+  </div>
+
+  <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+    <h2 class="font-semibold text-slate-900 mb-4">Equipe da diretoria (prévia)</h2>
+    {% if directorate_preview %}
+    <div class="flex flex-wrap gap-3">
+      {% for d in directorate_preview %}
+      <div class="flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 px-3 py-2 text-sm">
+        {% if d.photo_filename %}
+        <img src="{{ url_for('uploaded_file', rel_path=d.photo_filename) }}" class="h-9 w-9 rounded-full object-cover" alt="" />
+        {% else %}
+        <div class="h-9 w-9 rounded-full bg-violet-200 text-violet-800 flex items-center justify-center font-bold text-xs">
+          {{ d.full_name[0]|upper }}
+        </div>
+        {% endif %}
+        <div>
+          <p class="font-medium text-slate-800 leading-tight">{{ d.full_name }}</p>
+          <p class="text-xs text-slate-500">{{ d.cargo }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <a href="{{ url_for('admin.directorate_list') }}" class="text-sm text-blue-600 mt-4 inline-block hover:underline">Editar equipe</a>
+    {% else %}
+    <p class="text-slate-500 text-sm">Cadastre líderes em Equipe da diretoria.</p>
+    {% endif %}
+  </div>
+</div>
+
+<div class="mt-10 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+  <h2 class="font-semibold text-slate-900 mb-3">Últimos avisos internos (feed do clube)</h2>
+  <ul class="space-y-2">
+    {% for p in recent_posts %}
+    <li class="text-sm border-b border-slate-100 pb-2 flex justify-between gap-2">
+      <span class="text-slate-800">{{ p.title }}</span>
+      <span class="text-slate-400 shrink-0">{{ p.created_at.strftime('%d/%m/%Y') }}</span>
+    </li>
+    {% else %}
+    <li class="text-slate-500 text-sm">Nenhum aviso.</li>
+    {% endfor %}
+  </ul>
+  <a href="{{ url_for('admin.post_new') }}" class="text-sm text-green-700 font-medium hover:underline mt-3 inline-block">Novo aviso</a>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "parent/base_parent.html" %}
+{% block title %}Liderança{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold text-slate-900">Equipe de liderança</h1>
+<p class="text-slate-500 text-sm mt-2">Diretoria e líderes do clube — cadastro voltado ao ministério.</p>
+<div class="mt-6 space-y-4">
+  {% for d in team %}
+  <div class="rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden flex gap-4 p-4">
+    {% if d.photo_filename %}
+    <img src="{{ url_for('uploaded_file', rel_path=d.photo_filename) }}" class="h-20 w-20 rounded-xl object-cover shrink-0" alt="" />
+    {% else %}
+    <div class="h-20 w-20 rounded-xl bg-violet-100 text-violet-800 flex items-center justify-center text-2xl font-bold shrink-0">
+      {{ d.full_name[0]|upper }}
+    </div>
+    {% endif %}
+    <div class="min-w-0 flex-1">
+      <p class="font-bold text-slate-900">{{ d.full_name }}</p>
+      <p class="text-violet-700 text-sm font-medium mt-0.5">{{ d.cargo }}</p>
+      {% if d.bio %}
+      <p class="text-slate-600 text-sm mt-2 leading-relaxed">{{ d.bio }}</p>
+      {% endif %}
+      {% if d.phone or d.email_public %}
+      <p class="text-xs text-slate-500 mt-2">
+        {% if d.phone %}<a href="tel:{{ d.phone }}" class="text-blue-600">{{ d.phone }}</a>{% endif %}
+        {% if d.phone and d.email_public %} · {% endif %}
+        {% if d.email_public %}<a href="mailto:{{ d.email_public }}" class="text-blue-600 break-all">{{ d.email_public }}</a>{% endif %}
+      </p>
+      {% endif %}
+    </div>
+  </div>
+  {% else %}
+  <p class="text-slate-500 text-sm">A diretoria ainda não cadastrou a equipe.</p>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Nova publicação{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold">Nova publicação</h1>
+<p class="text-slate-600 text-sm mt-1">Visível para todos os responsáveis no feed.</p>
+<div class="mt-6 max-w-2xl bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+  <form method="post" class="space-y-4">
+    <div>
+      <label class="block text-sm font-medium text-slate-700 mb-1">Título</label>
+      <input name="title" required class="w-full rounded-lg border border-slate-300 px-3 py-2" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-slate-700 mb-1">Texto</label>
+      <textarea name="body" rows="8" required class="w-full rounded-lg border border-slate-300 px-3 py-2"></textarea>
+    </div>
+    <div class="flex gap-3">
+      <button type="submit" class="rounded-lg bg-slate-900 text-white px-5 py-2 text-sm font-semibold">Publicar</button>
+      <a href="{{ url_for('admin.posts') }}" class="rounded-lg border border-slate-300 px-5 py-2 text-sm">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+# Blueprint Render: https://render.com/docs/blueprint-spec
+# Ajuste `name` dos serviços se quiser outros identificadores no painel.
+
+databases:
+  - name: primeiro-homem-db
+    plan: free
+    databaseName: primeiro_homem
+
+services:
+  - type: web
+    name: primeiro-homem-web
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements-prod.txt
+    startCommand: gunicorn -w 2 -b 0.0.0.0:$PORT wsgi:app
+    healthCheckPath: /health
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: FLASK_DEBUG
+        value: "0"
+      - key: TRUST_PROXY
+        value: "1"
+      - key: SESSION_COOKIE_SECURE
+        value: "1"
+      - key: PREFERRED_URL_SCHEME
+        value: https
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: primeiro-homem-db
+          property: connectionString

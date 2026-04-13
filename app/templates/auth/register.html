@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Criar conta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="min-h-screen bg-gradient-to-b from-white via-green-50/40 to-blue-50 p-6">
+    <div class="max-w-md mx-auto pt-6">
+      <a href="{{ url_for('auth.login') }}" class="text-blue-600 text-sm font-medium hover:underline">← Login</a>
+      <h1 class="text-2xl font-bold text-slate-900 mt-6">Criar conta de responsável</h1>
+      <p class="text-slate-600 text-sm mt-2">Seus dados ficam salvos para os próximos acessos.</p>
+      <div class="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
+        {% include "partials/flash.html" %}
+        <form method="post" class="space-y-4">
+          <div>
+            <label class="block text-sm text-slate-600 mb-1">Nome</label>
+            <input name="full_name" required class="w-full rounded-xl border border-slate-200 px-4 py-3" />
+          </div>
+          <div>
+            <label class="block text-sm text-slate-600 mb-1">E-mail</label>
+            <input name="email" type="email" required class="w-full rounded-xl border border-slate-200 px-4 py-3" />
+          </div>
+          <div>
+            <label class="block text-sm text-slate-600 mb-1">Senha (mín. 6)</label>
+            <input name="password" type="password" required minlength="6" class="w-full rounded-xl border px-4 py-3" />
+          </div>
+          <button
+            type="submit"
+            class="w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-red-500 via-green-500 to-blue-500"
+          >
+            Registrar
+          </button>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

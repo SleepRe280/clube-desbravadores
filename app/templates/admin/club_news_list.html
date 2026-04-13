@@ -1,0 +1,31 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Notícias WD{% endblock %}
+{% block content %}
+<div class="flex justify-between items-center flex-wrap gap-4">
+  <h1 class="text-2xl font-bold">Notícias dos Desbravadores</h1>
+  <a href="{{ url_for('admin.club_news_new') }}" class="rounded-xl bg-sky-600 text-white px-4 py-2 text-sm font-semibold">Nova notícia</a>
+</div>
+{% set level_map = dict(levels) %}
+<ul class="mt-6 space-y-3">
+  {% for n in news_list %}
+  <li class="bg-white rounded-xl border border-slate-200 p-4 flex flex-wrap justify-between gap-4">
+    <div>
+      <span
+        class="text-xs font-bold uppercase px-2 py-0.5 rounded-full {% if n.level == 'mundial' %}bg-indigo-100 text-indigo-800{% elif n.level == 'estadual' %}bg-blue-100 text-blue-800{% elif n.level == 'regional' %}bg-green-100 text-green-800{% else %}bg-amber-100 text-amber-900{% endif %}"
+        >{{ level_map.get(n.level, n.level) }}</span
+      >
+      <h2 class="font-semibold text-slate-900 mt-2">{{ n.title }}</h2>
+      <p class="text-xs text-slate-400 mt-1">{{ n.created_at.strftime('%d/%m/%Y %H:%M') }}</p>
+    </div>
+    <div class="flex gap-2 items-start">
+      <a href="{{ url_for('admin.club_news_edit', nid=n.id) }}" class="text-sm text-blue-600 hover:underline">Editar</a>
+      <form method="post" action="{{ url_for('admin.club_news_delete', nid=n.id) }}" onsubmit="return confirm('Excluir?');">
+        <button type="submit" class="text-sm text-red-600 hover:underline">Excluir</button>
+      </form>
+    </div>
+  </li>
+  {% else %}
+  <li class="text-slate-500">Nenhuma notícia.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

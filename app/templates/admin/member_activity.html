@@ -1,0 +1,195 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Caderno — {{ member.full_name }}{% endblock %}
+{% block content %}
+{% set pct = notebook_pct %}
+<div class="flex flex-wrap items-center justify-between gap-4">
+  <div>
+    <h1 class="text-2xl font-bold">Caderno de atividades</h1>
+    <p class="text-slate-600">{{ member.full_name }}</p>
+    {% if member.notebook_current %}
+    <p class="text-sm text-blue-700 mt-1 font-medium">Foco atual: {{ member.notebook_current }}</p>
+    {% endif %}
+  </div>
+  <a href="{{ url_for('admin.members') }}" class="text-sm text-slate-600 hover:underline">← Lista</a>
+</div>
+
+<section class="mt-8 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+  <h2 class="font-semibold text-slate-800 border-b border-slate-100 pb-2">Balanço do caderno</h2>
+  <p class="text-sm text-slate-600 mt-3">
+    <span class="font-medium text-slate-800">{{ checklist_done_count }}</span> de 30 itens do checklist marcados ·
+    {% set total_req = n_done + n_open %}
+    {% if total_req > 0 %}
+    <span class="text-slate-500">Requisitos avulsos: {{ n_done }} concluído(s), {{ n_open }} em andamento.</span>
+    {% endif %}
+  </p>
+  <div class="mt-4">
+    <div class="h-3 w-full rounded-full bg-slate-100 overflow-hidden">
+      <div
+        class="h-full rounded-full bg-gradient-to-r from-emerald-500 to-blue-500 transition-[width] duration-300"
+        style="width: {{ pct }}%"
+      ></div>
+    </div>
+    <p class="text-sm text-slate-700 mt-2">
+      <span class="font-bold text-slate-900">{{ notebook_pct }}%</span> de conclusão do caderno atual (checklist 1–30).
+    </p>
+  </div>
+  <p class="text-xs text-slate-500 mt-2">
+    Marque cada número quando o requisito correspondente estiver cumprido. A barra soma os itens verdadeiros (30 = 100%).
+  </p>
+</section>
+
+<section class="mt-8 rounded-xl border border-indigo-200 bg-indigo-50/40 p-6 shadow-sm">
+  <h2 class="font-semibold text-indigo-900 border-b border-indigo-100 pb-2">Checklist do caderno (itens 1 a 30)</h2>
+  <p class="text-xs text-slate-600 mt-2 mb-4">Cada caixa é verdadeiro ou falso. Itens marcados entram na progressão acima.</p>
+  <form method="post" action="{{ url_for('admin.member_notebook_checklist_save', member_id=member.id) }}" class="space-y-4">
+    <div class="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-10 gap-x-2 gap-y-3">
+      {% for i in range(1, 31) %}
+      <label class="flex items-center gap-1.5 text-xs text-slate-700 cursor-pointer select-none">
+        <input type="checkbox" name="nb_{{ i }}" value="1" class="rounded border-slate-400 text-indigo-600 shrink-0" {% if checklist_30[i - 1] %}checked{% endif %} />
+        <span class="font-medium">{{ i }}</span>
+      </label>
+      {% endfor %}
+    </div>
+    <button type="submit" class="rounded-lg bg-indigo-600 text-white px-4 py-2 text-sm font-semibold hover:bg-indigo-700">Salvar checklist</button>
+  </form>
+</section>
+
+<div class="grid lg:grid-cols-2 gap-8 mt-8">
+  <div class="space-y-8">
+    <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+      <h2 class="font-semibold border-b border-slate-100 pb-2">Novo requisito / atividade</h2>
+      <form method="post" class="mt-4 space-y-3 text-sm">
+        <div>
+          <label class="block text-slate-600 mb-1">Título / requisito *</label>
+          <input name="title" required class="w-full rounded-lg border border-slate-300 px-3 py-2" />
+        </div>
+        <div>
+          <label class="block text-slate-600 mb-1">Categoria</label>
+          <input name="category" class="w-full rounded-lg border border-slate-300 px-3 py-2" placeholder="Geral, Especialidade, ADRA…" />
+        </div>
+        <div>
+          <label class="block text-slate-600 mb-1">Progresso (%)</label>
+          <input name="progress_percent" type="number" min="0" max="100" value="0" class="w-full rounded-lg border border-slate-300 px-3 py-2" />
+        </div>
+        <label class="flex items-center gap-2 text-slate-700">
+          <input type="checkbox" name="completed" value="1" class="rounded border-slate-300" />
+          Já concluído
+        </label>
+        <div>
+          <label class="block text-slate-600 mb-1">Observações</label>
+          <textarea name="notes" rows="3" class="w-full rounded-lg border border-slate-300 px-3 py-2"></textarea>
+        </div>
+        <button type="submit" class="rounded-lg bg-gradient-to-r from-red-600 via-green-600 to-blue-600 text-white px-4 py-2 font-semibold text-sm">
+          Salvar
+        </button>
+      </form>
+    </div>
+
+    <div class="bg-white rounded-xl border border-amber-200/80 p-6 shadow-sm">
+      <h2 class="font-semibold border-b border-amber-100 pb-2 text-amber-900">Duques por reunião</h2>
+      <p class="text-xs text-slate-600 mt-2">
+        Registre quantos duques este desbravador trouxe em cada reunião. O total acumulado aparece para conferência.
+      </p>
+      <p class="text-lg font-bold text-amber-900 mt-3">Total acumulado: <span class="tabular-nums">{{ duques_total }}</span> duques</p>
+      <form method="post" action="{{ url_for('admin.member_duques_add', member_id=member.id) }}" class="mt-4 space-y-3 text-sm">
+        <div>
+          <label class="block text-slate-600 mb-1">Data da reunião *</label>
+          <input name="meeting_date" type="date" required value="{{ today_iso }}" class="w-full rounded-lg border border-slate-300 px-3 py-2" />
+        </div>
+        <div>
+          <label class="block text-slate-600 mb-1">Duques nesta reunião *</label>
+          <input name="duques" type="number" min="0" step="1" value="0" required class="w-full rounded-lg border border-slate-300 px-3 py-2" />
+        </div>
+        <div>
+          <label class="block text-slate-600 mb-1">Observação (opcional)</label>
+          <input name="note" maxlength="200" class="w-full rounded-lg border border-slate-300 px-3 py-2" placeholder="Ex.: bônus, troco…" />
+        </div>
+        <button type="submit" class="rounded-lg bg-amber-600 text-white px-4 py-2 font-semibold text-sm hover:bg-amber-700">
+          Registrar duques
+        </button>
+      </form>
+      {% if duques_rows %}
+      <ul class="mt-6 space-y-2 border-t border-amber-100 pt-4">
+        {% for d in duques_rows %}
+        <li class="flex flex-wrap items-center justify-between gap-2 text-sm bg-amber-50/50 rounded-lg px-3 py-2 border border-amber-100">
+          <div>
+            <span class="font-medium text-slate-800">{{ d.meeting_date.strftime('%d/%m/%Y') }}</span>
+            <span class="text-amber-800 font-semibold tabular-nums ml-2">+{{ d.duques }}</span>
+            {% if d.note %}<span class="text-slate-500 text-xs block mt-0.5">{{ d.note }}</span>{% endif %}
+          </div>
+          <form method="post" action="{{ url_for('admin.member_duques_delete', member_id=member.id, duque_id=d.id) }}" onsubmit="return confirm('Remover este lançamento de duques?');">
+            <button type="submit" class="text-xs text-red-600 hover:underline">Excluir</button>
+          </form>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="text-sm text-slate-500 mt-4">Nenhum duque registrado ainda.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="space-y-6">
+    <div>
+      <h2 class="font-semibold text-green-800 mb-2">Concluídos</h2>
+      <ul class="space-y-2">
+        {% for r in completed_recs %}
+        <li class="bg-green-50 border border-green-200 rounded-lg p-4 text-sm">
+          <div class="flex justify-between gap-2 flex-wrap">
+            <span class="font-medium">{{ r.title }}</span>
+          </div>
+          {% if r.category %}<p class="text-slate-600 text-xs mt-1">{{ r.category }}</p>{% endif %}
+          {% if r.notes %}<p class="text-slate-700 mt-2">{{ r.notes }}</p>{% endif %}
+          <div class="mt-3 h-2.5 bg-green-200 rounded-full overflow-hidden max-w-xs">
+            <div class="h-full bg-green-600 rounded-full" style="width: {{ r.progress_percent }}%"></div>
+          </div>
+          <p class="text-xs text-green-800 font-semibold mt-1.5">{{ r.progress_percent }}% concluído</p>
+          <p class="text-xs text-slate-400 mt-2">{{ r.recorded_at.strftime('%d/%m/%Y') }}</p>
+          <div class="flex flex-wrap gap-2 mt-3">
+            <form method="post" action="{{ url_for('admin.activity_toggle_completed', member_id=member.id, rec_id=r.id) }}">
+              <input type="hidden" name="completed" value="0" />
+              <button type="submit" class="text-xs text-amber-700 hover:underline">Marcar em andamento</button>
+            </form>
+            <form method="post" action="{{ url_for('admin.activity_delete', member_id=member.id, rec_id=r.id) }}" onsubmit="return confirm('Excluir este registro?');">
+              <button type="submit" class="text-xs text-red-600 hover:underline">Excluir</button>
+            </form>
+          </div>
+        </li>
+        {% else %}
+        <li class="text-slate-500 text-sm">Nenhum requisito marcado como concluído.</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div>
+      <h2 class="font-semibold text-amber-800 mb-2">Em andamento</h2>
+      <ul class="space-y-2">
+        {% for r in open_recs %}
+        <li class="bg-amber-50/80 border border-amber-200 rounded-lg p-4 text-sm">
+          <div class="flex justify-between gap-2 flex-wrap">
+            <span class="font-medium">{{ r.title }}</span>
+          </div>
+          {% if r.category %}<p class="text-slate-600 text-xs mt-1">{{ r.category }}</p>{% endif %}
+          {% if r.notes %}<p class="text-slate-700 mt-2">{{ r.notes }}</p>{% endif %}
+          <div class="mt-3 h-2.5 bg-amber-200 rounded-full overflow-hidden max-w-xs">
+            <div class="h-full bg-amber-500 rounded-full" style="width: {{ r.progress_percent }}%"></div>
+          </div>
+          <p class="text-xs text-amber-800 font-semibold mt-1.5">{{ r.progress_percent }}% no momento</p>
+          <p class="text-xs text-slate-400 mt-2">{{ r.recorded_at.strftime('%d/%m/%Y') }}</p>
+          <div class="flex flex-wrap gap-2 mt-3">
+            <form method="post" action="{{ url_for('admin.activity_toggle_completed', member_id=member.id, rec_id=r.id) }}">
+              <input type="hidden" name="completed" value="1" />
+              <button type="submit" class="text-xs text-green-700 font-medium hover:underline">Marcar concluído</button>
+            </form>
+            <form method="post" action="{{ url_for('admin.activity_delete', member_id=member.id, rec_id=r.id) }}" onsubmit="return confirm('Excluir este registro?');">
+              <button type="submit" class="text-xs text-red-600 hover:underline">Excluir</button>
+            </form>
+          </div>
+        </li>
+        {% else %}
+        <li class="text-slate-500 text-sm">Nada em aberto nesta lista.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

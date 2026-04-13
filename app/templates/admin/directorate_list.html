@@ -1,0 +1,41 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Diretoria{% endblock %}
+{% block content %}
+<div class="flex flex-wrap justify-between items-center gap-4">
+  <div>
+    <h1 class="text-2xl font-bold text-slate-900">Equipe da diretoria</h1>
+    <p class="text-slate-600 text-sm mt-1">Ficha tipo cadastro escolar + cargo de liderança. Fotos aparecem no app dos pais.</p>
+  </div>
+  <a href="{{ url_for('admin.directorate_new') }}" class="rounded-xl bg-violet-600 text-white px-4 py-2 text-sm font-semibold hover:bg-violet-700"
+    >Novo membro</a
+  >
+</div>
+<div class="mt-6 grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
+  {% for d in members %}
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+    <div class="p-4 flex gap-4">
+      {% if d.photo_filename %}
+      <img src="{{ url_for('uploaded_file', rel_path=d.photo_filename) }}" class="h-20 w-20 rounded-xl object-cover shrink-0" alt="" />
+      {% else %}
+      <div class="h-20 w-20 rounded-xl bg-violet-100 text-violet-700 flex items-center justify-center text-2xl font-bold shrink-0">
+        {{ d.full_name[0]|upper }}
+      </div>
+      {% endif %}
+      <div class="min-w-0">
+        <h2 class="font-semibold text-slate-900 leading-tight">{{ d.full_name }}</h2>
+        <p class="text-violet-700 text-sm font-medium mt-1">{{ d.cargo }}</p>
+        {% if d.phone %}<p class="text-xs text-slate-500 mt-1">{{ d.phone }}</p>{% endif %}
+      </div>
+    </div>
+    <div class="mt-auto border-t border-slate-100 px-4 py-3 flex gap-2 justify-end bg-slate-50">
+      <a href="{{ url_for('admin.directorate_edit', id=d.id) }}" class="text-sm text-blue-600 hover:underline">Editar</a>
+      <form method="post" action="{{ url_for('admin.directorate_delete', id=d.id) }}" onsubmit="return confirm('Excluir?');">
+        <button type="submit" class="text-sm text-red-600 hover:underline">Excluir</button>
+      </form>
+    </div>
+  </div>
+  {% else %}
+  <p class="text-slate-500 col-span-full">Nenhum cadastro. Adicione diretores, capelão, secretário, etc.</p>
+  {% endfor %}
+</div>
+{% endblock %}

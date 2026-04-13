@@ -1,0 +1,51 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Responsáveis{% endblock %}
+{% block content %}
+<div class="flex flex-wrap items-center justify-between gap-4">
+  <div>
+    <h1 class="text-2xl font-bold">Responsáveis cadastrados</h1>
+    <p class="text-slate-600 text-sm mt-1">
+      Quem criou conta pelo site. Abra o perfil para vincular ou desvincular desbravadores.
+    </p>
+  </div>
+</div>
+<div class="mt-6 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+  <table class="min-w-full text-sm">
+    <thead class="bg-slate-50 text-slate-600">
+      <tr>
+        <th class="text-left px-4 py-3 font-medium">Nome</th>
+        <th class="text-left px-4 py-3 font-medium">E-mail</th>
+        <th class="text-left px-4 py-3 font-medium">Cadastro</th>
+        <th class="text-left px-4 py-3 font-medium">Filhos no sistema</th>
+        <th class="text-right px-4 py-3 font-medium"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      {% set p = row.user %}
+      <tr class="border-t border-slate-100">
+        <td class="px-4 py-3 font-medium">{{ p.full_name or '—' }}</td>
+        <td class="px-4 py-3 text-slate-600">{{ p.email }}</td>
+        <td class="px-4 py-3 text-slate-500">{{ p.created_at.strftime('%d/%m/%Y') }}</td>
+        <td class="px-4 py-3">
+          {% if row.n_children %}
+          <span class="text-green-700 font-medium">{{ row.n_children }}</span>
+          {% else %}
+          <span class="text-amber-600">Nenhum vínculo</span>
+          {% endif %}
+        </td>
+        <td class="px-4 py-3 text-right">
+          <a href="{{ url_for('admin.parent_detail', user_id=p.id) }}" class="text-blue-600 font-medium hover:underline"
+            >Gerenciar vínculos</a
+          >
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="5" class="px-4 py-10 text-center text-slate-500">Nenhum responsável cadastrado ainda.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

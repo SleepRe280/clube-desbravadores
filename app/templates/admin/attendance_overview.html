@@ -1,0 +1,63 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Presenças — visão geral{% endblock %}
+{% block content %}
+<div class="flex flex-wrap items-center justify-between gap-4">
+  <div>
+    <h1 class="text-2xl font-bold">Presenças — visão geral</h1>
+    <p class="text-slate-600 text-sm mt-1">Taxa de presença e última reunião registrada por membro.</p>
+  </div>
+  <a href="{{ url_for('admin.members') }}" class="text-sm text-blue-600 hover:underline">Ir para desbravadores</a>
+</div>
+<div class="mt-6 bg-white rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
+  <table class="min-w-full text-sm">
+    <thead class="bg-slate-50 text-slate-600">
+      <tr>
+        <th class="text-left px-4 py-3 font-medium">Membro</th>
+        <th class="text-left px-4 py-3 font-medium">Unidade</th>
+        <th class="text-left px-4 py-3 font-medium">Presença</th>
+        <th class="text-left px-4 py-3 font-medium min-w-[140px]">Desempenho (barra)</th>
+        <th class="text-left px-4 py-3 font-medium">Última reunião</th>
+        <th class="text-right px-4 py-3 font-medium">Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in stats %}
+      {% set m = row.member %}
+      <tr class="border-t border-slate-100">
+        <td class="px-4 py-3 font-medium">{{ m.full_name }}</td>
+        <td class="px-4 py-3 text-slate-600">{{ m.unit or '—' }}</td>
+        <td class="px-4 py-3">
+          {% if row.total %}
+          <span class="text-green-700 font-semibold">{{ row.present }}/{{ row.total }}</span>
+          <span class="text-slate-500">({{ row.rate }}%)</span>
+          {% else %}
+          <span class="text-slate-400">Sem dados</span>
+          {% endif %}
+        </td>
+        <td class="px-4 py-3">
+          <div class="flex items-center gap-2">
+            <div class="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden min-w-[72px]">
+              <div
+                class="h-full rounded-full {% if row.rate is not none and row.rate >= 70 %}bg-green-500{% elif row.rate is not none and row.rate >= 40 %}bg-amber-500{% else %}bg-red-500{% endif %}"
+                style="width: {{ row.rate or 0 }}%"
+              ></div>
+            </div>
+            <span class="text-xs text-slate-500 w-8">{{ row.rate or 0 }}%</span>
+          </div>
+        </td>
+        <td class="px-4 py-3 text-slate-600">
+          {{ row.last_meeting.strftime('%d/%m/%Y') if row.last_meeting else '—' }}
+        </td>
+        <td class="px-4 py-3 text-right">
+          <a href="{{ url_for('admin.member_attendance', id=m.id) }}" class="text-blue-600 hover:underline">Gerir</a>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="6" class="px-4 py-10 text-center text-slate-500">Nenhum membro cadastrado.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

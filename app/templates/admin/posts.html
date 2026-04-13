@@ -1,0 +1,26 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Publicações{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between flex-wrap gap-4">
+  <h1 class="text-2xl font-bold">Publicações da diretoria</h1>
+  <a href="{{ url_for('admin.post_new') }}" class="rounded-lg bg-gradient-to-r from-red-600 to-blue-600 text-white px-4 py-2 text-sm font-semibold hover:opacity-90"
+    >Nova publicação</a
+  >
+</div>
+<ul class="mt-6 space-y-3">
+  {% for p in posts %}
+  <li class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+    <div class="min-w-0 flex-1">
+      <h2 class="font-semibold text-lg">{{ p.title }}</h2>
+      <p class="text-xs text-slate-400 mt-1">{{ p.created_at.strftime('%d/%m/%Y %H:%M') }}</p>
+      <p class="text-slate-700 text-sm mt-3 whitespace-pre-line">{{ p.body[:400] }}{% if p.body|length > 400 %}…{% endif %}</p>
+    </div>
+    <form method="post" action="{{ url_for('admin.post_delete', post_id=p.id) }}" class="shrink-0" onsubmit="return confirm('Excluir esta publicação? Os responsáveis deixarão de vê-la.');">
+      <button type="submit" class="rounded-lg border border-red-200 text-red-700 px-3 py-2 text-sm font-medium hover:bg-red-50">Excluir</button>
+    </form>
+  </li>
+  {% else %}
+  <li class="text-slate-500">Nenhuma publicação.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

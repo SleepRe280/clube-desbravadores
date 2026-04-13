@@ -1,0 +1,73 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Presença — {{ member.full_name }}{% endblock %}
+{% block content %}
+<div class="flex flex-wrap items-center justify-between gap-4">
+  <div>
+    <h1 class="text-2xl font-bold">Presença em reuniões</h1>
+    <p class="text-slate-600">{{ member.full_name }}</p>
+  </div>
+  <a href="{{ url_for('admin.members') }}" class="text-sm text-slate-600 hover:underline">← Lista</a>
+</div>
+
+{% if att_total %}
+<div class="mt-6 bg-white rounded-xl border border-slate-200 p-5 shadow-sm max-w-xl">
+  <p class="text-sm text-slate-600">Resumo de presença neste clube (todos os registros)</p>
+  <p class="text-2xl font-bold text-slate-900 mt-1">{{ att_present }} / {{ att_total }} <span class="text-lg text-slate-500">({{ att_rate }}%)</span></p>
+  <div class="mt-3 h-3 bg-slate-200 rounded-full overflow-hidden">
+    <div
+      class="h-full rounded-full {% if att_rate >= 75 %}bg-green-500{% elif att_rate >= 50 %}bg-amber-500{% else %}bg-red-500{% endif %}"
+      style="width: {{ att_rate }}%"
+    ></div>
+  </div>
+</div>
+{% endif %}
+
+<div class="grid lg:grid-cols-2 gap-8 mt-8">
+  <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+    <h2 class="font-semibold">Registrar reunião</h2>
+    <form method="post" class="mt-4 space-y-3 text-sm">
+      <div>
+        <label class="block text-slate-600 mb-1">Data da reunião</label>
+        <input type="date" name="meeting_date" required class="w-full rounded-lg border border-slate-300 px-3 py-2" />
+      </div>
+      <div>
+        <label class="block text-slate-600 mb-1">Situação</label>
+        <select name="present" class="w-full rounded-lg border border-slate-300 px-3 py-2">
+          <option value="1">Presente</option>
+          <option value="0">Falta</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-slate-600 mb-1">Observação</label>
+        <input name="note" class="w-full rounded-lg border border-slate-300 px-3 py-2" />
+      </div>
+      <button type="submit" class="rounded-lg bg-slate-900 text-white px-4 py-2 font-semibold">Salvar</button>
+    </form>
+  </div>
+  <div>
+    <h2 class="font-semibold mb-3">Histórico</h2>
+    <ul class="divide-y divide-slate-200 bg-white rounded-xl border border-slate-200 overflow-hidden">
+      {% for a in rows %}
+      <li class="px-4 py-3 text-sm">
+        <div class="flex justify-between items-center gap-2">
+          <span>{{ a.meeting_date.strftime('%d/%m/%Y') }}</span>
+          <div class="flex items-center gap-3">
+            {% if a.present %}
+            <span class="text-emerald-600 font-medium">Presente</span>
+            {% else %}
+            <span class="text-red-600 font-medium">Falta</span>
+            {% endif %}
+            <form method="post" action="{{ url_for('admin.attendance_delete', member_id=member.id, att_id=a.id) }}" class="inline" onsubmit="return confirm('Excluir este registro de presença?');">
+              <button type="submit" class="text-xs text-slate-500 hover:text-red-600">Excluir</button>
+            </form>
+          </div>
+        </div>
+        {% if a.note %}<p class="text-xs text-slate-500 mt-1">{{ a.note }}</p>{% endif %}
+      </li>
+      {% else %}
+      <li class="px-4 py-6 text-slate-500 text-sm text-center">Sem registros.</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock %}

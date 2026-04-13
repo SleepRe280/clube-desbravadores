@@ -1,0 +1,27 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}{% if ev %}Editar{% else %}Novo{% endif %} evento{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold">{% if ev %}Editar evento{% else %}Novo evento na agenda{% endif %}</h1>
+<form method="post" class="mt-6 max-w-xl space-y-4 bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+  <div>
+    <label class="block text-sm font-medium text-slate-700 mb-1">Título *</label>
+    <input name="title" required value="{{ ev.title if ev else '' }}" class="w-full rounded-lg border border-slate-300 px-3 py-2" />
+  </div>
+  <div>
+    <label class="block text-sm font-medium text-slate-700 mb-1">Data *</label>
+    <input type="date" name="event_date" required value="{% if ev %}{{ ev.event_date.isoformat() }}{% elif prefill_date %}{{ prefill_date[:10] }}{% endif %}" class="w-full rounded-lg border border-slate-300 px-3 py-2" />
+  </div>
+  <div>
+    <label class="block text-sm font-medium text-slate-700 mb-1">Hora (opcional)</label>
+    <input type="time" name="event_time" value="{{ ev.event_time if ev and ev.event_time else '' }}" class="w-full rounded-lg border border-slate-300 px-3 py-2" />
+  </div>
+  <div>
+    <label class="block text-sm font-medium text-slate-700 mb-1">Detalhes</label>
+    <textarea name="body" rows="5" class="w-full rounded-lg border border-slate-300 px-3 py-2">{{ ev.body if ev else '' }}</textarea>
+  </div>
+  <div class="flex gap-3">
+    <button type="submit" class="rounded-lg bg-indigo-600 text-white px-5 py-2 text-sm font-semibold">Salvar</button>
+    <a href="{{ url_for('admin.agenda_list', year=back_year) }}" class="rounded-lg border border-slate-300 px-5 py-2 text-sm">Voltar ao calendário</a>
+  </div>
+</form>
+{% endblock %}

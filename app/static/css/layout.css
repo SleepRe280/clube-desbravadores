@@ -1,0 +1,224 @@
+/**
+ * Camada 2 — Layout responsivo (mobile-first)
+ */
+
+/* ---------- Admin: sidebar + overlay ---------- */
+.admin-shell {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-page);
+  color: var(--text-primary);
+}
+
+@media (min-width: 1024px) {
+  .admin-shell {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: stretch;
+  }
+}
+
+/* Checkbox invisível controla menu mobile */
+.admin-nav-toggle {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.admin-topbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--surface-card);
+  border-bottom: 1px solid var(--border-subtle);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  min-height: var(--tap-min);
+}
+
+@media (min-width: 1024px) {
+  .admin-topbar {
+    display: none;
+  }
+}
+
+.admin-menu-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-card);
+  cursor: pointer;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+/* Overlay: só quando menu aberto (irmão do checkbox) */
+.admin-nav-toggle:checked ~ .admin-overlay {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.admin-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgb(15 23 42 / 0.45);
+  z-index: 40;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s;
+}
+
+@media (min-width: 1024px) {
+  .admin-overlay {
+    display: none;
+  }
+}
+
+/* Fechar ao clicar no overlay */
+.admin-overlay-label {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+}
+
+/* Sidebar */
+.admin-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 45;
+  width: min(17rem, 88vw);
+  height: 100%;
+  height: 100dvh;
+  background: var(--surface-card);
+  border-right: 1px solid var(--border-subtle);
+  transform: translateX(-100%);
+  transition: transform 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 4px 0 24px rgb(15 23 42 / 0.08);
+}
+
+.admin-nav-toggle:checked ~ .admin-sidebar {
+  transform: translateX(0);
+}
+
+@media (min-width: 1024px) {
+  .admin-sidebar {
+    position: relative;
+    transform: none;
+    width: 16rem;
+    flex-shrink: 0;
+    box-shadow: none;
+  }
+}
+
+.admin-main {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-section);
+  padding-top: max(var(--space-section), env(safe-area-inset-top));
+}
+
+@media (min-width: 1024px) {
+  .admin-main {
+    padding: 2rem;
+    overflow: auto;
+  }
+}
+
+/* ---------- Pais: fundo e painel ---------- */
+.parent-app {
+  min-height: 100%;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(
+    165deg,
+    #f4f0ea 0%,
+    #eef4fc 38%,
+    #ecf8f0 72%,
+    #fcefef 100%
+  );
+  color: var(--text-primary);
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+}
+
+.parent-header {
+  flex-shrink: 0;
+  border-bottom: 1px solid rgb(120 113 108 / 0.12);
+  background: rgb(253 251 247 / 0.88);
+  backdrop-filter: blur(12px);
+}
+
+.parent-main-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0.75rem clamp(0.5rem, 2.5vw, 1.75rem) 5.25rem;
+}
+
+@media (min-width: 640px) {
+  .parent-main-wrap {
+    padding: 1rem clamp(0.75rem, 3vw, 2rem) 5.75rem;
+  }
+}
+
+.parent-panel {
+  flex: 1;
+  border-radius: var(--radius-xl);
+  border: 1px solid rgb(120 113 108 / 0.14);
+  background: var(--surface-glass);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-card);
+  padding: clamp(0.875rem, 2.5vw, 1.75rem);
+}
+
+.parent-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  background: rgb(253 251 247 / 0.96);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgb(120 113 108 / 0.12);
+  box-shadow: var(--shadow-nav);
+}
+
+.parent-bottom-nav--compact {
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
+}
+
+/* ---------- Utilitários de largura / overflow ---------- */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.container-readable {
+  max-width: 65ch;
+}

@@ -1,0 +1,57 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Responsável — {{ parent_user.full_name or parent_user.email }}{% endblock %}
+{% block content %}
+<a href="{{ url_for('admin.parents_list') }}" class="text-sm text-slate-600 hover:underline">← Lista de responsáveis</a>
+<h1 class="text-2xl font-bold mt-4">{{ parent_user.full_name or 'Sem nome' }}</h1>
+<p class="text-slate-600 text-sm mt-1">{{ parent_user.email }}</p>
+<p class="text-xs text-slate-400 mt-1">Conta criada em {{ parent_user.created_at.strftime('%d/%m/%Y %H:%M') }}</p>
+
+<div class="grid lg:grid-cols-2 gap-8 mt-8">
+  <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+    <h2 class="font-semibold text-lg border-b border-slate-100 pb-2">Desbravadores vinculados</h2>
+    {% if linked %}
+    <ul class="mt-4 space-y-3">
+      {% for m in linked %}
+      <li class="flex items-center justify-between gap-2 text-sm border border-slate-100 rounded-lg px-3 py-2">
+        <span class="font-medium">{{ m.full_name }}</span>
+        <form method="post" class="inline" onsubmit="return confirm('Remover vínculo deste desbravador?');">
+          <input type="hidden" name="action" value="unlink" />
+          <input type="hidden" name="member_id" value="{{ m.id }}" />
+          <button type="submit" class="text-red-600 hover:underline text-xs font-medium">Desvincular</button>
+        </form>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="text-slate-500 text-sm mt-4">Nenhum desbravador vinculado ainda.</p>
+    {% endif %}
+  </div>
+
+  <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+    <h2 class="font-semibold text-lg border-b border-slate-100 pb-2">Vincular desbravador</h2>
+    <p class="text-slate-600 text-sm mt-3">
+      Lista apenas membros <strong>sem responsável</strong> definido. Depois do vínculo, o pai/mãe vê o perfil na área
+      familiar.
+    </p>
+    {% if unlinked %}
+    <form method="post" class="mt-4 space-y-3">
+      <input type="hidden" name="action" value="link" />
+      <div>
+        <label class="block text-sm text-slate-600 mb-1">Desbravador</label>
+        <select name="member_id" required class="w-full rounded-lg border border-slate-300 px-3 py-2 bg-white">
+          <option value="">Selecione…</option>
+          {% for m in unlinked %}
+          <option value="{{ m.id }}">{{ m.full_name }}{% if m.unit %} — {{ m.unit }}{% endif %}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="rounded-lg bg-blue-600 text-white px-4 py-2 text-sm font-semibold hover:bg-blue-700">
+        Vincular a este responsável
+      </button>
+    </form>
+    {% else %}
+    <p class="text-amber-700 text-sm mt-4">Todos os desbravadores já têm responsável ou não há membros cadastrados.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

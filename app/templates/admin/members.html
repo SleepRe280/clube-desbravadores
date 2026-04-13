@@ -1,0 +1,61 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Desbravadores{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between gap-4 flex-wrap">
+  <div>
+    <h1 class="text-2xl font-bold">Desbravadores</h1>
+    <p class="text-slate-600 text-sm mt-1">Ficha completa, caderno, presença e vínculo com responsável.</p>
+  </div>
+  <a
+    href="{{ url_for('admin.member_new') }}"
+    class="rounded-lg bg-slate-900 text-white px-4 py-2 text-sm font-semibold hover:bg-slate-800"
+    >Novo membro</a
+  >
+</div>
+<div class="table-responsive mt-6 rounded-xl border border-slate-200 shadow-sm bg-white">
+  <table class="min-w-[720px] w-full text-sm">
+    <thead class="bg-slate-50 text-slate-600">
+      <tr>
+        <th class="text-left px-4 py-3 font-medium">Nome</th>
+        <th class="text-left px-4 py-3 font-medium">Unidade</th>
+        <th class="text-left px-4 py-3 font-medium">CPF</th>
+        <th class="text-left px-4 py-3 font-medium min-w-[100px]">Desempenho</th>
+        <th class="text-left px-4 py-3 font-medium">Responsável (login)</th>
+        <th class="text-right px-4 py-3 font-medium">Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in members %}
+      <tr class="border-t border-slate-100">
+        <td class="px-4 py-3 font-medium">{{ m.full_name }}</td>
+        <td class="px-4 py-3 text-slate-600">{{ m.unit or '—' }}</td>
+        <td class="px-4 py-3 text-slate-600 font-mono text-xs">{% if m.cpf %}{{ format_cpf_display(m.cpf) }}{% else %}—{% endif %}</td>
+        <td class="px-4 py-3">
+          <div class="flex items-center gap-2 min-w-[80px]">
+            <div class="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
+              <div class="h-full bg-blue-600 rounded-full" style="width: {{ m.overall_performance or 0 }}%"></div>
+            </div>
+            <span class="text-xs text-slate-500">{{ m.overall_performance or 0 }}%</span>
+          </div>
+        </td>
+        <td class="px-4 py-3 text-slate-600 text-xs max-w-[160px] truncate" title="{{ m.parent.email if m.parent else '' }}">
+          {{ m.parent.email if m.parent else '—' }}
+        </td>
+        <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap">
+          <a href="{{ url_for('admin.member_edit', id=m.id) }}" class="text-red-600 hover:underline">Ficha</a>
+          <a href="{{ url_for('admin.member_activity', id=m.id) }}" class="text-green-700 hover:underline">Caderno</a>
+          <a href="{{ url_for('admin.member_attendance', id=m.id) }}" class="text-blue-600 hover:underline">Presença</a>
+          <form method="post" action="{{ url_for('admin.member_delete', id=m.id) }}" class="inline" onsubmit="return confirm('Excluir este desbravador?');">
+            <button type="submit" class="text-slate-400 hover:text-red-600 text-xs align-middle">Excluir</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="6" class="px-4 py-8 text-center text-slate-500">Nenhum membro cadastrado.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

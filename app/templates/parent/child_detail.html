@@ -1,0 +1,148 @@
+{% extends "parent/base_parent.html" %}
+{% block title %}{{ member.full_name }}{% endblock %}
+{% block content %}
+<a href="{{ url_for('parent.home') }}" class="text-sm text-blue-600 hover:underline mb-4 inline-block">← Voltar ao feed</a>
+
+<div class="flex items-start gap-4 mb-6">
+  {% if member.photo_filename %}
+  <img src="{{ url_for('uploaded_file', rel_path=member.photo_filename) }}" class="h-20 w-20 rounded-2xl object-cover border border-slate-200 shadow-sm shrink-0" alt="" />
+  {% else %}
+  <div
+    class="h-20 w-20 rounded-2xl bg-gradient-to-br from-red-200 via-green-200 to-blue-200 flex items-center justify-center text-3xl font-bold text-slate-700 shrink-0"
+  >
+    {{ member.full_name[0]|upper }}
+  </div>
+  {% endif %}
+  <div>
+    <h1 class="text-2xl font-bold text-slate-900">{{ member.full_name }}</h1>
+    <p class="text-slate-500 text-sm mt-1">
+      {{ member.unit or 'Desbravador' }}
+      {% if member.age_years is not none %} · {{ member.age_years }} anos{% endif %}
+    </p>
+    {% if member.notebook_current %}
+    <p class="text-green-700 text-sm font-medium mt-2">Caderno: {{ member.notebook_current }}</p>
+    {% endif %}
+  </div>
+</div>
+
+{% if member.emergency_contact_name or member.emergency_contact_phone %}
+<div class="rounded-2xl bg-amber-50 border border-amber-200 p-4 mb-6">
+  <p class="text-xs font-bold text-amber-800 uppercase tracking-wide">Emergência</p>
+  <p class="text-slate-800 text-sm mt-1">
+    {{ member.emergency_contact_name or 'Contato' }}
+    {% if member.emergency_contact_phone %} — <a href="tel:{{ member.emergency_contact_phone }}" class="text-blue-600 font-medium">{{ member.emergency_contact_phone }}</a>{% endif %}
+  </p>
+</div>
+{% endif %}
+
+<p class="text-xs text-slate-400 mb-4">
+  Dados como CPF, tipo sanguíneo e ficha administrativa completa não são exibidos aqui — apenas o acompanhamento do desempenho.
+</p>
+
+<h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Desempenho</h2>
+<div class="space-y-4 mb-8">
+  <div class="rounded-2xl bg-white border border-slate-200 p-4 shadow-sm">
+    <p class="text-sm text-slate-600 mb-2">Desempenho geral</p>
+    <div class="h-3 rounded-full bg-slate-100 overflow-hidden mb-2">
+      <div
+        class="h-full rounded-full bg-gradient-to-r from-red-400 via-green-400 to-blue-400"
+        style="width: {{ member.overall_performance or 0 }}%"
+      ></div>
+    </div>
+    <p class="text-sm"><span class="font-bold text-slate-900">{{ member.overall_performance or 0 }}%</span></p>
+  </div>
+  <div class="rounded-2xl bg-white border border-slate-200 p-4 shadow-sm">
+    <p class="text-sm text-slate-600 mb-2">Caderno — checklist 1 a 30</p>
+    <div class="h-3 rounded-full bg-slate-100 overflow-hidden mb-2">
+      <div
+        class="h-full rounded-full bg-violet-500"
+        style="width: {{ notebook_checklist_pct }}%"
+      ></div>
+    </div>
+    <p class="text-sm"><span class="font-bold text-slate-900">{{ notebook_checklist_pct }}%</span> do caderno atual (itens marcados pela diretoria)</p>
+  </div>
+  {% if attendance_rate is not none %}
+  <div class="rounded-2xl bg-white border border-slate-200 p-4 shadow-sm">
+    <div class="flex justify-between text-sm mb-2">
+      <span class="text-slate-600">Presença nas reuniões</span>
+      <span class="font-bold text-slate-900">{{ attendance_rate }}%</span>
+    </div>
+    <div class="h-3 rounded-full bg-slate-100 overflow-hidden">
+      <div class="h-full bg-green-500 rounded-full" style="width: {{ attendance_rate }}%"></div>
+    </div>
+    <p class="text-xs text-slate-500 mt-2">{{ present_count }} presenças em {{ attendance_total }} registros</p>
+  </div>
+  {% endif %}
+  {% if activity_avg is not none %}
+  <div class="rounded-2xl bg-white border border-slate-200 p-4 shadow-sm">
+    <p class="text-sm text-slate-600 mb-2">Média do caderno</p>
+    <div class="h-3 rounded-full bg-slate-100 overflow-hidden mb-2">
+      <div class="h-full bg-blue-500 rounded-full" style="width: {{ activity_avg }}%"></div>
+    </div>
+    <p class="text-sm"><span class="font-bold text-slate-900">{{ activity_avg }}%</span> avançado no momento</p>
+  </div>
+  {% endif %}
+  <div class="rounded-2xl bg-amber-50 border border-amber-200 p-4 shadow-sm">
+    <p class="text-sm text-amber-900 mb-1">Duques (reuniões)</p>
+    <p class="text-2xl font-bold text-amber-900 tabular-nums">{{ duques_total }}</p>
+    <p class="text-xs text-slate-600 mt-1">Total acumulado registrado pela diretoria.</p>
+    {% if duques_rows %}
+    <ul class="mt-3 space-y-1 text-xs text-slate-700 border-t border-amber-200/80 pt-2 max-h-48 overflow-y-auto">
+      {% for d in duques_rows %}
+      <li class="flex justify-between gap-2">
+        <span>{{ d.meeting_date.strftime('%d/%m/%Y') }}</span>
+        <span class="font-medium text-amber-800 tabular-nums">+{{ d.duques }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </div>
+</div>
+
+<h2 class="text-xs font-bold text-green-600 uppercase tracking-wider mb-3">Caderno — concluídos</h2>
+<ul class="space-y-2 mb-8">
+  {% for a in activities_done %}
+  <li class="rounded-xl bg-green-50 border border-green-200 px-4 py-3 text-sm">
+    <span class="font-medium text-slate-800 block">{{ a.title }}</span>
+    <div class="mt-2 h-2 rounded-full bg-green-200 overflow-hidden max-w-xs">
+      <div class="h-full bg-green-600 rounded-full" style="width: {{ a.progress_percent }}%"></div>
+    </div>
+    <p class="text-xs text-green-800 font-semibold mt-1">{{ a.progress_percent }}% concluído</p>
+    {% if a.notes %}<p class="text-slate-600 text-xs mt-1">{{ a.notes }}</p>{% endif %}
+  </li>
+  {% else %}
+  <li class="text-slate-400 text-sm">Nenhum item concluído registrado.</li>
+  {% endfor %}
+</ul>
+
+<h2 class="text-xs font-bold text-amber-600 uppercase tracking-wider mb-3">Em andamento</h2>
+<ul class="space-y-3 mb-10">
+  {% for a in activities_open %}
+  <li class="rounded-xl bg-white border border-slate-200 px-4 py-3 text-sm shadow-sm">
+    <span class="font-medium text-slate-800 block">{{ a.title }}</span>
+    <div class="mt-2 h-2 bg-slate-100 rounded-full overflow-hidden max-w-xs">
+      <div class="h-full bg-amber-400 rounded-full" style="width: {{ a.progress_percent }}%"></div>
+    </div>
+    <p class="text-xs text-amber-700 font-semibold mt-1">{{ a.progress_percent }}% no momento</p>
+  </li>
+  {% else %}
+  <li class="text-slate-400 text-sm">Nada em aberto.</li>
+  {% endfor %}
+</ul>
+
+<h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Reuniões</h2>
+<ul class="rounded-xl border border-slate-200 divide-y divide-slate-100 overflow-hidden bg-white">
+  {% for att in attendances %}
+  <li class="flex justify-between items-center px-4 py-3 text-sm">
+    <span class="text-slate-700">{{ att.meeting_date.strftime('%d/%m/%Y') }}</span>
+    {% if att.present %}
+    <span class="text-green-600 font-medium">Presente</span>
+    {% else %}
+    <span class="text-red-500 font-medium">Falta</span>
+    {% endif %}
+  </li>
+  {% else %}
+  <li class="px-4 py-6 text-slate-400 text-sm text-center">Sem registros.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,228 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}{% if member %}Editar{% else %}Novo{% endif %} membro{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold">{% if member %}Ficha do desbravador{% else %}Novo desbravador{% endif %}</h1>
+<p class="text-slate-600 text-sm mt-1">
+  Cadastro alinhado às informações usuais do clube. O responsável vinculado enxerga estes dados na área da família.
+</p>
+
+<form method="post" enctype="multipart/form-data" class="mt-6 max-w-3xl space-y-8">
+  <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+    <h2 class="text-sm font-bold text-red-700 uppercase tracking-wide border-b border-red-100 pb-2">Identificação</h2>
+    <div class="grid sm:grid-cols-2 gap-4 mt-4">
+      <div class="sm:col-span-2">
+        <label class="block text-sm font-medium text-slate-700 mb-1">Nome completo *</label>
+        <input
+          name="full_name"
+          value="{{ member.full_name if member else '' }}"
+          required
+          class="w-full rounded-lg border border-slate-300 px-3 py-2"
+        />
+      </div>
+      <div class="sm:col-span-2 rounded-lg border border-dashed border-slate-300 p-4 bg-slate-50">
+        <label class="block text-sm font-medium text-slate-700 mb-2">Foto do desbravador (visível na vitrine social do clube)</label>
+        {% if member and member.photo_filename %}
+        <div class="flex items-center gap-4 mb-3">
+          <img
+            src="{{ url_for('uploaded_file', rel_path=member.photo_filename) }}"
+            alt=""
+            class="h-16 w-16 rounded-full object-cover border border-slate-200"
+          />
+        </div>
+        {% endif %}
+        <input type="file" name="photo" accept="image/png,image/jpeg,image/webp" class="text-sm w-full" />
+        {% if member and member.photo_filename %}
+        <label class="inline-flex items-center gap-2 mt-2 text-sm text-slate-600">
+          <input type="checkbox" name="remove_photo" value="1" />
+          Remover foto atual
+        </label>
+        {% endif %}
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">CPF (11 dígitos) *</label>
+        <input
+          name="cpf"
+          required
+          value="{% if member and member.cpf %}{{ member.cpf[0:3] }}.{{ member.cpf[3:6] }}.{{ member.cpf[6:9] }}-{{ member.cpf[9:11] }}{% endif %}"
+          placeholder="000.000.000-00"
+          class="w-full rounded-lg border border-slate-300 px-3 py-2"
+        />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Data de nascimento *</label>
+        <input
+          type="date"
+          name="birth_date"
+          required
+          value="{{ member.birth_date.isoformat() if member and member.birth_date else '' }}"
+          class="w-full rounded-lg border border-slate-300 px-3 py-2"
+        />
+        {% if member and member.age_years is not none %}
+        <p class="text-xs text-slate-500 mt-1">Idade calculada: {{ member.age_years }} anos</p>
+        {% endif %}
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Tipo sanguíneo *</label>
+        <select name="blood_type" required class="w-full rounded-lg border border-slate-300 px-3 py-2 bg-white">
+          <option value="" disabled {% if not member or not member.blood_type %}selected{% endif %}>Selecione</option>
+          {% for bt in ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'Não informado'] %}
+          <option value="{{ bt }}" {% if member and member.blood_type == bt %}selected{% endif %}>{{ bt }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Nome da unidade / classe *</label>
+        <input
+          name="unit"
+          required
+          value="{{ member.unit if member else '' }}"
+          placeholder="Ex.: Companheiro, nome do clube…"
+          class="w-full rounded-lg border border-slate-300 px-3 py-2"
+          list="units-list"
+        />
+        <datalist id="units-list">
+          <option value="Amigo"></option>
+          <option value="Companheiro"></option>
+          <option value="Pesquisador"></option>
+          <option value="Pioneiro"></option>
+          <option value="Excursionista"></option>
+          <option value="Clube de líderes"></option>
+        </datalist>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+    <h2 class="text-sm font-bold text-green-700 uppercase tracking-wide border-b border-green-100 pb-2">Pais / responsáveis legais (cadastro)</h2>
+    <div class="grid sm:grid-cols-2 gap-4 mt-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Nome do pai / responsável *</label>
+        <input
+          name="father_name"
+          required
+          value="{{ member.father_name if member else '' }}"
+          class="w-full rounded-lg border border-slate-300 px-3 py-2"
+        />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Nome da mãe / responsável *</label>
+        <input
+          name="mother_name"
+          required
+          value="{{ member.mother_name if member else '' }}"
+          class="w-full rounded-lg border border-slate-300 px-3 py-2"
+        />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Contato de emergência — nome *</label>
+        <input
+          name="emergency_contact_name"
+          required
+          value="{{ member.emergency_contact_name if member else '' }}"
+          class="w-full rounded-lg border border-slate-300 px-3 py-2"
+        />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Contato de emergência — telefone *</label>
+        <input
+          name="emergency_contact_phone"
+          required
+          value="{{ member.emergency_contact_phone if member else '' }}"
+          placeholder="(00) 00000-0000"
+          class="w-full rounded-lg border border-slate-300 px-3 py-2"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+    <h2 class="text-sm font-bold text-blue-700 uppercase tracking-wide border-b border-blue-100 pb-2">Caderno & desempenho</h2>
+    <div class="grid sm:grid-cols-2 gap-4 mt-4">
+      <div class="sm:col-span-2">
+        <label class="block text-sm font-medium text-slate-700 mb-1">Caderno de atividades — foco atual</label>
+        <input
+          name="notebook_current"
+          value="{{ member.notebook_current if member else '' }}"
+          placeholder="Ex.: Especialidade de Naturologia — em andamento"
+          class="w-full rounded-lg border border-slate-300 px-3 py-2"
+          list="notebook-suggestions"
+        />
+        <datalist id="notebook-suggestions">
+          <option value="Investidura — Amigo"></option>
+          <option value="Investidura — Companheiro"></option>
+          <option value="Investidura — Pesquisador"></option>
+          <option value="Investidura — Pioneiro"></option>
+          <option value="Investidura — Excursionista"></option>
+          <option value="Especialidades — em andamento"></option>
+          <option value="Honra ao mérito — CLB"></option>
+        </datalist>
+        <p class="text-xs text-slate-500 mt-1">
+          Requisitos concluídos e em andamento são registrados na página <strong>Caderno</strong> deste membro.
+        </p>
+      </div>
+      <div class="sm:col-span-2">
+        <label class="block text-sm font-medium text-slate-700 mb-1">Desempenho geral (0–100%)</label>
+        <input
+          type="range"
+          name="overall_performance"
+          min="0"
+          max="100"
+          value="{{ member.overall_performance if member else 0 }}"
+          class="w-full accent-blue-600"
+          id="perf-range"
+        />
+        <p class="text-sm text-slate-600 mt-1">Valor: <span id="perf-val">{{ member.overall_performance if member else 0 }}</span>% — visível para o responsável como barra de progresso.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+    <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide border-b border-slate-200 pb-2">Conta no portal (pai/mãe)</h2>
+    <div class="mt-4">
+      <label class="block text-sm font-medium text-slate-700 mb-1">Responsável com login no site</label>
+      <select name="parent_id" class="w-full rounded-lg border border-slate-300 px-3 py-2 bg-white">
+        <option value="0" {% if not member or not member.parent_id %}selected{% endif %}>Nenhum ainda</option>
+        {% for p in parent_users %}
+        <option value="{{ p.id }}" {% if member and member.parent_id == p.id %}selected{% endif %}>
+          {{ p.full_name or 'Sem nome' }} — {{ p.email }}
+        </option>
+        {% endfor %}
+      </select>
+      {% if not parent_users %}
+      <p class="text-xs text-amber-700 mt-2">Nenhum responsável cadastrado ainda.</p>
+      {% endif %}
+      <p class="text-xs text-slate-500 mt-2">
+        Também é possível vincular em <a href="{{ url_for('admin.parents_list') }}" class="text-blue-600 underline">Responsáveis & vínculos</a>.
+      </p>
+    </div>
+  </div>
+
+  <div class="flex flex-wrap gap-3">
+    <button type="submit" class="rounded-lg bg-slate-900 text-white px-6 py-2.5 text-sm font-semibold">Salvar ficha</button>
+    <a href="{{ url_for('admin.members') }}" class="rounded-lg border border-slate-300 px-6 py-2.5 text-sm">Voltar à lista</a>
+  </div>
+</form>
+
+{% if member %}
+<form
+  method="post"
+  action="{{ url_for('admin.member_delete', id=member.id) }}"
+  class="mt-8 max-w-3xl pt-6 border-t border-red-100"
+  onsubmit="return confirm('Excluir permanentemente este desbravador e presenças, caderno e duques? Esta ação não pode ser desfeita.');"
+>
+  <button type="submit" class="text-sm font-semibold text-red-600 hover:text-red-800 hover:underline">Excluir desbravador do sistema</button>
+</form>
+{% endif %}
+
+<script>
+  (function () {
+    var r = document.getElementById("perf-range");
+    var v = document.getElementById("perf-val");
+    if (r && v) {
+      r.addEventListener("input", function () {
+        v.textContent = r.value;
+      });
+    }
+  })();
+</script>
+{% endblock %}
