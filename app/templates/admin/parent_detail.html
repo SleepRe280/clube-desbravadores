@@ -54,4 +54,22 @@
     {% endif %}
   </div>
 </div>
+
+<section class="mt-10 max-w-2xl rounded-xl border border-red-200 bg-red-50/40 p-6">
+  <h2 class="font-semibold text-red-900 border-b border-red-100 pb-2">Excluir conta do responsável</h2>
+  <p class="text-sm text-slate-700 mt-3">
+    Remove o login deste responsável do sistema. Os desbravadores cadastrados <strong>não são apagados</strong>; apenas ficam
+    <strong>sem responsável vinculado</strong> até a diretoria associar outra conta.
+  </p>
+  <form
+    method="post"
+    action="{{ url_for('admin.parent_delete', user_id=parent_user.id) }}"
+    class="mt-4"
+    onsubmit="return confirm('Excluir permanentemente esta conta de responsável? Esta ação não pode ser desfeita.');"
+  >
+    <button type="submit" class="rounded-lg border border-red-300 bg-white text-red-800 px-4 py-2 text-sm font-semibold hover:bg-red-100">
+      Excluir conta do responsável
+    </button>
+  </form>
+</section>
 {% endblock %}

@@ -73,6 +73,14 @@ def create_app(config_class=Config):
     def health():
         return {"status": "ok"}, 200
 
+    prefix = (app.config.get("URL_PREFIX") or "").strip()
+    if prefix:
+        app.config["APPLICATION_ROOT"] = prefix
+        app.config["SESSION_COOKIE_PATH"] = prefix + "/"
+        from app.prefix_middleware import PrefixMiddleware
+
+        app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix)
+
     with app.app_context():
         db.create_all()
         from app.db_migrate import migrate_sqlite_schema

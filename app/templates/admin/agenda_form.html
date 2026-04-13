@@ -21,7 +21,7 @@
   </div>
   <div class="flex gap-3">
     <button type="submit" class="rounded-lg bg-indigo-600 text-white px-5 py-2 text-sm font-semibold">Salvar</button>
-    <a href="{{ url_for('admin.agenda_list', year=back_year) }}" class="rounded-lg border border-slate-300 px-5 py-2 text-sm">Voltar ao calendário</a>
+    <a href="{{ url_for('admin.agenda_list', year=back_year, month=back_month) }}" class="rounded-lg border border-slate-300 px-5 py-2 text-sm">Voltar ao calendário</a>
   </div>
 </form>
 {% endblock %}

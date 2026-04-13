@@ -27,6 +27,16 @@ def _env_flag(name: str, default: bool = False) -> bool:
     return v.strip().lower() in ("1", "true", "yes", "on")
 
 
+def _url_prefix() -> str:
+    """Ex.: /portal — app atende em https://host/portal/... (vazio = raiz)."""
+    raw = (os.environ.get("URL_PREFIX") or "").strip()
+    if not raw:
+        return ""
+    if not raw.startswith("/"):
+        raw = "/" + raw
+    return raw.rstrip("/") or ""
+
+
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "troque-esta-chave-em-producao")
     SQLALCHEMY_DATABASE_URI = _database_uri()
@@ -38,3 +48,4 @@ class Config:
     SESSION_COOKIE_SAMESITE = "Lax"
     SESSION_COOKIE_SECURE = _env_flag("SESSION_COOKIE_SECURE", default=False)
     PREFERRED_URL_SCHEME = os.environ.get("PREFERRED_URL_SCHEME", "http").strip().lower()
+    URL_PREFIX = _url_prefix()

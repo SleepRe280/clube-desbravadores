@@ -18,6 +18,7 @@ from app.models import (
     DirectorateMember,
     MeetingDuque,
     Member,
+    PasswordResetToken,
     User,
 )
 from app.uploads_util import save_upload
@@ -259,6 +260,29 @@ def parent_detail(user_id):
     )
 
 
+@bp.route("/responsaveis/<int:user_id>/excluir", methods=["POST"])
+def parent_delete(user_id):
+    p = db.session.get(User, user_id)
+    if not p or p.role != "parent":
+        flash("Conta não encontrada.", "danger")
+        return redirect(url_for("admin.parents_list"))
+    if current_user.id == p.id:
+        flash("Você não pode excluir a própria conta por este painel.", "danger")
+        return redirect(url_for("admin.parent_detail", user_id=user_id))
+    for m in Member.query.filter_by(parent_id=p.id).all():
+        m.parent_id = None
+    ClubNews.query.filter_by(author_id=p.id).update({ClubNews.author_id: None}, synchronize_session=False)
+    BoardPost.query.filter_by(author_id=p.id).update({BoardPost.author_id: None}, synchronize_session=False)
+    PasswordResetToken.query.filter_by(user_id=p.id).delete()
+    db.session.delete(p)
+    db.session.commit()
+    flash(
+        "Conta do responsável excluída. Os desbravadores permanecem no sistema, sem vínculo com esta conta.",
+        "info",
+    )
+    return redirect(url_for("admin.parents_list"))
+
+
 @bp.route("/presencas")
 def attendance_overview():
     members = Member.query.order_by(Member.full_name).all()
@@ -362,35 +386,36 @@ def _parse_agenda_form(form):
     return title, body, evd, tm
 
 
-def _agenda_year_months(year: int):
-    months = []
-    for month in range(1, 13):
-        weeks = calendar_stdlib.monthcalendar(year, month)
-        months.append({"n": month, "weeks": weeks})
-    return months
+def _agenda_add_months(y: int, m: int, delta: int) -> tuple[int, int]:
+    """m em 1..12; retorna (ano, mês) após somar delta meses."""
+    idx = y * 12 + (m - 1) + delta
+    return idx // 12, idx % 12 + 1
+
+
+def _agenda_clamp_day_in_month(y: int, m: int, day: int) -> date:
+    last = calendar_stdlib.monthrange(y, m)[1]
+    return date(y, m, min(max(1, day), last))
+
+
+def _agenda_sort_day_events(evs: list) -> list:
+    def key(ev):
+        t = ev.event_time or "99:99:99"
+        return (t, ev.id)
+
+    return sorted(evs, key=key)
 
 
 @bp.route("/agenda")
 def agenda_list():
+    today = date.today()
     try:
-        year = int(request.args.get("year") or date.today().year)
+        year = int(request.args.get("year") or today.year)
+        month = int(request.args.get("month") or today.month)
     except (TypeError, ValueError):
-        year = date.today().year
+        year, month = today.year, today.month
     year = max(2000, min(2100, year))
-    start = date(year, 1, 1)
-    end = date(year, 12, 31)
-    rows = (
-        AgendaEvent.query.filter(
-            AgendaEvent.event_date >= start, AgendaEvent.event_date <= end
-        )
-        .order_by(AgendaEvent.event_date.asc(), AgendaEvent.id.asc())
-        .all()
-    )
-    events_by_date = {}
-    for ev in rows:
-        key = ev.event_date.isoformat()
-        events_by_date.setdefault(key, []).append(ev)
-    months = _agenda_year_months(year)
+    month = max(1, min(12, month))
+
     month_names_pt = [
         "",
         "Janeiro",
@@ -406,26 +431,78 @@ def agenda_list():
         "Novembro",
         "Dezembro",
     ]
-    for m in months:
-        m["label"] = month_names_pt[m["n"]]
+    month_label = f"{month_names_pt[month]} {year}"
+
+    sel_raw = (request.args.get("selected") or "").strip()
+    selected_day = None
+    if len(sel_raw) >= 10:
+        try:
+            candidate = date.fromisoformat(sel_raw[:10])
+        except ValueError:
+            candidate = None
+        if candidate:
+            if candidate.year == year and candidate.month == month:
+                selected_day = candidate
+            else:
+                selected_day = _agenda_clamp_day_in_month(year, month, candidate.day)
+    if selected_day is None:
+        selected_day = (
+            today
+            if today.year == year and today.month == month
+            else date(year, month, 1)
+        )
+
+    last_dom = calendar_stdlib.monthrange(year, month)[1]
+    start = date(year, month, 1)
+    end = date(year, month, last_dom)
+    month_events = (
+        AgendaEvent.query.filter(
+            AgendaEvent.event_date >= start, AgendaEvent.event_date <= end
+        )
+        .order_by(AgendaEvent.event_date.asc(), AgendaEvent.id.asc())
+        .all()
+    )
+    events_by_date: dict[str, list] = {}
+    for ev in month_events:
+        key = ev.event_date.isoformat()
+        events_by_date.setdefault(key, []).append(ev)
+
+    weeks = calendar_stdlib.monthcalendar(year, month)
+    prev_y, prev_m = _agenda_add_months(year, month, -1)
+    next_y, next_m = _agenda_add_months(year, month, 1)
+    nav_sel_prev = _agenda_clamp_day_in_month(prev_y, prev_m, selected_day.day).isoformat()
+    nav_sel_next = _agenda_clamp_day_in_month(next_y, next_m, selected_day.day).isoformat()
+
+    day_events = [ev for ev in month_events if ev.event_date == selected_day]
+    day_events = _agenda_sort_day_events(day_events)
+
     return render_template(
         "admin/agenda_calendar.html",
         year=year,
-        year_prev=year - 1,
-        year_next=year + 1,
-        months=months,
+        month=month,
+        month_label=month_label,
+        weeks=weeks,
         events_by_date=events_by_date,
-        all_events=rows,
+        selected_day=selected_day,
+        day_events=day_events,
+        prev_y=prev_y,
+        prev_m=prev_m,
+        next_y=next_y,
+        next_m=next_m,
+        nav_sel_prev=nav_sel_prev,
+        nav_sel_next=nav_sel_next,
     )
 
 
 @bp.route("/agenda/nova", methods=["GET", "POST"])
 def agenda_new():
     prefill = (request.args.get("date") or "").strip()
-    back_year = date.today().year
+    today = date.today()
+    back_year, back_month = today.year, today.month
     if len(prefill) >= 10:
         try:
-            back_year = date.fromisoformat(prefill[:10]).year
+            d0 = date.fromisoformat(prefill[:10])
+            back_year, back_month = d0.year, d0.month
         except ValueError:
             pass
     if request.method == "POST":
@@ -438,17 +515,26 @@ def agenda_new():
                 ev=None,
                 prefill_date=prefill or None,
                 back_year=back_year,
+                back_month=back_month,
             )
         ev = AgendaEvent(title=title, body=body, event_date=evd, event_time=tm)
         db.session.add(ev)
         db.session.commit()
         flash("Evento agendado.", "success")
-        return redirect(url_for("admin.agenda_list", year=evd.year))
+        return redirect(
+            url_for(
+                "admin.agenda_list",
+                year=evd.year,
+                month=evd.month,
+                selected=evd.isoformat(),
+            )
+        )
     return render_template(
         "admin/agenda_form.html",
         ev=None,
         prefill_date=prefill or None,
         back_year=back_year,
+        back_month=back_month,
     )
 
 
@@ -461,7 +547,11 @@ def agenda_edit(eid):
         except ValueError as e:
             flash(str(e), "warning")
             return render_template(
-                "admin/agenda_form.html", ev=ev, prefill_date=None, back_year=ev.event_date.year
+                "admin/agenda_form.html",
+                ev=ev,
+                prefill_date=None,
+                back_year=ev.event_date.year,
+                back_month=ev.event_date.month,
             )
         ev.title = title
         ev.body = body
@@ -469,20 +559,33 @@ def agenda_edit(eid):
         ev.event_time = tm
         db.session.commit()
         flash("Agenda atualizada.", "success")
-        return redirect(url_for("admin.agenda_list", year=evd.year))
+        return redirect(
+            url_for(
+                "admin.agenda_list",
+                year=evd.year,
+                month=evd.month,
+                selected=evd.isoformat(),
+            )
+        )
     return render_template(
-        "admin/agenda_form.html", ev=ev, prefill_date=None, back_year=ev.event_date.year
+        "admin/agenda_form.html",
+        ev=ev,
+        prefill_date=None,
+        back_year=ev.event_date.year,
+        back_month=ev.event_date.month,
     )
 
 
 @bp.route("/agenda/<int:eid>/excluir", methods=["POST"])
 def agenda_delete(eid):
     ev = AgendaEvent.query.get_or_404(eid)
-    y = ev.event_date.year
+    d = ev.event_date
     db.session.delete(ev)
     db.session.commit()
     flash("Evento removido.", "info")
-    return redirect(url_for("admin.agenda_list", year=y))
+    return redirect(
+        url_for("admin.agenda_list", year=d.year, month=d.month, selected=d.isoformat())
+    )
 
 
 @bp.route("/membros/<int:member_id>/caderno/checklist", methods=["POST"])
