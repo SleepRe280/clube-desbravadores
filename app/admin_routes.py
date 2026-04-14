@@ -491,6 +491,7 @@ def agenda_list():
         next_m=next_m,
         nav_sel_prev=nav_sel_prev,
         nav_sel_next=nav_sel_next,
+        today_iso=today.isoformat(),
     )
 
 
