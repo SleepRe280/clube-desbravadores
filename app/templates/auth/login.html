@@ -9,91 +9,106 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700&display=swap"
       rel="stylesheet"
     />
     <style>
       body {
-        font-family: "Outfit", system-ui, sans-serif;
+        font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+        color: var(--text-primary);
       }
-      .login-soft-bg {
-        background: linear-gradient(
-            145deg,
-            rgba(254, 226, 226, 0.95) 0%,
-            rgba(220, 252, 231, 0.92) 45%,
-            rgba(219, 234, 254, 0.95) 100%
-          ),
-          url("https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?auto=format&fit=crop&w=1800&q=70");
-        background-size: cover;
-        background-position: center;
+      .auth-bg {
+        background: linear-gradient(145deg, #ffebee 0%, #e8f5e9 40%, #e3f2fd 100%);
+        min-height: 100vh;
+        min-height: 100dvh;
       }
     </style>
   </head>
-  <body class="min-h-screen login-soft-bg text-slate-800 antialiased flex flex-col lg:flex-row">
-    <div class="h-1 w-full shrink-0 bg-gradient-to-r from-red-400 via-green-400 to-blue-400 lg:hidden"></div>
+  <body class="auth-bg antialiased flex flex-col lg:flex-row">
     <div class="flex-1 flex flex-col justify-center px-6 py-10 lg:py-16 lg:pl-12 lg:pr-6 lg:max-w-[44%]">
-      <div class="max-w-md bg-white/70 backdrop-blur-sm rounded-3xl p-8 border border-white shadow-lg">
-        <div class="flex gap-1 mb-6">
-          <span class="h-2 flex-1 rounded-full bg-red-400"></span>
-          <span class="h-2 flex-1 rounded-full bg-green-400"></span>
-          <span class="h-2 flex-1 rounded-full bg-blue-400"></span>
+      <div class="max-w-md rounded-3xl p-8 border border-[var(--border-pastel)] bg-white/90 shadow-[var(--shadow-card)]">
+        <div class="flex gap-1 mb-5">
+          <span class="h-2 flex-1 rounded-full bg-[#e91e63]/80"></span>
+          <span class="h-2 flex-1 rounded-full bg-[#4caf50]/80"></span>
+          <span class="h-2 flex-1 rounded-full bg-[#03a9f4]/80"></span>
         </div>
-        <p class="text-red-600 text-xs font-bold tracking-widest uppercase">Duque De Caxias</p>
-        <h1 class="text-2xl lg:text-3xl font-bold text-slate-900 mt-2">Portal do clube</h1>
-        <p class="text-slate-600 mt-3 text-sm leading-relaxed">
-          Acesso para diretoria e famílias. Cores claras, mesmo compromisso com o ministério dos Desbravadores.
+        <p class="text-[#c2185b] text-xs font-bold tracking-widest uppercase">Duque De Caxias</p>
+        <h1 class="text-2xl lg:text-3xl font-bold text-[var(--text-primary)] mt-2">Portal do clube</h1>
+        <p class="text-[var(--text-secondary)] mt-3 text-sm leading-relaxed">
+          Acesso para diretoria e famílias — tema claro e acolhedor.
         </p>
       </div>
     </div>
 
     <div class="flex-1 flex items-center justify-center p-6 lg:p-12">
       <div class="w-full max-w-[420px]">
-        <div
-          class="rounded-3xl border border-slate-200/80 bg-white shadow-xl shadow-slate-200/50 p-8 sm:p-10"
-        >
-          <h2 class="text-xl font-semibold text-slate-900">Entrar</h2>
-          <p class="text-slate-500 text-sm mt-1">E-mail e senha</p>
+        <div class="rounded-3xl border border-[var(--border-pastel)] bg-white shadow-[var(--shadow-card)] p-8 sm:p-10">
+          <h2 class="text-xl font-semibold text-[var(--text-primary)]">Entrar</h2>
+          <p class="text-[var(--text-secondary)] text-sm mt-1">E-mail e senha</p>
 
           {% include "partials/flash.html" %}
 
           <form method="post" class="mt-6 space-y-4">
             <div>
-              <label class="block text-xs font-medium text-slate-500 uppercase tracking-wide mb-1.5">E-mail</label>
+              <label class="block text-xs font-medium text-[var(--text-muted)] uppercase tracking-wide mb-1.5">E-mail</label>
               <input
                 name="email"
                 type="email"
                 autocomplete="email"
                 required
-                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none"
+                class="w-full rounded-2xl border border-[var(--border-pastel)] bg-[#fafafa] px-4 py-3 text-[var(--text-primary)] focus:border-[#7e57c2] focus:ring-2 focus:ring-[#f3e5f5] outline-none"
               />
             </div>
             <div>
-              <label class="block text-xs font-medium text-slate-500 uppercase tracking-wide mb-1.5">Senha</label>
-              <input
-                name="password"
-                type="password"
-                autocomplete="current-password"
-                required
-                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 focus:border-green-400 focus:ring-2 focus:ring-green-100 outline-none"
-              />
+              <label class="block text-xs font-medium text-[var(--text-muted)] uppercase tracking-wide mb-1.5">Senha</label>
+              <div class="relative">
+                <input
+                  id="login-password"
+                  name="password"
+                  type="password"
+                  autocomplete="current-password"
+                  required
+                  class="w-full rounded-2xl border border-[var(--border-pastel)] bg-[#fafafa] pl-4 pr-12 py-3 text-[var(--text-primary)] focus:border-[#4caf50] focus:ring-2 focus:ring-[#e8f5e9] outline-none"
+                />
+                <button
+                  type="button"
+                  id="toggle-password"
+                  class="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl px-2 py-1.5 text-xs font-semibold text-[var(--text-secondary)] hover:bg-[#f3e5f5] hover:text-[#6a1b9a] min-h-[40px]"
+                  aria-label="Mostrar ou ocultar senha"
+                  aria-pressed="false"
+                >
+                  Ver
+                </button>
+              </div>
             </div>
             <button
               type="submit"
-              class="w-full py-3.5 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-red-500 via-green-500 to-blue-500 hover:opacity-95 shadow-md"
+              class="w-full py-3.5 rounded-2xl font-semibold text-sm text-white bg-gradient-to-r from-[#e91e63] via-[#4caf50] to-[#03a9f4] hover:opacity-95 shadow-md"
             >
               Entrar
             </button>
           </form>
 
-          <p class="text-center mt-4">
-            <a href="{{ url_for('auth.forgot_password') }}" class="text-sm text-blue-600 hover:underline"
-              >Esqueci minha senha</a
-            >
-            <span class="text-slate-300 mx-2">·</span>
-            <a href="{{ url_for('auth.register') }}" class="text-sm text-green-700 hover:underline">Criar conta</a>
+          <p class="text-center mt-4 text-sm">
+            <a href="{{ url_for('auth.forgot_password') }}" class="text-[#0277bd] font-medium hover:underline">Esqueci minha senha</a>
+            <span class="text-[var(--text-muted)] mx-2">·</span>
+            <a href="{{ url_for('auth.register') }}" class="text-[#2e7d32] font-medium hover:underline">Criar conta</a>
           </p>
         </div>
       </div>
     </div>
+    <script>
+      (function () {
+        var input = document.getElementById("login-password");
+        var btn = document.getElementById("toggle-password");
+        if (!input || !btn) return;
+        btn.addEventListener("click", function () {
+          var show = input.type === "password";
+          input.type = show ? "text" : "password";
+          btn.textContent = show ? "Ocultar" : "Ver";
+          btn.setAttribute("aria-pressed", show ? "true" : "false");
+        });
+      })();
+    </script>
   </body>
 </html>

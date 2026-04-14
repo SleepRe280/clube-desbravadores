@@ -1,10 +1,18 @@
-import calendar as calendar_stdlib
 from collections import defaultdict
 from datetime import date
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
+from app.agenda_calendar_util import (
+    MONTH_NAMES_PT,
+    agenda_add_months,
+    agenda_clamp_day_in_month,
+    agenda_month_bounds,
+    agenda_resolve_selected_day,
+    agenda_sort_day_events,
+    agenda_weeks,
+)
 from app.auth import parent_required
 from sqlalchemy import func
 
@@ -65,58 +73,59 @@ def home():
     )
 
 
-def _parent_agenda_months(year: int):
-    months = []
-    for month in range(1, 13):
-        weeks = calendar_stdlib.monthcalendar(year, month)
-        months.append({"n": month, "weeks": weeks})
-    return months
-
-
 @bp.route("/agenda")
 def parent_agenda():
+    today = date.today()
     try:
-        year = int(request.args.get("year") or date.today().year)
+        year = int(request.args.get("year") or today.year)
+        month = int(request.args.get("month") or today.month)
     except (TypeError, ValueError):
-        year = date.today().year
+        year, month = today.year, today.month
     year = max(2000, min(2100, year))
-    start = date(year, 1, 1)
-    end = date(year, 12, 31)
-    rows = (
-        AgendaEvent.query.filter(AgendaEvent.event_date >= start, AgendaEvent.event_date <= end)
+    month = max(1, min(12, month))
+
+    month_label = f"{MONTH_NAMES_PT[month]} {year}"
+    sel_raw = (request.args.get("selected") or "").strip()
+    selected_day = agenda_resolve_selected_day(year, month, sel_raw, today)
+
+    start, end = agenda_month_bounds(year, month)
+    month_events = (
+        AgendaEvent.query.filter(
+            AgendaEvent.event_date >= start, AgendaEvent.event_date <= end
+        )
         .order_by(AgendaEvent.event_date.asc(), AgendaEvent.id.asc())
         .all()
     )
     events_by_date = {}
-    for ev in rows:
+    for ev in month_events:
         key = ev.event_date.isoformat()
         events_by_date.setdefault(key, []).append(ev)
-    months = _parent_agenda_months(year)
-    month_names_pt = [
-        "",
-        "Janeiro",
-        "Fevereiro",
-        "Março",
-        "Abril",
-        "Maio",
-        "Junho",
-        "Julho",
-        "Agosto",
-        "Setembro",
-        "Outubro",
-        "Novembro",
-        "Dezembro",
-    ]
-    for m in months:
-        m["label"] = month_names_pt[m["n"]]
+
+    weeks = agenda_weeks(year, month)
+    prev_y, prev_m = agenda_add_months(year, month, -1)
+    next_y, next_m = agenda_add_months(year, month, 1)
+    nav_sel_prev = agenda_clamp_day_in_month(prev_y, prev_m, selected_day.day).isoformat()
+    nav_sel_next = agenda_clamp_day_in_month(next_y, next_m, selected_day.day).isoformat()
+
+    day_events = [ev for ev in month_events if ev.event_date == selected_day]
+    day_events = agenda_sort_day_events(day_events)
+
     return render_template(
         "parent/agenda_calendar.html",
         year=year,
-        year_prev=year - 1,
-        year_next=year + 1,
-        months=months,
+        month=month,
+        month_label=month_label,
+        weeks=weeks,
         events_by_date=events_by_date,
-        all_events=rows,
+        selected_day=selected_day,
+        day_events=day_events,
+        prev_y=prev_y,
+        prev_m=prev_m,
+        next_y=next_y,
+        next_m=next_m,
+        nav_sel_prev=nav_sel_prev,
+        nav_sel_next=nav_sel_next,
+        today_iso=today.isoformat(),
     )
 
 

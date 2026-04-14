@@ -2,79 +2,115 @@
 {% block title %}Agenda{% endblock %}
 {% block content %}
 {% macro iso_day(y, m, d) -%}{{ y }}-{% if m < 10 %}0{% endif %}{{ m }}-{% if d < 10 %}0{% endif %}{{ d }}{%- endmacro %}
-<a href="{{ url_for('parent.home') }}" class="text-sm text-blue-600 hover:underline mb-4 inline-block">← Feed</a>
-<div class="flex flex-wrap justify-between items-center gap-4 mb-6">
-  <div>
-    <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Agenda do clube</h1>
-    <p class="text-slate-500 text-sm mt-1">Calendário de {{ year }} — eventos definidos pela diretoria.</p>
-  </div>
-  <div class="flex items-center gap-2">
-    <a href="{{ url_for('parent.parent_agenda', year=year_prev) }}" class="rounded-lg border border-slate-200 bg-white/80 px-3 py-2 text-sm">← {{ year_prev }}</a>
-    <span class="font-bold text-slate-800 px-1">{{ year }}</span>
-    <a href="{{ url_for('parent.parent_agenda', year=year_next) }}" class="rounded-lg border border-slate-200 bg-white/80 px-3 py-2 text-sm">{{ year_next }} →</a>
+{% set selected_iso = selected_day.isoformat() %}
+
+<a href="{{ url_for('parent.home') }}" class="text-sm font-medium text-[var(--nav-agenda-fg)] hover:underline mb-4 inline-block">← Voltar ao feed</a>
+
+<div class="rounded-2xl bg-gradient-to-br from-amber-100/90 via-white to-sky-100/80 p-[1px] shadow-md border border-[var(--border-pastel)] mb-6">
+  <div class="rounded-2xl bg-white/95 px-4 py-4 sm:px-6 sm:py-5">
+    <div class="flex flex-wrap justify-between items-start gap-3">
+      <div>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-amber-800/80">Somente leitura</p>
+        <h1 class="text-xl sm:text-2xl font-bold text-[var(--text-primary)] mt-0.5">Agenda do clube</h1>
+        <p class="text-[var(--text-secondary)] text-sm mt-1 max-w-md">
+          O calendário mostra só se há evento no dia. Os detalhes aparecem abaixo. A diretoria cadastra os compromissos.
+        </p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <a
+          href="{{ url_for('parent.parent_agenda', year=prev_y, month=prev_m, selected=nav_sel_prev) }}"
+          class="rounded-xl border border-slate-200 bg-[#fff8e1] px-3 py-2 text-sm font-bold text-amber-900 min-h-[44px] inline-flex items-center hover:bg-[#ffecb3] transition"
+          aria-label="Mês anterior"
+          >←</a
+        >
+        <span class="font-bold text-[var(--text-primary)] px-1 min-w-[10rem] text-center">{{ month_label }}</span>
+        <a
+          href="{{ url_for('parent.parent_agenda', year=next_y, month=next_m, selected=nav_sel_next) }}"
+          class="rounded-xl border border-slate-200 bg-[#fff8e1] px-3 py-2 text-sm font-bold text-amber-900 min-h-[44px] inline-flex items-center hover:bg-[#ffecb3] transition"
+          aria-label="Próximo mês"
+          >→</a
+        >
+      </div>
+    </div>
   </div>
 </div>
 
-<div class="grid lg:grid-cols-2 xl:grid-cols-3 gap-5">
-  {% for month in months %}
-  <div class="rounded-2xl border border-slate-200/90 bg-white/90 p-3 sm:p-4 overflow-x-auto shadow-sm">
-    <h2 class="font-semibold text-slate-900 mb-3 text-center text-sm">{{ month.label }}</h2>
-    <table class="w-full text-[10px] sm:text-xs border-collapse min-w-[240px]">
-      <thead>
-        <tr class="text-slate-500">
-          <th class="p-0.5 font-medium">Seg</th>
-          <th class="p-0.5 font-medium">Ter</th>
-          <th class="p-0.5 font-medium">Qua</th>
-          <th class="p-0.5 font-medium">Qui</th>
-          <th class="p-0.5 font-medium">Sex</th>
-          <th class="p-0.5 font-medium">Sáb</th>
-          <th class="p-0.5 font-medium">Dom</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for week in month.weeks %}
-        <tr>
-          {% for day in week %}
-          <td class="p-0.5 align-top border border-slate-100 min-w-[2rem] h-[4rem] sm:h-[4.5rem]">
-            {% if day == 0 %}
-            <span class="block h-full"></span>
-            {% else %}
-            {% set dkey = iso_day(year, month.n, day) %}
-            <div class="h-full rounded-lg p-1 text-left">
-              <span class="font-semibold text-slate-800">{{ day }}</span>
-              {% if dkey in events_by_date %}
-              <span class="block mt-0.5 space-y-0.5">
-                {% for ev in events_by_date[dkey][:2] %}
-                <span class="block truncate text-[9px] sm:text-[10px] text-indigo-800 bg-indigo-100/90 rounded px-0.5" title="{{ ev.title }}">{{ ev.title }}</span>
-                {% endfor %}
-                {% if events_by_date[dkey]|length > 2 %}
-                <span class="text-[9px] text-slate-500">+{{ events_by_date[dkey]|length - 2 }}</span>
-                {% endif %}
-              </span>
-              {% endif %}
-            </div>
+<div class="max-w-4xl">
+  <div class="rounded-2xl border border-[var(--border-pastel)] bg-white shadow-[var(--shadow-card)] overflow-hidden ring-1 ring-violet-100/60">
+    <div class="grid grid-cols-7 gap-px text-center text-[10px] sm:text-xs font-bold uppercase tracking-wide text-white bg-gradient-to-r from-amber-400 to-orange-400">
+      <div class="py-2 px-0.5">Seg</div>
+      <div class="py-2 px-0.5">Ter</div>
+      <div class="py-2 px-0.5">Qua</div>
+      <div class="py-2 px-0.5">Qui</div>
+      <div class="py-2 px-0.5">Sex</div>
+      <div class="py-2 px-0.5">Sáb</div>
+      <div class="py-2 px-0.5">Dom</div>
+    </div>
+    <div class="bg-[#faf8fc] p-2 sm:p-3">
+      {% for week in weeks %}
+      <div class="grid grid-cols-7 gap-1.5 sm:gap-2 mb-1.5 sm:mb-2 last:mb-0">
+        {% for day in week %}
+        {% if day == 0 %}
+        <div class="min-h-[4.5rem] sm:min-h-[5.25rem] rounded-xl bg-violet-50/30 border border-dashed border-violet-100"></div>
+        {% else %}
+        {% set dkey = iso_day(year, month, day) %}
+        {% set is_sel = dkey == selected_iso %}
+        {% set is_today = dkey == today_iso %}
+        {% set n_events = (events_by_date[dkey] | length) if dkey in events_by_date else 0 %}
+        <a
+          href="{{ url_for('parent.parent_agenda', year=year, month=month, selected=dkey) }}"
+          class="group relative min-h-[4.5rem] sm:min-h-[5.25rem] rounded-xl border-2 p-2 sm:p-2.5 flex flex-col transition-all duration-200 no-underline {% if is_sel %}border-violet-500 bg-gradient-to-b from-violet-50 to-white shadow-md ring-2 ring-violet-300/50 z-[1]{% elif is_today %}border-[#fbc02d] bg-[#fffde7] hover:border-amber-400{% else %}border-slate-200/90 bg-white hover:border-violet-300 hover:shadow-md{% endif %}"
+          title="Ver compromissos de {{ dkey }}"
+        >
+          <span
+            class="text-sm sm:text-base font-bold tabular-nums {% if is_sel %}text-violet-900{% elif is_today %}text-amber-900{% else %}text-[var(--text-primary)] group-hover:text-violet-800{% endif %}"
+            >{{ day }}</span
+          >
+          {% if n_events > 0 %}
+          <div class="mt-auto flex items-center justify-center pt-1.5" aria-hidden="true">
+            <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 ring-2 ring-white shadow-sm"></span>
+            {% if n_events > 1 %}
+            <span
+              class="ml-1 min-w-[1.1rem] h-[1.1rem] rounded-full bg-violet-600 text-[9px] font-bold text-white flex items-center justify-center tabular-nums"
+              >{{ n_events }}</span
+            >
             {% endif %}
-          </td>
-          {% endfor %}
-        </tr>
+          </div>
+          {% endif %}
+        </a>
+        {% endif %}
         {% endfor %}
-      </tbody>
-    </table>
+      </div>
+      {% endfor %}
+    </div>
   </div>
-  {% endfor %}
+  <p class="text-xs text-[var(--text-muted)] mt-3">Ponto = há programação neste dia (definida pela diretoria).</p>
 </div>
 
-<section class="mt-10">
-  <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Lista do ano</h2>
-  <div class="space-y-3">
-    {% for ev in all_events %}
-    <article class="rounded-2xl border border-slate-200 bg-white/95 p-4 text-sm">
-      <p class="text-indigo-600 font-bold text-xs">{{ ev.event_date.strftime('%d/%m/%Y') }}{% if ev.event_time %} · {{ ev.event_time }}{% endif %}</p>
-      <h3 class="font-semibold text-slate-900 mt-1">{{ ev.title }}</h3>
-      {% if ev.body %}<p class="text-slate-600 text-sm mt-2 whitespace-pre-line">{{ ev.body }}</p>{% endif %}
+<section class="mt-8 rounded-2xl border border-[var(--border-pastel)] bg-white shadow-[var(--shadow-card)] overflow-hidden">
+  <div class="px-4 py-4 sm:px-6 border-b border-violet-100 bg-gradient-to-r from-[#f3e5f5]/60 via-white to-[#e1f5fe]/50">
+    <h2 class="text-lg font-bold text-[var(--text-primary)]">{{ selected_day.strftime('%d/%m/%Y') }}</h2>
+    <p class="text-sm text-[var(--text-secondary)] mt-1">Compromissos do dia (visualização).</p>
+  </div>
+  <div class="p-4 sm:p-6 space-y-4">
+    {% for ev in day_events %}
+    <article class="relative rounded-2xl border border-slate-200/80 bg-[#fafafa] p-4 sm:p-5 overflow-hidden">
+      <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-violet-500 to-fuchsia-500 rounded-l-2xl"></div>
+      <div class="pl-3">
+        <h3 class="font-bold text-[var(--text-primary)] text-base">{{ ev.title }}</h3>
+        <p class="text-xs text-[var(--text-secondary)] mt-2 flex flex-wrap gap-2">
+          <span class="rounded-lg bg-violet-100 text-violet-900 px-2 py-0.5 font-semibold">{{ ev.event_date.strftime('%d/%m/%Y') }}</span>
+          {% if ev.event_time %}
+          <span class="rounded-lg bg-sky-100 text-sky-900 px-2 py-0.5 font-medium tabular-nums">{{ ev.event_time[:5] }}</span>
+          {% endif %}
+        </p>
+        {% if ev.body %}
+        <div class="mt-3 text-sm text-[var(--text-secondary)] whitespace-pre-line leading-relaxed">{{ ev.body }}</div>
+        {% endif %}
+      </div>
     </article>
     {% else %}
-    <p class="text-slate-400 text-sm text-center py-6">Nenhum evento em {{ year }}.</p>
+    <p class="text-center text-[var(--text-secondary)] text-sm py-10">Sem compromissos neste dia.</p>
     {% endfor %}
   </div>
 </section>

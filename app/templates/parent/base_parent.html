@@ -24,14 +24,14 @@
   <body class="parent-app antialiased flex flex-col h-full min-h-[100dvh] text-slate-800">
     <header class="parent-header shrink-0 z-30 shadow-[0_1px_0_rgba(15,23,42,0.06)]">
       <div class="w-full max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 py-2 sm:py-2.5 flex items-center gap-2 sm:gap-3">
-        <a href="{{ url_for('parent.home') }}" class="flex items-center gap-2 font-bold text-slate-900 tracking-tight min-w-0">
+        <a href="{{ url_for('parent.home') }}" class="flex items-center gap-2 font-bold text-[var(--text-primary)] tracking-tight min-w-0">
           <span
-            class="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-red-500 via-green-500 to-blue-500 text-white text-[10px] sm:text-xs font-black shadow-md shadow-slate-300/40"
+            class="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#e91e63] via-[#4caf50] to-[#03a9f4] text-white text-[10px] sm:text-xs font-black shadow-md"
             >DC</span
           >
           <span class="hidden sm:block leading-tight text-left min-w-0">
-            <span class="block text-[10px] font-semibold uppercase tracking-widest text-slate-500">Duque De Caxias</span>
-            <span class="block text-xs sm:text-sm">Portal família</span>
+            <span class="block text-[10px] font-semibold uppercase tracking-widest text-[var(--text-muted)]">Duque De Caxias</span>
+            <span class="block text-xs sm:text-sm text-[var(--text-secondary)]">Portal família</span>
           </span>
         </a>
 
@@ -42,7 +42,7 @@
           </p>
           <a
             href="{{ url_for('auth.logout') }}"
-            class="shrink-0 inline-flex items-center justify-center gap-1 rounded-lg border border-slate-200/90 bg-white/90 px-2.5 py-1.5 sm:px-3 sm:py-2 text-[11px] sm:text-sm font-semibold text-slate-700 shadow-sm hover:bg-red-50 hover:border-red-200 hover:text-red-700 min-h-[40px] transition"
+            class="shrink-0 inline-flex items-center justify-center gap-1 rounded-2xl border-2 border-[#f8bbd0] bg-[#ffebee] px-2.5 py-1.5 sm:px-3 sm:py-2 text-[11px] sm:text-sm font-semibold text-[#c2185b] shadow-sm hover:bg-[#fce4ec] min-h-[40px] transition"
             title="Sair e voltar ao login"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 sm:h-4 sm:w-4 opacity-70 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -67,42 +67,42 @@
       <div class="max-w-6xl mx-auto px-0.5 grid grid-cols-6 gap-0.5 sm:gap-1 py-1 sm:py-1.5">
         <a
           href="{{ url_for('parent.home') }}"
-          class="flex flex-col items-center justify-center gap-0 rounded-lg px-0.5 py-1 min-h-[40px] sm:min-h-[44px] text-[9px] sm:text-[10px] font-medium transition text-center leading-tight {% if request.endpoint == 'parent.home' %}text-red-600 bg-red-50{% else %}text-slate-500 hover:text-slate-800 hover:bg-slate-50{% endif %}"
+          class="flex flex-col items-center justify-center gap-0 rounded-xl px-0.5 py-1 min-h-[40px] sm:min-h-[44px] text-[9px] sm:text-[10px] font-medium transition text-center leading-tight {% if request.endpoint == 'parent.home' %}text-[var(--nav-inicio-fg)] bg-[var(--nav-inicio-bg)]{% else %}text-[var(--text-secondary)] hover:bg-white/80{% endif %}"
         >
           <span class="text-sm sm:text-base leading-none" aria-hidden="true">⌂</span>
           Feed
         </a>
         <a
           href="{{ url_for('parent.parent_agenda') }}"
-          class="flex flex-col items-center justify-center gap-0 rounded-lg px-0.5 py-1 min-h-[40px] sm:min-h-[44px] text-[9px] sm:text-[10px] font-medium transition text-center leading-tight {% if request.endpoint == 'parent.parent_agenda' %}text-indigo-700 bg-indigo-50{% else %}text-slate-500 hover:text-slate-800 hover:bg-slate-50{% endif %}"
+          class="flex flex-col items-center justify-center gap-0 rounded-xl px-0.5 py-1 min-h-[40px] sm:min-h-[44px] text-[9px] sm:text-[10px] font-medium transition text-center leading-tight {% if request.endpoint == 'parent.parent_agenda' %}text-[var(--nav-agenda-fg)] bg-[var(--nav-agenda-bg)]{% else %}text-[var(--text-secondary)] hover:bg-white/80{% endif %}"
         >
           <span class="text-sm sm:text-base leading-none" aria-hidden="true">📅</span>
           Agenda
         </a>
         <a
           href="{{ url_for('parent.club_directory') }}"
-          class="flex flex-col items-center justify-center gap-0 rounded-lg px-0.5 py-1 min-h-[40px] sm:min-h-[44px] text-[9px] sm:text-[10px] font-medium transition text-center leading-tight {% if request.endpoint == 'parent.club_directory' %}text-green-700 bg-green-50{% else %}text-slate-500 hover:text-slate-800 hover:bg-slate-50{% endif %}"
+          class="flex flex-col items-center justify-center gap-0 rounded-xl px-0.5 py-1 min-h-[40px] sm:min-h-[44px] text-[9px] sm:text-[10px] font-medium transition text-center leading-tight {% if request.endpoint == 'parent.club_directory' %}text-[var(--nav-desbravadores-fg)] bg-[var(--nav-desbravadores-bg)]{% else %}text-[var(--text-secondary)] hover:bg-white/80{% endif %}"
         >
           <span class="text-sm sm:text-base leading-none" aria-hidden="true">👥</span>
           Membros
         </a>
         <a
           href="{{ url_for('parent.news_feed') }}"
-          class="flex flex-col items-center justify-center gap-0 rounded-lg px-0.5 py-1 min-h-[40px] sm:min-h-[44px] text-[9px] sm:text-[10px] font-medium transition text-center leading-tight {% if request.endpoint == 'parent.news_feed' %}text-blue-600 bg-blue-50{% else %}text-slate-500 hover:text-slate-800 hover:bg-slate-50{% endif %}"
+          class="flex flex-col items-center justify-center gap-0 rounded-xl px-0.5 py-1 min-h-[40px] sm:min-h-[44px] text-[9px] sm:text-[10px] font-medium transition text-center leading-tight {% if request.endpoint == 'parent.news_feed' %}text-[var(--nav-noticias-fg)] bg-[var(--nav-noticias-bg)]{% else %}text-[var(--text-secondary)] hover:bg-white/80{% endif %}"
         >
           <span class="text-sm sm:text-base leading-none" aria-hidden="true">📰</span>
           Notícias
         </a>
         <a
           href="{{ url_for('parent.club_directorate') }}"
-          class="flex flex-col items-center justify-center gap-0 rounded-lg px-0.5 py-1 min-h-[40px] sm:min-h-[44px] text-[9px] sm:text-[10px] font-medium transition text-center leading-tight {% if request.endpoint == 'parent.club_directorate' %}text-violet-700 bg-violet-50{% else %}text-slate-500 hover:text-slate-800 hover:bg-slate-50{% endif %}"
+          class="flex flex-col items-center justify-center gap-0 rounded-xl px-0.5 py-1 min-h-[40px] sm:min-h-[44px] text-[9px] sm:text-[10px] font-medium transition text-center leading-tight {% if request.endpoint == 'parent.club_directorate' %}text-[var(--nav-diretoria-fg)] bg-[var(--nav-diretoria-bg)]{% else %}text-[var(--text-secondary)] hover:bg-white/80{% endif %}"
         >
           <span class="text-sm sm:text-base leading-none" aria-hidden="true">★</span>
           Liderança
         </a>
         <a
           href="{{ url_for('parent.account') }}"
-          class="flex flex-col items-center justify-center gap-0 rounded-lg px-0.5 py-1 min-h-[40px] sm:min-h-[44px] text-[9px] sm:text-[10px] font-medium transition text-center leading-tight {% if request.endpoint == 'parent.account' %}text-slate-900 bg-slate-100{% else %}text-slate-500 hover:text-slate-800 hover:bg-slate-50{% endif %}"
+          class="flex flex-col items-center justify-center gap-0 rounded-xl px-0.5 py-1 min-h-[40px] sm:min-h-[44px] text-[9px] sm:text-[10px] font-medium transition text-center leading-tight {% if request.endpoint == 'parent.account' %}text-[var(--text-primary)] bg-[#ede7f6]{% else %}text-[var(--text-secondary)] hover:bg-white/80{% endif %}"
         >
           <span class="text-sm sm:text-base leading-none" aria-hidden="true">⚙</span>
           Conta

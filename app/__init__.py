@@ -83,9 +83,10 @@ def create_app(config_class=Config):
 
     with app.app_context():
         db.create_all()
-        from app.db_migrate import migrate_sqlite_schema
+        from app.db_migrate import ensure_users_email_verified_column, migrate_sqlite_schema
 
         migrate_sqlite_schema(app)
+        ensure_users_email_verified_column(app)
         _ensure_default_admin(app)
 
     @app.cli.command("create-admin")
@@ -100,10 +101,16 @@ def create_app(config_class=Config):
         u = User.query.filter_by(email=email).first()
         if u:
             u.role = "admin"
+            u.email_verified = True
             u.full_name = full_name.strip() or u.full_name
             u.set_password(password)
         else:
-            u = User(email=email, role="admin", full_name=full_name.strip() or "Admin")
+            u = User(
+                email=email,
+                role="admin",
+                full_name=full_name.strip() or "Admin",
+                email_verified=True,
+            )
             u.set_password(password)
             db.session.add(u)
         db.session.commit()
@@ -126,10 +133,13 @@ def _ensure_default_admin(app):
     existing = User.query.filter_by(role="admin").first()
     if existing:
         existing.email = target
+        existing.email_verified = True
         existing.set_password("admin123")
         db.session.commit()
         return
-    u = User(email=target, role="admin", full_name="Diretoria do Clube")
+    u = User(
+        email=target, role="admin", full_name="Diretoria do Clube", email_verified=True
+    )
     u.set_password("admin123")
     db.session.add(u)
     db.session.commit()

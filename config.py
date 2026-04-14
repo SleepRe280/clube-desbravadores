@@ -49,3 +49,12 @@ class Config:
     SESSION_COOKIE_SECURE = _env_flag("SESSION_COOKIE_SECURE", default=False)
     PREFERRED_URL_SCHEME = os.environ.get("PREFERRED_URL_SCHEME", "http").strip().lower()
     URL_PREFIX = _url_prefix()
+
+    # E-mail (SMTP) — cadastro e recuperação de senha
+    MAIL_SERVER = os.environ.get("MAIL_SERVER", "").strip()
+    MAIL_PORT = int(os.environ.get("MAIL_PORT") or "587")
+    MAIL_USE_TLS = _env_flag("MAIL_USE_TLS", default=True)
+    MAIL_USE_SSL = _env_flag("MAIL_USE_SSL", default=False)
+    MAIL_USERNAME = os.environ.get("MAIL_USERNAME", "").strip()
+    MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD", "").strip()
+    MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER", "").strip()

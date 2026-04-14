@@ -1,5 +1,9 @@
 # Blueprint Render: https://render.com/docs/blueprint-spec
 # Ajuste `name` dos serviços se quiser outros identificadores no painel.
+#
+# E-mail (opcional no painel Environment): MAIL_SERVER, MAIL_PORT (587), MAIL_USE_TLS=1,
+# MAIL_USE_SSL=0, MAIL_USERNAME, MAIL_PASSWORD, MAIL_DEFAULT_SENDER — necessário para
+# confirmação de cadastro e recuperação de senha por e-mail em produção.
 
 databases:
   - name: primeiro-homem-db

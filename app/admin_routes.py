@@ -1,4 +1,3 @@
-import calendar as calendar_stdlib
 import json
 from datetime import date
 from pathlib import Path
@@ -7,6 +6,15 @@ from flask import Blueprint, current_app, flash, redirect, render_template, requ
 from flask_login import current_user, login_required
 from sqlalchemy import func
 
+from app.agenda_calendar_util import (
+    MONTH_NAMES_PT,
+    agenda_add_months,
+    agenda_clamp_day_in_month,
+    agenda_month_bounds,
+    agenda_resolve_selected_day,
+    agenda_sort_day_events,
+    agenda_weeks,
+)
 from app.auth import admin_required
 from app.extensions import db
 from app.models import (
@@ -386,25 +394,6 @@ def _parse_agenda_form(form):
     return title, body, evd, tm
 
 
-def _agenda_add_months(y: int, m: int, delta: int) -> tuple[int, int]:
-    """m em 1..12; retorna (ano, mês) após somar delta meses."""
-    idx = y * 12 + (m - 1) + delta
-    return idx // 12, idx % 12 + 1
-
-
-def _agenda_clamp_day_in_month(y: int, m: int, day: int) -> date:
-    last = calendar_stdlib.monthrange(y, m)[1]
-    return date(y, m, min(max(1, day), last))
-
-
-def _agenda_sort_day_events(evs: list) -> list:
-    def key(ev):
-        t = ev.event_time or "99:99:99"
-        return (t, ev.id)
-
-    return sorted(evs, key=key)
-
-
 @bp.route("/agenda")
 def agenda_list():
     today = date.today()
@@ -416,45 +405,12 @@ def agenda_list():
     year = max(2000, min(2100, year))
     month = max(1, min(12, month))
 
-    month_names_pt = [
-        "",
-        "Janeiro",
-        "Fevereiro",
-        "Março",
-        "Abril",
-        "Maio",
-        "Junho",
-        "Julho",
-        "Agosto",
-        "Setembro",
-        "Outubro",
-        "Novembro",
-        "Dezembro",
-    ]
-    month_label = f"{month_names_pt[month]} {year}"
+    month_label = f"{MONTH_NAMES_PT[month]} {year}"
 
     sel_raw = (request.args.get("selected") or "").strip()
-    selected_day = None
-    if len(sel_raw) >= 10:
-        try:
-            candidate = date.fromisoformat(sel_raw[:10])
-        except ValueError:
-            candidate = None
-        if candidate:
-            if candidate.year == year and candidate.month == month:
-                selected_day = candidate
-            else:
-                selected_day = _agenda_clamp_day_in_month(year, month, candidate.day)
-    if selected_day is None:
-        selected_day = (
-            today
-            if today.year == year and today.month == month
-            else date(year, month, 1)
-        )
+    selected_day = agenda_resolve_selected_day(year, month, sel_raw, today)
 
-    last_dom = calendar_stdlib.monthrange(year, month)[1]
-    start = date(year, month, 1)
-    end = date(year, month, last_dom)
+    start, end = agenda_month_bounds(year, month)
     month_events = (
         AgendaEvent.query.filter(
             AgendaEvent.event_date >= start, AgendaEvent.event_date <= end
@@ -467,14 +423,14 @@ def agenda_list():
         key = ev.event_date.isoformat()
         events_by_date.setdefault(key, []).append(ev)
 
-    weeks = calendar_stdlib.monthcalendar(year, month)
-    prev_y, prev_m = _agenda_add_months(year, month, -1)
-    next_y, next_m = _agenda_add_months(year, month, 1)
-    nav_sel_prev = _agenda_clamp_day_in_month(prev_y, prev_m, selected_day.day).isoformat()
-    nav_sel_next = _agenda_clamp_day_in_month(next_y, next_m, selected_day.day).isoformat()
+    weeks = agenda_weeks(year, month)
+    prev_y, prev_m = agenda_add_months(year, month, -1)
+    next_y, next_m = agenda_add_months(year, month, 1)
+    nav_sel_prev = agenda_clamp_day_in_month(prev_y, prev_m, selected_day.day).isoformat()
+    nav_sel_next = agenda_clamp_day_in_month(next_y, next_m, selected_day.day).isoformat()
 
     day_events = [ev for ev in month_events if ev.event_date == selected_day]
-    day_events = _agenda_sort_day_events(day_events)
+    day_events = agenda_sort_day_events(day_events)
 
     return render_template(
         "admin/agenda_calendar.html",

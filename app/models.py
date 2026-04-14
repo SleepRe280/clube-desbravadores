@@ -15,6 +15,7 @@ class User(db.Model, UserMixin):
     role = db.Column(db.String(20), nullable=False)
     full_name = db.Column(db.String(120), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    email_verified = db.Column(db.Boolean, default=False, nullable=False)
 
     children = db.relationship(
         "Member", back_populates="parent", foreign_keys="Member.parent_id"
@@ -22,6 +23,12 @@ class User(db.Model, UserMixin):
     posts = db.relationship("BoardPost", backref="author", lazy="dynamic")
     reset_tokens = db.relationship(
         "PasswordResetToken", backref="user", lazy="dynamic", cascade="all, delete-orphan"
+    )
+    email_confirm_tokens = db.relationship(
+        "EmailConfirmationToken",
+        backref="user",
+        lazy="dynamic",
+        cascade="all, delete-orphan",
     )
 
     def is_admin(self):
@@ -36,6 +43,15 @@ class User(db.Model, UserMixin):
 
 class PasswordResetToken(db.Model):
     __tablename__ = "password_reset_tokens"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
+    token = db.Column(db.String(64), unique=True, nullable=False, index=True)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class EmailConfirmationToken(db.Model):
+    __tablename__ = "email_confirmation_tokens"
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
     token = db.Column(db.String(64), unique=True, nullable=False, index=True)

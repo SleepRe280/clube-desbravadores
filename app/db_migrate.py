@@ -49,3 +49,23 @@ def migrate_sqlite_schema(app):
                     )
                 )
                 conn.commit()
+
+
+def ensure_users_email_verified_column(app):
+    """Adiciona users.email_verified em bancos já existentes (SQLite ou PostgreSQL)."""
+    uri = (app.config.get("SQLALCHEMY_DATABASE_URI") or "").lower()
+    engine = db.engine
+    insp = inspect(engine)
+    try:
+        cols = {c["name"] for c in insp.get_columns("users")}
+    except Exception:
+        return
+    if "email_verified" in cols:
+        return
+    if "sqlite" in uri:
+        ddl = "ALTER TABLE users ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 1"
+    else:
+        ddl = "ALTER TABLE users ADD COLUMN email_verified BOOLEAN NOT NULL DEFAULT TRUE"
+    with engine.connect() as conn:
+        conn.execute(text(ddl))
+        conn.commit()

@@ -5,8 +5,9 @@ import secrets
 from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 
+from app.email_util import send_simple_email
 from app.extensions import db
-from app.models import PasswordResetToken, User
+from app.models import EmailConfirmationToken, PasswordResetToken, User
 
 bp = Blueprint("auth", __name__)
 
@@ -47,6 +48,12 @@ def login():
         password = request.form.get("password") or ""
         user = User.query.filter_by(email=email).first()
         if user and user.check_password(password):
+            if user.role == "parent" and not user.email_verified:
+                flash(
+                    "Confirme seu e-mail antes de entrar. Verifique a caixa de entrada ou o spam.",
+                    "warning",
+                )
+                return render_template("auth/login.html")
             login_user(user, remember=True)
             next_url = request.args.get("next")
             if next_url:
@@ -84,13 +91,21 @@ def forgot_password():
             db.session.add(row)
             db.session.commit()
             reset_url = url_for("auth.reset_password", token=token, _external=True)
-            if current_app.debug:
+            body = (
+                f"Olá!\n\nPara criar uma nova senha no portal do clube, acesse:\n{reset_url}\n\n"
+                "O link expira em 24 horas.\n"
+            )
+            sent = send_simple_email(
+                user.email, "Recuperação de senha — Portal do clube", body
+            )
+            if not sent and current_app.debug:
                 flash(
                     f"Desenvolvimento: abra este link para criar uma nova senha — {reset_url}",
                     "info",
                 )
         flash(
-            "Se este e-mail estiver cadastrado como responsável, você poderá redefinir a senha pelas instruções enviadas (ou pela mensagem em modo desenvolvimento). Caso contrário, procure o clube.",
+            "Se este e-mail estiver cadastrado como responsável, você receberá instruções para redefinir a senha. "
+            "Caso contrário, procure o clube.",
             "success",
         )
         return redirect(url_for("auth.login"))
@@ -157,18 +172,78 @@ def register():
             flash("Este e-mail já está cadastrado. Use o login.", "warning")
             return render_template("auth/register.html")
 
-        user = User(email=email, role="parent", full_name=full_name)
+        user = User(
+            email=email, role="parent", full_name=full_name, email_verified=False
+        )
         user.set_password(password)
         db.session.add(user)
-        db.session.commit()
-        login_user(user, remember=True)
-        flash(
-            "Conta criada. A diretoria associa seu filho à sua conta ao editar o desbravador.",
-            "success",
+        db.session.flush()
+        EmailConfirmationToken.query.filter_by(user_id=user.id).delete()
+        ctoken = secrets.token_urlsafe(32)
+        conf_row = EmailConfirmationToken(
+            user_id=user.id,
+            token=ctoken,
+            expires_at=datetime.utcnow() + timedelta(hours=48),
         )
-        return redirect(url_for("parent.home"))
+        db.session.add(conf_row)
+        db.session.commit()
+
+        confirm_url = url_for("auth.confirm_email", token=ctoken, _external=True)
+        subj = "Confirme seu cadastro — Duque De Caxias"
+        body = (
+            f"Olá, {full_name}!\n\n"
+            f"Para ativar sua conta de responsável no portal, acesse:\n{confirm_url}\n\n"
+            "O link expira em 48 horas.\n\n"
+            "Depois de confirmar, você poderá entrar com seu e-mail e senha. "
+            "A diretoria associa seu filho à sua conta ao editar o desbravador.\n"
+        )
+        sent = send_simple_email(user.email, subj, body)
+        if sent:
+            flash(
+                "Enviamos um e-mail com o link para confirmar seu cadastro. Verifique também a pasta de spam.",
+                "success",
+            )
+        else:
+            if current_app.debug:
+                flash(
+                    f"Desenvolvimento — confirme o cadastro por este link: {confirm_url}",
+                    "warning",
+                )
+            else:
+                flash(
+                    "Conta criada, mas o e-mail de confirmação não pôde ser enviado. "
+                    "Entre em contato com o clube ou tente novamente mais tarde.",
+                    "danger",
+                )
+        return redirect(url_for("auth.login"))
 
     return render_template("auth/register.html")
+
+
+@bp.route("/confirmar-email/<token>")
+def confirm_email(token):
+    if current_user.is_authenticated:
+        return redirect(url_for("index"))
+
+    row = EmailConfirmationToken.query.filter_by(token=token).first()
+    if not row or row.expires_at < datetime.utcnow():
+        flash("Link inválido ou expirado. Cadastre-se novamente ou fale com o clube.", "danger")
+        return redirect(url_for("auth.register"))
+
+    user = db.session.get(User, row.user_id)
+    if not user or user.role != "parent":
+        flash("Conta inválida.", "danger")
+        return redirect(url_for("auth.login"))
+
+    user.email_verified = True
+    db.session.delete(row)
+    db.session.commit()
+    flash(
+        "E-mail confirmado. Agora você pode entrar com sua senha. "
+        "A diretoria associa seu filho à sua conta ao editar o desbravador.",
+        "success",
+    )
+    return redirect(url_for("auth.login"))
 
 
 @bp.route("/conta/senha", methods=["GET", "POST"])

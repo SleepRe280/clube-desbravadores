@@ -1,77 +1,93 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>{% block title %}Gestão{% endblock %} — Admin</title>
+    <title>{% block title %}GestÃ£o{% endblock %} â€” Admin</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body.admin-shell {
+        font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+      }
+    </style>
   </head>
   <body class="admin-shell">
     <input type="checkbox" id="admin-nav-toggle" class="admin-nav-toggle" aria-hidden="true" tabindex="-1" />
 
     <header class="admin-topbar lg:hidden">
-      <label for="admin-nav-toggle" class="admin-menu-btn" aria-label="Abrir ou fechar menu">☰</label>
-      <span class="font-bold text-slate-900 truncate">Painel — Diretoria</span>
+      <label for="admin-nav-toggle" class="admin-menu-btn" aria-label="Abrir ou fechar menu">&#9776;</label>
+      <span class="font-bold text-[var(--text-primary)] truncate">Painel â€” Diretoria</span>
     </header>
 
     <label for="admin-nav-toggle" class="admin-overlay" aria-hidden="true"></label>
 
     <aside class="admin-sidebar">
-      <div class="p-5 border-b border-slate-100 shrink-0">
+      <div class="p-5 border-b border-[var(--border-pastel)] shrink-0 bg-gradient-to-r from-[#ffebee]/80 via-[#e8f5e9]/80 to-[#e3f2fd]/80">
         <div class="flex gap-1 mb-2">
-          <span class="h-1.5 flex-1 rounded-full bg-red-400"></span>
-          <span class="h-1.5 flex-1 rounded-full bg-green-400"></span>
-          <span class="h-1.5 flex-1 rounded-full bg-blue-400"></span>
+          <span class="h-1.5 flex-1 rounded-full bg-[#e91e63]/70"></span>
+          <span class="h-1.5 flex-1 rounded-full bg-[#4caf50]/70"></span>
+          <span class="h-1.5 flex-1 rounded-full bg-[#03a9f4]/70"></span>
         </div>
-        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Painel</p>
-        <p class="font-bold text-slate-900">Diretoria</p>
+        <p class="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">Painel</p>
+        <p class="font-bold text-[var(--text-primary)]">Diretoria</p>
       </div>
-      <nav class="p-3 space-y-0.5 flex-1 text-sm overflow-y-auto">
+      <nav class="p-3 space-y-1 flex-1 text-sm overflow-y-auto">
         <a
           href="{{ url_for('admin.dashboard') }}"
-          class="block rounded-lg px-3 py-2.5 min-h-[44px] flex items-center hover:bg-red-50 text-slate-700 {% if request.endpoint == 'admin.dashboard' %}bg-red-50 text-red-800 font-medium{% endif %}"
-          >Início & mapa</a
+          class="block rounded-2xl px-3 py-2.5 min-h-[44px] flex items-center transition {% if request.endpoint == 'admin.dashboard' %}bg-[var(--nav-inicio-bg)] text-[var(--nav-inicio-fg)] font-semibold shadow-sm{% else %}text-[var(--text-secondary)] hover:bg-[var(--nav-inicio-bg)]/50{% endif %}"
+          >InÃ­cio & mapa</a
         >
         <a
           href="{{ url_for('admin.agenda_list') }}"
-          class="block rounded-lg px-3 py-2.5 min-h-[44px] flex items-center hover:bg-indigo-50 text-slate-700 {% if request.endpoint in ['admin.agenda_list', 'admin.agenda_new', 'admin.agenda_edit'] %}bg-indigo-50 text-indigo-900 font-medium{% endif %}"
+          class="block rounded-2xl px-3 py-2.5 min-h-[44px] flex items-center transition {% if request.endpoint in ['admin.agenda_list', 'admin.agenda_new', 'admin.agenda_edit'] %}bg-[var(--nav-agenda-bg)] text-[var(--nav-agenda-fg)] font-semibold shadow-sm{% else %}text-[var(--text-secondary)] hover:bg-[var(--nav-agenda-bg)]/50{% endif %}"
           >Agenda</a
         >
         <a
           href="{{ url_for('admin.members') }}"
-          class="block rounded-lg px-3 py-2.5 min-h-[44px] flex items-center hover:bg-green-50 text-slate-700 {% if request.endpoint in ['admin.members', 'admin.member_new', 'admin.member_edit', 'admin.member_activity', 'admin.member_attendance'] %}bg-green-50 text-green-800 font-medium{% endif %}"
+          class="block rounded-2xl px-3 py-2.5 min-h-[44px] flex items-center transition {% if request.endpoint in ['admin.members', 'admin.member_new', 'admin.member_edit', 'admin.member_activity', 'admin.member_attendance'] %}bg-[var(--nav-desbravadores-bg)] text-[var(--nav-desbravadores-fg)] font-semibold shadow-sm{% else %}text-[var(--text-secondary)] hover:bg-[var(--nav-desbravadores-bg)]/50{% endif %}"
           >Desbravadores</a
         >
         <a
           href="{{ url_for('admin.directorate_list') }}"
-          class="block rounded-lg px-3 py-2.5 min-h-[44px] flex items-center hover:bg-violet-50 text-slate-700 {% if request.endpoint in ['admin.directorate_list', 'admin.directorate_new', 'admin.directorate_edit'] %}bg-violet-50 text-violet-900 font-medium{% endif %}"
+          class="block rounded-2xl px-3 py-2.5 min-h-[44px] flex items-center transition {% if request.endpoint in ['admin.directorate_list', 'admin.directorate_new', 'admin.directorate_edit'] %}bg-[var(--nav-diretoria-bg)] text-[var(--nav-diretoria-fg)] font-semibold shadow-sm{% else %}text-[var(--text-secondary)] hover:bg-[var(--nav-diretoria-bg)]/50{% endif %}"
           >Equipe da diretoria</a
         >
         <a
           href="{{ url_for('admin.parents_list') }}"
-          class="block rounded-lg px-3 py-2.5 min-h-[44px] flex items-center hover:bg-blue-50 text-slate-700 {% if request.endpoint in ['admin.parents_list', 'admin.parent_detail'] %}bg-blue-50 text-blue-800 font-medium{% endif %}"
-          >Responsáveis</a
+          class="block rounded-2xl px-3 py-2.5 min-h-[44px] flex items-center transition {% if request.endpoint in ['admin.parents_list', 'admin.parent_detail'] %}bg-[var(--nav-responsaveis-bg)] text-[var(--nav-responsaveis-fg)] font-semibold shadow-sm{% else %}text-[var(--text-secondary)] hover:bg-[var(--nav-responsaveis-bg)]/50{% endif %}"
+          >ResponsÃ¡veis</a
         >
         <a
           href="{{ url_for('admin.attendance_overview') }}"
-          class="block rounded-lg px-3 py-2.5 min-h-[44px] flex items-center hover:bg-emerald-50 text-slate-700 {% if request.endpoint == 'admin.attendance_overview' %}bg-emerald-50 text-emerald-800 font-medium{% endif %}"
-          >Presenças</a
+          class="block rounded-2xl px-3 py-2.5 min-h-[44px] flex items-center transition {% if request.endpoint == 'admin.attendance_overview' %}bg-[var(--nav-presencas-bg)] text-[var(--nav-presencas-fg)] font-semibold shadow-sm{% else %}text-[var(--text-secondary)] hover:bg-[var(--nav-presencas-bg)]/50{% endif %}"
+          >PresenÃ§as</a
         >
         <a
           href="{{ url_for('admin.posts') }}"
-          class="block rounded-lg px-3 py-2.5 min-h-[44px] flex items-center hover:bg-amber-50 text-slate-700 {% if request.endpoint in ['admin.posts', 'admin.post_new'] %}bg-amber-50 text-amber-900 font-medium{% endif %}"
+          class="block rounded-2xl px-3 py-2.5 min-h-[44px] flex items-center transition {% if request.endpoint in ['admin.posts', 'admin.post_new'] %}bg-[var(--nav-avisos-bg)] text-[var(--nav-avisos-fg)] font-semibold shadow-sm{% else %}text-[var(--text-secondary)] hover:bg-[var(--nav-avisos-bg)]/50{% endif %}"
           >Avisos do clube</a
         >
         <a
           href="{{ url_for('admin.club_news_list') }}"
-          class="block rounded-lg px-3 py-2.5 min-h-[44px] flex items-center hover:bg-sky-50 text-slate-700 {% if 'club_news' in (request.endpoint or '') %}bg-sky-50 text-sky-900 font-medium{% endif %}"
-          >Notícias Desbravadores</a
+          class="block rounded-2xl px-3 py-2.5 min-h-[44px] flex items-center transition {% if 'club_news' in (request.endpoint or '') %}bg-[var(--nav-noticias-bg)] text-[var(--nav-noticias-fg)] font-semibold shadow-sm{% else %}text-[var(--text-secondary)] hover:bg-[var(--nav-noticias-bg)]/50{% endif %}"
+          >NotÃ­cias Desbravadores</a
         >
       </nav>
-      <div class="p-4 border-t border-slate-100 text-xs text-slate-500 shrink-0">
+      <div class="p-4 border-t border-[var(--border-pastel)] text-xs text-[var(--text-secondary)] shrink-0 bg-[#fafafa]">
         <p class="truncate">{{ current_user.email }}</p>
-        <a href="{{ url_for('auth.logout') }}" class="text-blue-600 hover:underline mt-2 inline-block min-h-[44px] inline-flex items-center">Sair</a>
+        <a
+          href="{{ url_for('auth.logout') }}"
+          class="mt-3 inline-flex items-center justify-center gap-2 w-full rounded-2xl border-2 border-[#f8bbd0] bg-[#ffebee] text-[var(--nav-avisos-fg)] font-semibold py-2.5 min-h-[44px] hover:bg-[#fce4ec] transition"
+        >
+          Sair
+        </a>
       </div>
     </aside>
 
