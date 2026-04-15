@@ -11,10 +11,21 @@
   --color-orange: 251 140 0;
 
   /* Fundos */
-  --surface-page: #f5f3fa;
+  --surface-page: #f6f3fb;
   --surface-card: #ffffff;
   --surface-muted: #faf8fc;
-  --surface-glass: rgb(255 255 255 / 0.92);
+  --surface-glass: rgb(255 255 255 / 0.88);
+  --surface-glass-strong: rgb(255 255 255 / 0.94);
+
+  /* Fundo “colorido” (bem próximo da referência) */
+  --bg-admin: radial-gradient(1200px 800px at 12% 6%, rgb(255 220 230 / 0.85), transparent 55%),
+    radial-gradient(900px 700px at 74% 10%, rgb(210 235 255 / 0.75), transparent 52%),
+    radial-gradient(900px 700px at 86% 58%, rgb(230 220 255 / 0.70), transparent 55%),
+    radial-gradient(900px 700px at 30% 78%, rgb(220 255 235 / 0.70), transparent 55%),
+    linear-gradient(165deg, #f6f3fb 0%, #f0ecfb 35%, #eef7ff 70%, #fff8f0 100%);
+  --bg-parent: var(--bg-admin);
+  --bg-topbar: linear-gradient(135deg, rgb(255 235 238 / 0.95) 0%, rgb(232 245 233 / 0.95) 45%, rgb(227 242 253 / 0.95) 100%);
+  --bg-soft: linear-gradient(135deg, rgb(255 255 255 / 0.55), rgb(255 255 255 / 0.30));
 
   /* Pastéis por seção (admin nav) */
   --nav-inicio-bg: #e8f5e9;
@@ -41,8 +52,9 @@
 
   --border-pastel: #e8e4f0;
   --border-subtle: #e8e4f0;
-  --shadow-card: 0 10px 40px -12px rgb(45 45 68 / 0.12);
+  --shadow-card: 0 18px 60px -18px rgb(45 45 68 / 0.18);
   --shadow-nav: 0 -8px 32px rgb(45 45 68 / 0.08);
+  --shadow-glass: 0 18px 55px -22px rgb(45 45 68 / 0.20);
 
   --space-section: clamp(1rem, 3vw, 2rem);
   --radius-lg: clamp(0.875rem, 2vw, 1.125rem);
