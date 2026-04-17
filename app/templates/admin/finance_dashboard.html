@@ -1,0 +1,178 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Financeiro{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold text-slate-900">Financeiro do clube</h1>
+<p class="text-slate-600 mt-1">
+  Acompanhe entradas, saídas e mensalidades dos desbravadores. Os responsáveis veem apenas as cobranças dos próprios filhos no portal família.
+</p>
+
+<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+  <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+    <p class="text-xs font-semibold text-emerald-600 uppercase">Entradas</p>
+    <p class="text-2xl font-bold text-slate-900 mt-1 tabular-nums">{{ format_brl(total_in) }}</p>
+  </div>
+  <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+    <p class="text-xs font-semibold text-rose-600 uppercase">Saídas</p>
+    <p class="text-2xl font-bold text-slate-900 mt-1 tabular-nums">{{ format_brl(total_out) }}</p>
+  </div>
+  <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+    <p class="text-xs font-semibold text-violet-600 uppercase">Saldo (entradas − saídas)</p>
+    <p class="text-2xl font-bold text-slate-900 mt-1 tabular-nums">{{ format_brl(balance) }}</p>
+  </div>
+  <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+    <p class="text-xs font-semibold text-amber-700 uppercase">A receber (aberto)</p>
+    <p class="text-2xl font-bold text-slate-900 mt-1 tabular-nums">{{ format_brl(pending_fees) }}</p>
+    <p class="text-[11px] text-slate-500 mt-2">Soma das mensalidades/cobranças não pagas.</p>
+  </div>
+</div>
+
+<div class="grid lg:grid-cols-2 gap-8 mt-10">
+  <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+    <h2 class="font-semibold text-slate-900 mb-4">Novo lançamento no caixa</h2>
+    <form method="post" action="{{ url_for('admin.finance_ledger_add') }}" class="space-y-3">
+      <div>
+        <label class="block text-xs font-medium text-slate-600 mb-1">Tipo</label>
+        <select name="direction" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm">
+          <option value="income">Entrada (dinheiro que entrou)</option>
+          <option value="expense">Saída (despesa)</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-600 mb-1">Data</label>
+        <input type="date" name="occurred_at" value="{{ today.isoformat() }}" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" />
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-600 mb-1">Valor (R$)</label>
+        <input name="amount" type="text" placeholder="ex.: 120,00" required class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" />
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-600 mb-1">Descrição</label>
+        <input name="description" type="text" required maxlength="400" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" />
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-600 mb-1">Categoria (opcional)</label>
+        <input name="category" type="text" maxlength="120" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" placeholder="Mensalidades, evento, material…" />
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-600 mb-1">Desbravador (opcional)</label>
+        <select name="member_id" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm">
+          <option value="0">— Caixa geral do clube —</option>
+          {% for m in members %}
+          <option value="{{ m.id }}">{{ m.full_name }}{% if m.unit %} ({{ m.unit }}){% endif %}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="w-full py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800">Registrar</button>
+    </form>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+    <h2 class="font-semibold text-slate-900 mb-4">Nova cobrança (mensalidade)</h2>
+    <form method="post" action="{{ url_for('admin.finance_fee_add') }}" class="space-y-3">
+      <div>
+        <label class="block text-xs font-medium text-slate-600 mb-1">Desbravador</label>
+        <select name="member_id" required class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm">
+          <option value="">Selecione…</option>
+          {% for m in members %}
+          <option value="{{ m.id }}">{{ m.full_name }}{% if m.unit %} — {{ m.unit }}{% endif %}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-600 mb-1">Título</label>
+        <input name="title" type="text" value="Mensalidade" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" />
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-600 mb-1">Valor (R$)</label>
+        <input name="amount" type="text" placeholder="ex.: 80,00" required class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" />
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-600 mb-1">Vencimento</label>
+        <input type="date" name="due_date" value="{{ today.isoformat() }}" required class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" />
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-600 mb-1">Observação (opcional)</label>
+        <textarea name="notes" rows="2" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"></textarea>
+      </div>
+      <button type="submit" class="w-full py-2.5 rounded-xl bg-emerald-700 text-white text-sm font-semibold hover:bg-emerald-800">Criar cobrança</button>
+    </form>
+  </div>
+</div>
+
+<div class="mt-10 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm overflow-x-auto">
+  <h2 class="font-semibold text-slate-900 mb-4">Cobranças em aberto</h2>
+  {% if fees_open %}
+  <table class="min-w-full text-sm">
+    <thead>
+      <tr class="text-left text-xs text-slate-500 border-b border-slate-100">
+        <th class="pb-2 pr-3">Desbravador</th>
+        <th class="pb-2 pr-3">Título</th>
+        <th class="pb-2 pr-3">Valor</th>
+        <th class="pb-2 pr-3">Vencimento</th>
+        <th class="pb-2 pr-3">Status</th>
+        <th class="pb-2"></th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-slate-100">
+      {% for f in fees_open %}
+      <tr>
+        <td class="py-2 pr-3 font-medium text-slate-800">{{ f.member.full_name }}</td>
+        <td class="py-2 pr-3">{{ f.title }}</td>
+        <td class="py-2 pr-3 tabular-nums">{{ format_brl(f.amount_cents) }}</td>
+        <td class="py-2 pr-3">{{ f.due_date.strftime('%d/%m/%Y') }}</td>
+        <td class="py-2 pr-3">
+          {% if f.due_date < today %}<span class="text-rose-600 font-medium">Atrasado</span>{% else %}<span class="text-amber-700">Pendente</span>{% endif %}
+        </td>
+        <td class="py-2 flex flex-wrap gap-2">
+          <form method="post" action="{{ url_for('admin.finance_fee_mark_paid', fid=f.id) }}" class="inline">
+            <button type="submit" class="text-xs font-semibold text-white bg-emerald-600 rounded-lg px-2 py-1 hover:bg-emerald-700">Marcar pago</button>
+          </form>
+          <form method="post" action="{{ url_for('admin.finance_fee_delete', fid=f.id) }}" class="inline" onsubmit="return confirm('Excluir esta cobrança?');">
+            <button type="submit" class="text-xs text-slate-500 hover:text-rose-600">Excluir</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="text-slate-500 text-sm">Nenhuma cobrança em aberto.</p>
+  {% endif %}
+</div>
+
+<div class="mt-10 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm overflow-x-auto">
+  <h2 class="font-semibold text-slate-900 mb-4">Livro-caixa (últimos lançamentos)</h2>
+  {% if ledger %}
+  <table class="min-w-full text-sm">
+    <thead>
+      <tr class="text-left text-xs text-slate-500 border-b border-slate-100">
+        <th class="pb-2 pr-3">Data</th>
+        <th class="pb-2 pr-3">Tipo</th>
+        <th class="pb-2 pr-3">Valor</th>
+        <th class="pb-2 pr-3">Descrição</th>
+        <th class="pb-2 pr-3">Categoria</th>
+        <th class="pb-2"></th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-slate-100">
+      {% for row in ledger %}
+      <tr>
+        <td class="py-2 pr-3 whitespace-nowrap">{{ row.occurred_at.strftime('%d/%m/%Y') }}</td>
+        <td class="py-2 pr-3">{% if row.direction == 'income' %}<span class="text-emerald-700">Entrada</span>{% else %}<span class="text-rose-700">Saída</span>{% endif %}</td>
+        <td class="py-2 pr-3 tabular-nums font-medium">{{ format_brl(row.amount_cents) }}</td>
+        <td class="py-2 pr-3">{{ row.description }}{% if row.member %} <span class="text-slate-400">· {{ row.member.full_name }}</span>{% endif %}</td>
+        <td class="py-2 pr-3 text-slate-500">{{ row.category or '—' }}</td>
+        <td class="py-2">
+          <form method="post" action="{{ url_for('admin.finance_ledger_delete', lid=row.id) }}" onsubmit="return confirm('Excluir este lançamento?');">
+            <button type="submit" class="text-xs text-slate-500 hover:text-rose-600">Excluir</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="text-slate-500 text-sm">Nenhum lançamento ainda.</p>
+  {% endif %}
+</div>
+{% endblock %}

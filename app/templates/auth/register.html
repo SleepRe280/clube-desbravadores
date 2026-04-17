@@ -16,34 +16,8 @@
       body {
         font-family: "Plus Jakarta Sans", system-ui, sans-serif;
         color: var(--text-primary);
+        background: linear-gradient(165deg, #f5f3fa 0%, #e8f5e9 50%, #fff8e1 100%);
         min-height: 100vh;
-        background-color: #fdf4ff;
-        background-image: linear-gradient(
-          105deg,
-          #ff8ad0 0%,
-          #a78bfa 22%,
-          #60a5fa 44%,
-          #2dd4bf 66%,
-          #facc15 88%,
-          #fb7185 100%
-        );
-        background-size: 280% 280%;
-        animation: reg-rainbow 20s ease-in-out infinite;
-      }
-      @keyframes reg-rainbow {
-        0%,
-        100% {
-          background-position: 0% 50%;
-        }
-        50% {
-          background-position: 100% 50%;
-        }
-      }
-      @media (prefers-reduced-motion: reduce) {
-        body {
-          animation: none;
-          background-size: 100% 100%;
-        }
       }
     </style>
   </head>

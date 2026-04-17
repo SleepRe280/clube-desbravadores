@@ -13,36 +13,8 @@
       rel="stylesheet"
     />
     <style>
-      body.auth-shell {
+      body {
         font-family: "Plus Jakarta Sans", system-ui, sans-serif;
-        background-color: #2a1538;
-        background-image: linear-gradient(
-          118deg,
-          #c026d3 0%,
-          #7c3aed 18%,
-          #2563eb 36%,
-          #059669 54%,
-          #ca8a04 72%,
-          #ea580c 90%,
-          #db2777 100%
-        );
-        background-size: 320% 320%;
-        animation: login-shell-rainbow 26s ease-in-out infinite;
-      }
-      @keyframes login-shell-rainbow {
-        0%,
-        100% {
-          background-position: 0% 45%;
-        }
-        50% {
-          background-position: 100% 55%;
-        }
-      }
-      @media (prefers-reduced-motion: reduce) {
-        body.auth-shell {
-          animation: none;
-          background-size: 100% 100%;
-        }
       }
       .auth-visual::after {
         content: "";
@@ -51,14 +23,14 @@
         z-index: 1;
         background: linear-gradient(
           135deg,
-          rgb(124 58 237 / 0.55) 0%,
-          rgb(219 39 119 / 0.45) 40%,
-          rgb(2 132 199 / 0.45) 100%
+          rgba(15, 81, 50, 0.72) 0%,
+          rgba(13, 99, 90, 0.45) 45%,
+          rgba(30, 64, 175, 0.35) 100%
         );
       }
     </style>
   </head>
-  <body class="auth-shell antialiased flex flex-col lg:flex-row min-h-screen min-h-[100dvh]">
+  <body class="auth-shell antialiased flex flex-col lg:flex-row min-h-screen min-h-[100dvh] bg-emerald-950">
     <div class="auth-visual relative order-2 lg:order-1 lg:flex-[1.15] min-h-[220px] sm:min-h-[280px] lg:min-h-0 overflow-hidden">
       <img
         src="{{ url_for('static', filename='img/login-nature.jpg') }}"
@@ -78,7 +50,7 @@
     </div>
 
     <div
-      class="order-1 lg:order-2 flex flex-1 flex-col justify-center px-5 py-8 sm:px-8 sm:py-10 lg:px-12 lg:py-16 bg-gradient-to-br from-white/92 via-[#fff5fc]/95 to-[#eef8ff]/92 backdrop-blur-md"
+      class="order-1 lg:order-2 flex flex-1 flex-col justify-center px-5 py-8 sm:px-8 sm:py-10 lg:px-12 lg:py-16 bg-gradient-to-b from-emerald-50 via-white to-sky-50/80"
     >
       <div class="mx-auto w-full max-w-[420px]">
         <div

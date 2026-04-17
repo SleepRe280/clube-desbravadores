@@ -68,6 +68,9 @@ class Member(db.Model):
     duques_entries = db.relationship(
         "MeetingDuque", backref="member", lazy="dynamic", cascade="all, delete-orphan"
     )
+    fees = db.relationship(
+        "MemberFee", back_populates="member", lazy="dynamic", cascade="all, delete-orphan"
+    )
 
     @property
     def age_years(self):
@@ -223,3 +226,33 @@ class BoardPost(db.Model):
     body = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+
+
+class FinanceLedgerEntry(db.Model):
+    """Entradas e saídas do caixa do clube (visão diretoria)."""
+
+    __tablename__ = "finance_ledger"
+    id = db.Column(db.Integer, primary_key=True)
+    occurred_at = db.Column(db.Date, nullable=False, index=True)
+    direction = db.Column(db.String(16), nullable=False)  # income | expense
+    amount_cents = db.Column(db.Integer, nullable=False)
+    description = db.Column(db.String(400), nullable=False)
+    category = db.Column(db.String(120), nullable=True)
+    member_id = db.Column(db.Integer, db.ForeignKey("members.id", ondelete="SET NULL"), nullable=True)
+    member = db.relationship("Member", backref=db.backref("ledger_entries", lazy="dynamic"))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class MemberFee(db.Model):
+    """Cobrança (ex.: mensalidade) ligada a um desbravador — pais veem só do(s) filho(s)."""
+
+    __tablename__ = "member_fees"
+    id = db.Column(db.Integer, primary_key=True)
+    member_id = db.Column(db.Integer, db.ForeignKey("members.id", ondelete="CASCADE"), nullable=False, index=True)
+    member = db.relationship("Member", back_populates="fees")
+    title = db.Column(db.String(200), nullable=False, default="Mensalidade")
+    amount_cents = db.Column(db.Integer, nullable=False)
+    due_date = db.Column(db.Date, nullable=False, index=True)
+    paid_at = db.Column(db.DateTime, nullable=True)
+    notes = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)

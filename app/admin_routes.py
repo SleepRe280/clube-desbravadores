@@ -1,5 +1,5 @@
 import json
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 
 from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
@@ -17,6 +17,7 @@ from app.agenda_calendar_util import (
 )
 from app.auth import admin_required
 from app.extensions import db
+from app.finance_util import format_brl_cents, parse_money_brl
 from app.models import (
     ActivityRecord,
     AgendaEvent,
@@ -24,8 +25,10 @@ from app.models import (
     BoardPost,
     ClubNews,
     DirectorateMember,
+    FinanceLedgerEntry,
     MeetingDuque,
     Member,
+    MemberFee,
     PasswordResetToken,
     User,
 )
@@ -195,6 +198,24 @@ def dashboard():
         .limit(12)
         .all()
     )
+    total_in = (
+        db.session.query(func.coalesce(func.sum(FinanceLedgerEntry.amount_cents), 0))
+        .filter(FinanceLedgerEntry.direction == "income")
+        .scalar()
+        or 0
+    )
+    total_out = (
+        db.session.query(func.coalesce(func.sum(FinanceLedgerEntry.amount_cents), 0))
+        .filter(FinanceLedgerEntry.direction == "expense")
+        .scalar()
+        or 0
+    )
+    pending_fees = (
+        db.session.query(func.coalesce(func.sum(MemberFee.amount_cents), 0))
+        .filter(MemberFee.paid_at.is_(None))
+        .scalar()
+        or 0
+    )
     return render_template(
         "admin/dashboard.html",
         n_members=n_members,
@@ -205,6 +226,10 @@ def dashboard():
         unit_stats=unit_stats,
         max_unit_count=max_u,
         directorate_preview=directorate_preview,
+        finance_total_in=int(total_in),
+        finance_total_out=int(total_out),
+        finance_pending_fees=int(pending_fees),
+        format_brl=format_brl_cents,
     )
 
 
@@ -898,3 +923,158 @@ def club_news_delete(nid):
     db.session.commit()
     flash("Notícia excluída.", "info")
     return redirect(url_for("admin.club_news_list"))
+
+
+# ---------- Financeiro ----------
+
+
+@bp.route("/financeiro")
+def finance_dashboard():
+    total_in = (
+        db.session.query(func.coalesce(func.sum(FinanceLedgerEntry.amount_cents), 0))
+        .filter(FinanceLedgerEntry.direction == "income")
+        .scalar()
+        or 0
+    )
+    total_out = (
+        db.session.query(func.coalesce(func.sum(FinanceLedgerEntry.amount_cents), 0))
+        .filter(FinanceLedgerEntry.direction == "expense")
+        .scalar()
+        or 0
+    )
+    pending = (
+        db.session.query(func.coalesce(func.sum(MemberFee.amount_cents), 0))
+        .filter(MemberFee.paid_at.is_(None))
+        .scalar()
+        or 0
+    )
+    ledger = (
+        FinanceLedgerEntry.query.order_by(
+            FinanceLedgerEntry.occurred_at.desc(), FinanceLedgerEntry.id.desc()
+        )
+        .limit(80)
+        .all()
+    )
+    fees_open = (
+        MemberFee.query.filter(MemberFee.paid_at.is_(None))
+        .order_by(MemberFee.due_date.asc(), MemberFee.id.asc())
+        .limit(100)
+        .all()
+    )
+    members = Member.query.order_by(Member.full_name).all()
+    return render_template(
+        "admin/finance_dashboard.html",
+        total_in=int(total_in),
+        total_out=int(total_out),
+        pending_fees=int(pending),
+        balance=int(total_in) - int(total_out),
+        ledger=ledger,
+        fees_open=fees_open,
+        members=members,
+        today=date.today(),
+        format_brl=format_brl_cents,
+    )
+
+
+@bp.route("/financeiro/lancamento", methods=["POST"])
+def finance_ledger_add():
+    direction = (request.form.get("direction") or "").strip()
+    if direction not in ("income", "expense"):
+        flash("Tipo de lançamento inválido.", "warning")
+        return redirect(url_for("admin.finance_dashboard"))
+    amt = parse_money_brl(request.form.get("amount") or "")
+    if amt is None or amt <= 0:
+        flash("Informe um valor válido.", "warning")
+        return redirect(url_for("admin.finance_dashboard"))
+    desc = (request.form.get("description") or "").strip()
+    if not desc:
+        flash("Descrição é obrigatória.", "warning")
+        return redirect(url_for("admin.finance_dashboard"))
+    raw_date = (request.form.get("occurred_at") or "").strip()
+    try:
+        occurred = date.fromisoformat(raw_date) if raw_date else date.today()
+    except ValueError:
+        occurred = date.today()
+    cat = (request.form.get("category") or "").strip() or None
+    mid_raw = (request.form.get("member_id") or "").strip()
+    mid = None
+    if mid_raw and mid_raw != "0":
+        try:
+            m = db.session.get(Member, int(mid_raw))
+            if m:
+                mid = m.id
+        except (TypeError, ValueError):
+            pass
+    row = FinanceLedgerEntry(
+        occurred_at=occurred,
+        direction=direction,
+        amount_cents=amt,
+        description=desc[:400],
+        category=cat[:120] if cat else None,
+        member_id=mid,
+    )
+    db.session.add(row)
+    db.session.commit()
+    flash("Lançamento registrado.", "success")
+    return redirect(url_for("admin.finance_dashboard"))
+
+
+@bp.route("/financeiro/lancamento/<int:lid>/excluir", methods=["POST"])
+def finance_ledger_delete(lid):
+    row = FinanceLedgerEntry.query.get_or_404(lid)
+    db.session.delete(row)
+    db.session.commit()
+    flash("Lançamento removido.", "info")
+    return redirect(url_for("admin.finance_dashboard"))
+
+
+@bp.route("/financeiro/mensalidade", methods=["POST"])
+def finance_fee_add():
+    try:
+        mid = int(request.form.get("member_id") or 0)
+    except (TypeError, ValueError):
+        mid = 0
+    m = db.session.get(Member, mid)
+    if not m:
+        flash("Selecione um desbravador.", "warning")
+        return redirect(url_for("admin.finance_dashboard"))
+    amt = parse_money_brl(request.form.get("amount") or "")
+    if amt is None or amt <= 0:
+        flash("Informe um valor válido para a cobrança.", "warning")
+        return redirect(url_for("admin.finance_dashboard"))
+    title = (request.form.get("title") or "").strip() or "Mensalidade"
+    raw_due = (request.form.get("due_date") or "").strip()
+    try:
+        due = date.fromisoformat(raw_due) if raw_due else date.today()
+    except ValueError:
+        due = date.today()
+    notes = (request.form.get("notes") or "").strip() or None
+    fee = MemberFee(
+        member_id=m.id,
+        title=title[:200],
+        amount_cents=amt,
+        due_date=due,
+        notes=notes,
+    )
+    db.session.add(fee)
+    db.session.commit()
+    flash("Cobrança criada para o desbravador.", "success")
+    return redirect(url_for("admin.finance_dashboard"))
+
+
+@bp.route("/financeiro/mensalidade/<int:fid>/paga", methods=["POST"])
+def finance_fee_mark_paid(fid):
+    fee = MemberFee.query.get_or_404(fid)
+    fee.paid_at = datetime.utcnow()
+    db.session.commit()
+    flash("Pagamento registrado.", "success")
+    return redirect(url_for("admin.finance_dashboard"))
+
+
+@bp.route("/financeiro/mensalidade/<int:fid>/excluir", methods=["POST"])
+def finance_fee_delete(fid):
+    fee = MemberFee.query.get_or_404(fid)
+    db.session.delete(fee)
+    db.session.commit()
+    flash("Cobrança removida.", "info")
+    return redirect(url_for("admin.finance_dashboard"))

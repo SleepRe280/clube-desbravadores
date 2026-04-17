@@ -17,6 +17,7 @@ from app.auth import parent_required
 from sqlalchemy import func
 
 from app.extensions import db
+from app.finance_util import format_brl_cents
 from app.models import (
     ActivityRecord,
     AgendaEvent,
@@ -26,6 +27,7 @@ from app.models import (
     DirectorateMember,
     MeetingDuque,
     Member,
+    MemberFee,
 )
 
 bp = Blueprint("parent", __name__)
@@ -163,6 +165,35 @@ def account():
     return render_template("parent/account.html")
 
 
+@bp.route("/financeiro")
+def parent_finance():
+    children = list(current_user.children)
+    by_member = {c.id: c for c in children}
+    if not children:
+        return render_template(
+            "parent/finance.html",
+            children=[],
+            fees=[],
+            by_member=by_member,
+            today=date.today(),
+            format_brl=format_brl_cents,
+        )
+    ids = [c.id for c in children]
+    fees = (
+        MemberFee.query.filter(MemberFee.member_id.in_(ids))
+        .order_by(MemberFee.due_date.desc(), MemberFee.id.desc())
+        .all()
+    )
+    return render_template(
+        "parent/finance.html",
+        children=children,
+        fees=fees,
+        by_member=by_member,
+        today=date.today(),
+        format_brl=format_brl_cents,
+    )
+
+
 @bp.route("/filho/<int:member_id>")
 def child_detail(member_id):
     m = Member.query.get_or_404(member_id)
@@ -198,6 +229,11 @@ def child_detail(member_id):
         .limit(24)
         .all()
     )
+    fees = (
+        MemberFee.query.filter_by(member_id=m.id)
+        .order_by(MemberFee.due_date.desc(), MemberFee.id.desc())
+        .all()
+    )
     return render_template(
         "parent/child_detail.html",
         member=m,
@@ -211,4 +247,7 @@ def child_detail(member_id):
         duques_total=int(duques_total),
         duques_rows=duques_rows,
         notebook_checklist_pct=m.notebook_checklist_progress_percent(),
+        fees=fees,
+        today=date.today(),
+        format_brl=format_brl_cents,
     )
