@@ -4,7 +4,8 @@ from pathlib import Path
 
 from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
-from sqlalchemy import func
+from sqlalchemy import func, text
+from sqlalchemy.exc import IntegrityError
 
 from app.agenda_calendar_util import (
     MONTH_NAMES_PT,
@@ -35,6 +36,16 @@ from app.models import (
 from app.uploads_util import save_upload
 
 bp = Blueprint("admin", __name__)
+
+# Cadernos de atividades (classes regulares dos Desbravadores — apenas estas opções na ficha)
+NOTEBOOK_ACTIVITY_OPTIONS = (
+    "Amigo",
+    "Companheiro",
+    "Pesquisador",
+    "Pioneiro",
+    "Excursionista",
+    "Clube de líderes",
+)
 
 NEWS_LEVELS = [
     ("local", "Clube (local)"),
@@ -111,7 +122,9 @@ def apply_member_form(m: Member, form, member_id_exclude=None):
 
     unit = (form.get("unit") or "").strip()
     if not unit:
-        raise ValueError('Nome da unidade (classe) é obrigatório — ex.: Amigo, Companheiro, "Duque de Caxias", etc.')
+        raise ValueError(
+            "Unidade é obrigatória — informe o nome da unidade (ex.: Amigo, Companheiro, nome do clube, etc.)."
+        )
     m.unit = unit
 
     bd_raw = (form.get("birth_date") or "").strip()
@@ -161,7 +174,17 @@ def apply_member_form(m: Member, form, member_id_exclude=None):
     m.emergency_contact_name = em_name
     m.emergency_contact_phone = em_phone
 
-    m.notebook_current = (form.get("notebook_current") or "").strip() or None
+    allowed_notebooks = set(NOTEBOOK_ACTIVITY_OPTIONS)
+    if member_id_exclude:
+        existing = db.session.get(Member, member_id_exclude)
+        if existing and existing.notebook_current:
+            allowed_notebooks.add(existing.notebook_current.strip())
+    nb = (form.get("notebook_current") or "").strip()
+    if not nb or nb not in allowed_notebooks:
+        raise ValueError(
+            "Selecione o caderno de atividades: Amigo, Companheiro, Pesquisador, Pioneiro, Excursionista ou Clube de líderes."
+        )
+    m.notebook_current = nb
     m.parent_id = parse_parent_id(form.get("parent_id"))
     m.overall_performance = m.computed_overall_performance()
 
@@ -302,13 +325,31 @@ def parent_delete(user_id):
     if current_user.id == p.id:
         flash("Você não pode excluir a própria conta por este painel.", "danger")
         return redirect(url_for("admin.parent_detail", user_id=user_id))
+    # Tabela legada (confirmação por e-mail removida do código) ainda pode existir no SQLite e bloquear o DELETE
+    try:
+        with db.session.begin_nested():
+            db.session.execute(
+                text("DELETE FROM email_confirmation_tokens WHERE user_id = :uid"),
+                {"uid": p.id},
+            )
+    except Exception:
+        pass
     for m in Member.query.filter_by(parent_id=p.id).all():
         m.parent_id = None
     ClubNews.query.filter_by(author_id=p.id).update({ClubNews.author_id: None}, synchronize_session=False)
     BoardPost.query.filter_by(author_id=p.id).update({BoardPost.author_id: None}, synchronize_session=False)
     PasswordResetToken.query.filter_by(user_id=p.id).delete()
-    db.session.delete(p)
-    db.session.commit()
+    try:
+        db.session.delete(p)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        flash(
+            "Não foi possível excluir esta conta: ainda existem registros ligados a ela no banco de dados. "
+            "Tente novamente ou peça suporte técnico.",
+            "danger",
+        )
+        return redirect(url_for("admin.parent_detail", user_id=user_id))
     flash(
         "Conta do responsável excluída. Os desbravadores permanecem no sistema, sem vínculo com esta conta.",
         "info",
@@ -346,7 +387,12 @@ def members():
 
 
 def _member_form_ctx(member, parents):
-    return dict(member=member, parent_users=parents)
+    opts = list(NOTEBOOK_ACTIVITY_OPTIONS)
+    if member and member.notebook_current:
+        cur = (member.notebook_current or "").strip()
+        if cur and cur not in opts:
+            opts = [cur] + opts
+    return dict(member=member, parent_users=parents, notebook_options=opts)
 
 
 @bp.route("/membros/novo", methods=["GET", "POST"])
@@ -391,6 +437,10 @@ def member_edit(id):
 @bp.route("/membros/<int:id>/excluir", methods=["POST"])
 def member_delete(id):
     m = Member.query.get_or_404(id)
+    MemberFee.query.filter_by(member_id=m.id).delete()
+    FinanceLedgerEntry.query.filter_by(member_id=m.id).update(
+        {FinanceLedgerEntry.member_id: None}, synchronize_session=False
+    )
     ActivityRecord.query.filter_by(member_id=m.id).delete()
     Attendance.query.filter_by(member_id=m.id).delete()
     MeetingDuque.query.filter_by(member_id=m.id).delete()

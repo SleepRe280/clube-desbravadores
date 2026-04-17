@@ -21,12 +21,13 @@
       </div>
       <div class="sm:col-span-2 rounded-lg border border-dashed border-slate-300 p-4 bg-slate-50">
         <label class="block text-sm font-medium text-slate-700 mb-2">Foto do desbravador (visível na vitrine social do clube)</label>
+        <p class="text-xs text-slate-500 mb-2">A pré-visualização segue o formato <strong>3 × 4</strong> (retrato), como documento ou foto escolar.</p>
         {% if member and member.photo_filename %}
-        <div class="flex items-center gap-4 mb-3">
+        <div class="mb-3 inline-block">
           <img
             src="{{ url_for('uploaded_file', rel_path=member.photo_filename) }}"
             alt=""
-            class="h-16 w-16 rounded-full object-cover border border-slate-200"
+            class="w-28 max-w-[40vw] aspect-[3/4] object-cover rounded-lg border-2 border-white shadow-md bg-slate-200"
           />
         </div>
         {% endif %}
@@ -71,23 +72,17 @@
         </select>
       </div>
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Classe *</label>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Unidade *</label>
         <input
           name="unit"
           required
           value="{{ member.unit if member else '' }}"
-          placeholder="Ex.: Amigo, Companheiro, Pesquisador..."
+          placeholder="Ex.: nome da unidade, faixa etária ou identificação do clube..."
           class="w-full rounded-lg border border-slate-300 px-3 py-2"
-          list="units-list"
         />
-        <datalist id="units-list">
-          <option value="Amigo"></option>
-          <option value="Companheiro"></option>
-          <option value="Pesquisador"></option>
-          <option value="Pioneiro"></option>
-          <option value="Excursionista"></option>
-          <option value="Clube de líderes"></option>
-        </datalist>
+        <p class="text-xs text-slate-500 mt-1">
+          Campo livre: a diretoria define o nome da unidade (ex.: Amigo, Companheiro, nome do clube de desbravadores, etc.).
+        </p>
       </div>
     </div>
   </div>
@@ -139,30 +134,20 @@
     <h2 class="text-sm font-bold text-blue-700 uppercase tracking-wide border-b border-blue-100 pb-2">Caderno de atividades</h2>
     <div class="grid sm:grid-cols-2 gap-4 mt-4">
       <div class="sm:col-span-2">
-        <label class="block text-sm font-medium text-slate-700 mb-1">Caderno de atividades — foco atual</label>
-        <input
-          name="notebook_current"
-          value="{{ member.notebook_current if member else '' }}"
-          placeholder="Ex.: Especialidade de Naturologia — em andamento"
-          class="w-full rounded-lg border border-slate-300 px-3 py-2"
-          list="notebook-suggestions"
-        />
-        <datalist id="notebook-suggestions">
-          <option value="Investidura — Amigo"></option>
-          <option value="Investidura — Companheiro"></option>
-          <option value="Investidura — Pesquisador"></option>
-          <option value="Investidura — Pioneiro"></option>
-          <option value="Investidura — Excursionista"></option>
-          <option value="Especialidades — em andamento"></option>
-          <option value="Honra ao mérito — CLB"></option>
-        </datalist>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Caderno de atividades *</label>
+        <select name="notebook_current" required class="w-full rounded-lg border border-slate-300 px-3 py-2 bg-white">
+          <option value="" disabled {% if not member or not member.notebook_current %}selected{% endif %}>Selecione o caderno</option>
+          {% for opt in notebook_options %}
+          <option value="{{ opt }}" {% if member and member.notebook_current == opt %}selected{% endif %}>{{ opt }}</option>
+          {% endfor %}
+        </select>
         <p class="text-xs text-slate-500 mt-1">
-          Requisitos concluídos e em andamento são registrados na página <strong>Caderno</strong> deste membro.
+          Apenas os cadernos oficiais da classe de Desbravadores. O andamento detalhado continua na página <strong>Caderno</strong> deste membro.
         </p>
       </div>
       <div class="sm:col-span-2 rounded-lg border border-blue-100 bg-blue-50/60 p-3">
         <p class="text-sm text-slate-700">
-          O desempenho agora e automatico e calculado pelo sistema com base nas atividades e na presenca.
+          O desempenho é calculado automaticamente pelo sistema com base nas atividades e na presença.
         </p>
       </div>
     </div>
