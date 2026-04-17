@@ -46,8 +46,7 @@ def create_app(config_class=Config):
     def _login_required_redirect():
         from flask import redirect, request, url_for
 
-        portal = "diretoria" if request.blueprint == "admin" else "familia"
-        return redirect(url_for("auth.login", next=request.url, portal=portal))
+        return redirect(url_for("auth.login", next=request.url))
 
     from app.auth import bp as auth_bp
 
@@ -70,7 +69,7 @@ def create_app(config_class=Config):
             if current_user.is_admin():
                 return redirect(url_for("admin.dashboard"))
             return redirect(url_for("parent.home"))
-        return redirect(url_for("auth.login", portal="familia"))
+        return redirect(url_for("auth.login"))
 
     @app.route("/uploads/<path:rel_path>")
     def uploaded_file(rel_path):
@@ -90,10 +89,15 @@ def create_app(config_class=Config):
 
     with app.app_context():
         db.create_all()
-        from app.db_migrate import ensure_users_email_verified_column, migrate_sqlite_schema
+        from app.db_migrate import (
+            ensure_email_confirmation_code_column,
+            ensure_users_email_verified_column,
+            migrate_sqlite_schema,
+        )
 
         migrate_sqlite_schema(app)
         ensure_users_email_verified_column(app)
+        ensure_email_confirmation_code_column(app)
         _ensure_default_admin(app)
 
     @app.cli.command("create-admin")

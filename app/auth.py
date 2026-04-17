@@ -11,13 +11,27 @@ from app.models import EmailConfirmationToken, PasswordResetToken, User
 
 bp = Blueprint("auth", __name__)
 
+_CONFIRM_CODE_ALPHABET = "ABDEFGHJKLMNPQRSTUVWXYZ23456789"
 
-def _login_portal():
-    if request.method == "POST":
-        p = (request.form.get("portal") or "").strip().lower()
-    else:
-        p = (request.args.get("portal") or "").strip().lower()
-    return "diretoria" if p == "diretoria" else "familia"
+
+def _normalize_confirmation_code(raw: str) -> str:
+    s = (raw or "").upper().replace(" ", "").replace("-", "")
+    return "".join(c for c in s if c in _CONFIRM_CODE_ALPHABET)
+
+
+def _generate_confirmation_code() -> str:
+    for _ in range(64):
+        code = "".join(secrets.choice(_CONFIRM_CODE_ALPHABET) for _ in range(8))
+        if not EmailConfirmationToken.query.filter_by(confirmation_code=code).first():
+            return code
+    raise RuntimeError("Não foi possível gerar código de confirmação.")
+
+
+def _format_code_for_display(code: str) -> str:
+    c = (code or "").strip().upper()
+    if len(c) == 8:
+        return f"{c[:4]}-{c[4:]}"
+    return c
 
 
 def _login_next_url():
@@ -25,18 +39,11 @@ def _login_next_url():
     return (n or "").strip() or None
 
 
-def _login_template_ctx():
-    return {
-        "login_portal": _login_portal(),
-        "next_url": _login_next_url(),
-    }
-
-
 def admin_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         if not current_user.is_authenticated:
-            return redirect(url_for("auth.login", portal="diretoria"))
+            return redirect(url_for("auth.login"))
         if not current_user.is_admin():
             flash("Esta área é só para a diretoria.", "warning")
             return redirect(url_for("parent.home"))
@@ -52,7 +59,7 @@ def parent_required(f):
             if current_user.is_authenticated and current_user.is_admin():
                 return redirect(url_for("admin.dashboard"))
             flash("Faça login como responsável.", "danger")
-            return redirect(url_for("auth.login", portal="familia"))
+            return redirect(url_for("auth.login"))
         return f(*args, **kwargs)
 
     return decorated
@@ -73,7 +80,7 @@ def login():
                     "Confirme seu e-mail antes de entrar. Verifique a caixa de entrada ou o spam.",
                     "warning",
                 )
-                return render_template("auth/login.html", **_login_template_ctx())
+                return render_template("auth/login.html", next_url=_login_next_url())
             login_user(user, remember=True)
             next_url = _login_next_url()
             if next_url:
@@ -82,14 +89,14 @@ def login():
                 return redirect(url_for("admin.dashboard"))
             return redirect(url_for("parent.home"))
         flash("E-mail ou senha incorretos.", "danger")
-    return render_template("auth/login.html", **_login_template_ctx())
+    return render_template("auth/login.html", next_url=_login_next_url())
 
 
 @bp.route("/logout")
 def logout():
     logout_user()
     flash("Sessão encerrada.", "info")
-    return redirect(url_for("auth.login", portal="familia"))
+    return redirect(url_for("auth.login"))
 
 
 @bp.route("/esqueci-senha", methods=["GET", "POST"])
@@ -128,7 +135,7 @@ def forgot_password():
             "Caso contrário, procure o clube.",
             "success",
         )
-        return redirect(url_for("auth.login", portal="familia"))
+        return redirect(url_for("auth.login"))
 
     return render_template("auth/forgot_password.html")
 
@@ -146,7 +153,7 @@ def reset_password(token):
     user = db.session.get(User, row.user_id)
     if not user or user.role != "parent":
         flash("Conta inválida.", "danger")
-        return redirect(url_for("auth.login", portal="familia"))
+        return redirect(url_for("auth.login"))
 
     if request.method == "POST":
         p1 = request.form.get("password") or ""
@@ -161,7 +168,7 @@ def reset_password(token):
         PasswordResetToken.query.filter_by(user_id=user.id).delete()
         db.session.commit()
         flash("Senha atualizada. Faça login.", "success")
-        return redirect(url_for("auth.login", portal="familia"))
+        return redirect(url_for("auth.login"))
 
     return render_template("auth/reset_password.html", token=token)
 
@@ -200,44 +207,90 @@ def register():
         db.session.flush()
         EmailConfirmationToken.query.filter_by(user_id=user.id).delete()
         ctoken = secrets.token_urlsafe(32)
+        confirm_code = _generate_confirmation_code()
         conf_row = EmailConfirmationToken(
             user_id=user.id,
             token=ctoken,
+            confirmation_code=confirm_code,
             expires_at=datetime.utcnow() + timedelta(hours=48),
         )
         db.session.add(conf_row)
         db.session.commit()
 
-        confirm_url = url_for("auth.confirm_email", token=ctoken, _external=True)
-        subj = "Confirme seu cadastro — Duque De Caxias"
+        code_display = _format_code_for_display(confirm_code)
+        confirm_page = url_for("auth.confirm_registration_code", _external=True)
+        subj = "Código para confirmar seu cadastro — Duque De Caxias"
         body = (
             f"Olá, {full_name}!\n\n"
-            f"Para ativar sua conta de responsável no portal, acesse:\n{confirm_url}\n\n"
-            "O link expira em 48 horas.\n\n"
+            "Obrigado por se cadastrar no portal do clube de Desbravadores.\n\n"
+            "Para ativar sua conta de responsável, acesse o portal e digite o código abaixo "
+            f"na página de confirmação:\n{confirm_page}\n\n"
+            f"Seu código de confirmação (válido por 48 horas):\n\n"
+            f"    {code_display}\n\n"
+            "Você pode digitar com ou sem o traço. Use apenas letras e números em maiúsculas.\n\n"
             "Depois de confirmar, você poderá entrar com seu e-mail e senha. "
-            "A diretoria associa seu filho à sua conta ao editar o desbravador.\n"
+            "A diretoria associa seu filho à sua conta ao cadastrar o desbravador.\n\n"
+            "Se você não fez este cadastro, ignore este e-mail.\n"
         )
         sent = send_simple_email(user.email, subj, body)
         if sent:
             flash(
-                "Enviamos um e-mail com o link para confirmar seu cadastro. Verifique também a pasta de spam.",
+                "Enviamos um e-mail com o código de confirmação. "
+                "Digite o código na próxima tela (verifique também o spam).",
                 "success",
             )
         else:
             if current_app.debug:
                 flash(
-                    f"Desenvolvimento — confirme o cadastro por este link: {confirm_url}",
+                    f"Desenvolvimento — e-mail não enviado. Seu código: {code_display}. "
+                    "Digite-o na próxima tela.",
                     "warning",
                 )
             else:
                 flash(
-                    "Conta criada, mas o e-mail de confirmação não pôde ser enviado. "
+                    "Conta criada, mas o e-mail com o código não pôde ser enviado. "
                     "Entre em contato com o clube ou tente novamente mais tarde.",
                     "danger",
                 )
-        return redirect(url_for("auth.login", portal="familia"))
+                return redirect(url_for("auth.login"))
+        return redirect(url_for("auth.confirm_registration_code"))
 
     return render_template("auth/register.html")
+
+
+@bp.route("/confirmar-cadastro", methods=["GET", "POST"])
+def confirm_registration_code():
+    """Responsável digita o código recebido por e-mail para ativar a conta."""
+    if current_user.is_authenticated:
+        return redirect(url_for("index"))
+
+    if request.method == "POST":
+        normalized = _normalize_confirmation_code(request.form.get("code", ""))
+        if len(normalized) != 8:
+            flash("O código tem 8 caracteres (letras e números). Confira o e-mail e tente de novo.", "warning")
+            return render_template("auth/confirm_registration.html")
+
+        row = EmailConfirmationToken.query.filter_by(confirmation_code=normalized).first()
+        if not row or row.expires_at < datetime.utcnow():
+            flash("Código inválido ou expirado. Peça um novo cadastro ou fale com o clube.", "danger")
+            return render_template("auth/confirm_registration.html")
+
+        user = db.session.get(User, row.user_id)
+        if not user or user.role != "parent":
+            flash("Conta inválida.", "danger")
+            return redirect(url_for("auth.login"))
+
+        user.email_verified = True
+        db.session.delete(row)
+        db.session.commit()
+        flash(
+            "Cadastro confirmado. Agora você pode entrar com seu e-mail e senha. "
+            "A diretoria associa seu filho à sua conta ao cadastrar o desbravador.",
+            "success",
+        )
+        return redirect(url_for("auth.login"))
+
+    return render_template("auth/confirm_registration.html")
 
 
 @bp.route("/confirmar-email/<token>")
@@ -253,7 +306,7 @@ def confirm_email(token):
     user = db.session.get(User, row.user_id)
     if not user or user.role != "parent":
         flash("Conta inválida.", "danger")
-        return redirect(url_for("auth.login", portal="familia"))
+        return redirect(url_for("auth.login"))
 
     user.email_verified = True
     db.session.delete(row)
@@ -263,7 +316,7 @@ def confirm_email(token):
         "A diretoria associa seu filho à sua conta ao editar o desbravador.",
         "success",
     )
-    return redirect(url_for("auth.login", portal="familia"))
+    return redirect(url_for("auth.login"))
 
 
 @bp.route("/conta/senha", methods=["GET", "POST"])

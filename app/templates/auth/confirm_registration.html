@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Confirmar cadastro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+        color: var(--text-primary);
+        background: linear-gradient(165deg, #f5f3fa 0%, #e8f5e9 50%, #fff8e1 100%);
+        min-height: 100vh;
+      }
+    </style>
+  </head>
+  <body class="p-6">
+    <div class="max-w-md mx-auto pt-6">
+      <a href="{{ url_for('auth.login') }}" class="text-[#0277bd] text-sm font-semibold hover:underline">← Login</a>
+      <h1 class="text-2xl font-bold mt-6 text-[var(--text-primary)]">Confirmar cadastro</h1>
+      <p class="text-[var(--text-secondary)] text-sm mt-2 leading-relaxed">
+        Digite abaixo o <strong>código de 8 caracteres</strong> que enviamos para o seu e-mail (mensagem com o assunto
+        sobre confirmação do cadastro). Depois disso sua conta fica ativa para entrar no portal.
+      </p>
+      <div class="mt-6 bg-white rounded-3xl border border-[var(--border-pastel)] shadow-[var(--shadow-card)] p-8">
+        {% include "partials/flash.html" %}
+        <form method="post" class="space-y-4">
+          <div>
+            <label class="block text-sm text-[var(--text-secondary)] mb-1">Código de confirmação</label>
+            <input
+              name="code"
+              type="text"
+              required
+              autocomplete="one-time-code"
+              maxlength="14"
+              placeholder="ex.: AB12-CD34"
+              class="w-full rounded-2xl border border-[var(--border-pastel)] px-4 py-3 bg-[#fafafa] font-mono text-lg tracking-widest text-center uppercase"
+            />
+          </div>
+          <button
+            type="submit"
+            class="w-full py-3.5 rounded-2xl font-semibold text-white bg-gradient-to-r from-[#7e57c2] to-[#03a9f4] shadow-md hover:opacity-95"
+          >
+            Confirmar e ativar conta
+          </button>
+        </form>
+        <p class="text-xs text-[var(--text-muted)] mt-5 text-center">
+          Não recebeu o e-mail?
+          <a href="{{ url_for('auth.register') }}" class="text-[#0277bd] font-medium hover:underline">Tentar cadastrar de novo</a>
+          ou verifique a pasta de spam.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
