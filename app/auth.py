@@ -12,11 +12,31 @@ from app.models import EmailConfirmationToken, PasswordResetToken, User
 bp = Blueprint("auth", __name__)
 
 
+def _login_portal():
+    if request.method == "POST":
+        p = (request.form.get("portal") or "").strip().lower()
+    else:
+        p = (request.args.get("portal") or "").strip().lower()
+    return "diretoria" if p == "diretoria" else "familia"
+
+
+def _login_next_url():
+    n = request.form.get("next") if request.method == "POST" else request.args.get("next")
+    return (n or "").strip() or None
+
+
+def _login_template_ctx():
+    return {
+        "login_portal": _login_portal(),
+        "next_url": _login_next_url(),
+    }
+
+
 def admin_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         if not current_user.is_authenticated:
-            return redirect(url_for("auth.login"))
+            return redirect(url_for("auth.login", portal="diretoria"))
         if not current_user.is_admin():
             flash("Esta área é só para a diretoria.", "warning")
             return redirect(url_for("parent.home"))
@@ -32,7 +52,7 @@ def parent_required(f):
             if current_user.is_authenticated and current_user.is_admin():
                 return redirect(url_for("admin.dashboard"))
             flash("Faça login como responsável.", "danger")
-            return redirect(url_for("auth.login"))
+            return redirect(url_for("auth.login", portal="familia"))
         return f(*args, **kwargs)
 
     return decorated
@@ -53,23 +73,23 @@ def login():
                     "Confirme seu e-mail antes de entrar. Verifique a caixa de entrada ou o spam.",
                     "warning",
                 )
-                return render_template("auth/login.html")
+                return render_template("auth/login.html", **_login_template_ctx())
             login_user(user, remember=True)
-            next_url = request.args.get("next")
+            next_url = _login_next_url()
             if next_url:
                 return redirect(next_url)
             if user.is_admin():
                 return redirect(url_for("admin.dashboard"))
             return redirect(url_for("parent.home"))
         flash("E-mail ou senha incorretos.", "danger")
-    return render_template("auth/login.html")
+    return render_template("auth/login.html", **_login_template_ctx())
 
 
 @bp.route("/logout")
 def logout():
     logout_user()
     flash("Sessão encerrada.", "info")
-    return redirect(url_for("auth.login"))
+    return redirect(url_for("auth.login", portal="familia"))
 
 
 @bp.route("/esqueci-senha", methods=["GET", "POST"])
@@ -108,7 +128,7 @@ def forgot_password():
             "Caso contrário, procure o clube.",
             "success",
         )
-        return redirect(url_for("auth.login"))
+        return redirect(url_for("auth.login", portal="familia"))
 
     return render_template("auth/forgot_password.html")
 
@@ -126,7 +146,7 @@ def reset_password(token):
     user = db.session.get(User, row.user_id)
     if not user or user.role != "parent":
         flash("Conta inválida.", "danger")
-        return redirect(url_for("auth.login"))
+        return redirect(url_for("auth.login", portal="familia"))
 
     if request.method == "POST":
         p1 = request.form.get("password") or ""
@@ -141,7 +161,7 @@ def reset_password(token):
         PasswordResetToken.query.filter_by(user_id=user.id).delete()
         db.session.commit()
         flash("Senha atualizada. Faça login.", "success")
-        return redirect(url_for("auth.login"))
+        return redirect(url_for("auth.login", portal="familia"))
 
     return render_template("auth/reset_password.html", token=token)
 
@@ -215,7 +235,7 @@ def register():
                     "Entre em contato com o clube ou tente novamente mais tarde.",
                     "danger",
                 )
-        return redirect(url_for("auth.login"))
+        return redirect(url_for("auth.login", portal="familia"))
 
     return render_template("auth/register.html")
 
@@ -233,7 +253,7 @@ def confirm_email(token):
     user = db.session.get(User, row.user_id)
     if not user or user.role != "parent":
         flash("Conta inválida.", "danger")
-        return redirect(url_for("auth.login"))
+        return redirect(url_for("auth.login", portal="familia"))
 
     user.email_verified = True
     db.session.delete(row)
@@ -243,7 +263,7 @@ def confirm_email(token):
         "A diretoria associa seu filho à sua conta ao editar o desbravador.",
         "success",
     )
-    return redirect(url_for("auth.login"))
+    return redirect(url_for("auth.login", portal="familia"))
 
 
 @bp.route("/conta/senha", methods=["GET", "POST"])

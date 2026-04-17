@@ -3,7 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Entrar — Clube de Desbravadores</title>
+    <title>
+      {% if login_portal == "diretoria" %}Entrar — Diretoria{% else %}Entrar — Famílias{% endif %}
+    </title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -15,52 +17,103 @@
     <style>
       body {
         font-family: "Plus Jakarta Sans", system-ui, sans-serif;
-        color: var(--text-primary);
-      }
-      .auth-bg {
-        background: linear-gradient(145deg, #ffebee 0%, #e8f5e9 40%, #e3f2fd 100%);
-        min-height: 100vh;
-        min-height: 100dvh;
       }
     </style>
   </head>
-  <body class="auth-bg antialiased flex flex-col lg:flex-row">
-    <div class="flex-1 flex flex-col justify-center px-6 py-10 lg:py-16 lg:pl-12 lg:pr-6 lg:max-w-[44%]">
-      <div class="max-w-md rounded-3xl p-8 border border-[var(--border-pastel)] bg-white/90 shadow-[var(--shadow-card)]">
-        <div class="flex gap-1 mb-5">
-          <span class="h-2 flex-1 rounded-full bg-[#e91e63]/80"></span>
-          <span class="h-2 flex-1 rounded-full bg-[#4caf50]/80"></span>
-          <span class="h-2 flex-1 rounded-full bg-[#03a9f4]/80"></span>
-        </div>
-        <p class="text-[#c2185b] text-xs font-bold tracking-widest uppercase">Duque De Caxias</p>
-        <h1 class="text-2xl lg:text-3xl font-bold text-[var(--text-primary)] mt-2">Portal do clube</h1>
-        <p class="text-[var(--text-secondary)] mt-3 text-sm leading-relaxed">
-          Acesso para diretoria e famílias — tema claro e acolhedor.
+  <body
+    class="auth-shell antialiased flex flex-col lg:flex-row min-h-screen min-h-[100dvh] {% if login_portal == 'diretoria' %}auth-shell--diretoria bg-slate-950{% else %}auth-shell--familia bg-emerald-950{% endif %}"
+  >
+    <div class="auth-visual relative order-2 lg:order-1 lg:flex-[1.15] min-h-[220px] sm:min-h-[280px] lg:min-h-0 overflow-hidden">
+      <img
+        src="{{ url_for('static', filename='img/login-nature.jpg') }}"
+        alt="Trilha entre árvores em floresta — natureza e acampamento"
+        class="absolute inset-0 h-full w-full object-cover object-center scale-105"
+        decoding="async"
+      />
+      <div class="absolute inset-0 z-[2] flex flex-col justify-end p-6 sm:p-10 lg:p-12 text-white pb-8 lg:pb-14">
+        {% if login_portal == "diretoria" %}
+        <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-indigo-200/90">Clube de Desbravadores</p>
+        <h1 class="mt-2 text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-sm">
+          Painel da diretoria
+        </h1>
+        <p class="mt-3 max-w-md text-sm sm:text-base text-slate-200/95 leading-relaxed">
+          Gestão do clube com foco e clareza — o mesmo espírito de serviço em acampamento e na comunidade.
+        </p>
+        {% else %}
+        <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-100/90">Duque de Caxias</p>
+        <h1 class="mt-2 text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white drop-shadow-sm">
+          Portal da família
+        </h1>
+        <p class="mt-3 max-w-md text-sm sm:text-base text-emerald-50/95 leading-relaxed">
+          Acompanhe agenda, notícias e o dia a dia do clube — natureza, amizades e caminhos a seguir, como nos
+          desbravadores.
+        </p>
+        {% endif %}
+        <p class="mt-6 text-[10px] sm:text-xs text-white/55">
+          Imagem: floresta e trilha (Unsplash) — remete a acampamentos e atividades ao ar livre.
         </p>
       </div>
     </div>
 
-    <div class="flex-1 flex items-center justify-center p-6 lg:p-12">
-      <div class="w-full max-w-[420px]">
-        <div class="rounded-3xl border border-[var(--border-pastel)] bg-white shadow-[var(--shadow-card)] p-8 sm:p-10">
-          <h2 class="text-xl font-semibold text-[var(--text-primary)]">Entrar</h2>
-          <p class="text-[var(--text-secondary)] text-sm mt-1">E-mail e senha</p>
+    <div
+      class="order-1 lg:order-2 flex flex-1 flex-col justify-center px-5 py-8 sm:px-8 sm:py-10 lg:px-12 lg:py-16 {% if login_portal == 'diretoria' %}bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950{% else %}bg-gradient-to-b from-emerald-50 via-white to-sky-50/80{% endif %}"
+    >
+      <div class="mx-auto w-full max-w-[420px]">
+        <div
+          class="rounded-3xl border p-7 sm:p-9 shadow-xl {% if login_portal == 'diretoria' %}border-slate-700/80 bg-slate-900/95 text-slate-100 shadow-black/30{% else %}border-[var(--border-pastel)] bg-white/95 text-[var(--text-primary)] shadow-slate-200/60{% endif %}"
+        >
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+            <div class="flex gap-1">
+              <span class="h-2 w-7 rounded-full {% if login_portal == 'diretoria' %}bg-indigo-400{% else %}bg-[#e91e63]/80{% endif %}"></span>
+              <span class="h-2 w-7 rounded-full {% if login_portal == 'diretoria' %}bg-violet-400{% else %}bg-[#4caf50]/80{% endif %}"></span>
+              <span class="h-2 w-7 rounded-full {% if login_portal == 'diretoria' %}bg-sky-400{% else %}bg-[#03a9f4]/80{% endif %}"></span>
+            </div>
+            <div class="flex rounded-full border p-0.5 text-[11px] font-semibold {% if login_portal == 'diretoria' %}border-slate-600 bg-slate-800/80{% else %}border-[var(--border-pastel)] bg-[#fafafa]{% endif %}">
+              <a
+                href="{% if next_url %}{{ url_for('auth.login', portal='familia', next=next_url) }}{% else %}{{ url_for('auth.login', portal='familia') }}{% endif %}"
+                class="rounded-full px-3 py-1.5 transition {% if login_portal != 'diretoria' %}bg-emerald-600 text-white{% else %}text-slate-400 hover:text-white{% endif %}"
+                >Famílias</a
+              >
+              <a
+                href="{% if next_url %}{{ url_for('auth.login', portal='diretoria', next=next_url) }}{% else %}{{ url_for('auth.login', portal='diretoria') }}{% endif %}"
+                class="rounded-full px-3 py-1.5 transition {% if login_portal == 'diretoria' %}bg-indigo-500 text-white shadow-sm{% else %}text-[var(--text-secondary)] hover:bg-white{% endif %}"
+                >Diretoria</a
+              >
+            </div>
+          </div>
+
+          <h2 class="text-xl font-semibold {% if login_portal == 'diretoria' %}text-white{% else %}text-[var(--text-primary)]{% endif %}">
+            Entrar
+          </h2>
+          <p class="text-sm mt-1 {% if login_portal == 'diretoria' %}text-slate-400{% else %}text-[var(--text-secondary)]{% endif %}">
+            E-mail e senha
+          </p>
 
           {% include "partials/flash.html" %}
 
           <form method="post" class="mt-6 space-y-4">
+            <input type="hidden" name="portal" value="{{ login_portal }}" />
+            {% if next_url %}
+            <input type="hidden" name="next" value="{{ next_url }}" />
+            {% endif %}
             <div>
-              <label class="block text-xs font-medium text-[var(--text-muted)] uppercase tracking-wide mb-1.5">E-mail</label>
+              <label
+                class="block text-xs font-medium uppercase tracking-wide mb-1.5 {% if login_portal == 'diretoria' %}text-slate-400{% else %}text-[var(--text-muted)]{% endif %}"
+                >E-mail</label
+              >
               <input
                 name="email"
                 type="email"
                 autocomplete="email"
                 required
-                class="w-full rounded-2xl border border-[var(--border-pastel)] bg-[#fafafa] px-4 py-3 text-[var(--text-primary)] focus:border-[#7e57c2] focus:ring-2 focus:ring-[#f3e5f5] outline-none"
+                class="w-full rounded-2xl border px-4 py-3 outline-none transition {% if login_portal == 'diretoria' %}border-slate-600 bg-slate-800/80 text-slate-100 placeholder:text-slate-500 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/30{% else %}border-[var(--border-pastel)] bg-[#fafafa] text-[var(--text-primary)] focus:border-[#7e57c2] focus:ring-2 focus:ring-[#f3e5f5]{% endif %}"
               />
             </div>
             <div>
-              <label class="block text-xs font-medium text-[var(--text-muted)] uppercase tracking-wide mb-1.5">Senha</label>
+              <label
+                class="block text-xs font-medium uppercase tracking-wide mb-1.5 {% if login_portal == 'diretoria' %}text-slate-400{% else %}text-[var(--text-muted)]{% endif %}"
+                >Senha</label
+              >
               <div class="relative">
                 <input
                   id="login-password"
@@ -68,12 +121,12 @@
                   type="password"
                   autocomplete="current-password"
                   required
-                  class="w-full rounded-2xl border border-[var(--border-pastel)] bg-[#fafafa] pl-4 pr-12 py-3 text-[var(--text-primary)] focus:border-[#4caf50] focus:ring-2 focus:ring-[#e8f5e9] outline-none"
+                  class="w-full rounded-2xl border pl-4 pr-12 py-3 outline-none transition {% if login_portal == 'diretoria' %}border-slate-600 bg-slate-800/80 text-slate-100 focus:border-emerald-500/80 focus:ring-2 focus:ring-emerald-500/20{% else %}border-[var(--border-pastel)] bg-[#fafafa] text-[var(--text-primary)] focus:border-[#4caf50] focus:ring-2 focus:ring-[#e8f5e9]{% endif %}"
                 />
                 <button
                   type="button"
                   id="toggle-password"
-                  class="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl px-2 py-1.5 text-xs font-semibold text-[var(--text-secondary)] hover:bg-[#f3e5f5] hover:text-[#6a1b9a] min-h-[40px]"
+                  class="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl px-2 py-1.5 text-xs font-semibold min-h-[40px] {% if login_portal == 'diretoria' %}text-slate-400 hover:bg-slate-700 hover:text-white{% else %}text-[var(--text-secondary)] hover:bg-[#f3e5f5] hover:text-[#6a1b9a]{% endif %}"
                   aria-label="Mostrar ou ocultar senha"
                   aria-pressed="false"
                 >
@@ -83,20 +136,50 @@
             </div>
             <button
               type="submit"
-              class="w-full py-3.5 rounded-2xl font-semibold text-sm text-white bg-gradient-to-r from-[#e91e63] via-[#4caf50] to-[#03a9f4] hover:opacity-95 shadow-md"
+              class="w-full py-3.5 rounded-2xl font-semibold text-sm text-white shadow-md transition hover:opacity-95 {% if login_portal == 'diretoria' %}bg-gradient-to-r from-indigo-600 via-violet-600 to-sky-600{% else %}bg-gradient-to-r from-[#e91e63] via-[#4caf50] to-[#03a9f4]{% endif %}"
             >
               Entrar
             </button>
           </form>
 
-          <p class="text-center mt-4 text-sm">
-            <a href="{{ url_for('auth.forgot_password') }}" class="text-[#0277bd] font-medium hover:underline">Esqueci minha senha</a>
+          <p class="text-center mt-4 text-sm {% if login_portal == 'diretoria' %}text-slate-400{% endif %}">
+            <a
+              href="{{ url_for('auth.forgot_password') }}"
+              class="{% if login_portal == 'diretoria' %}text-sky-400 hover:underline{% else %}text-[#0277bd] font-medium hover:underline{% endif %}"
+              >Esqueci minha senha</a
+            >
+            {% if login_portal != "diretoria" %}
             <span class="text-[var(--text-muted)] mx-2">·</span>
             <a href="{{ url_for('auth.register') }}" class="text-[#2e7d32] font-medium hover:underline">Criar conta</a>
+            {% endif %}
           </p>
         </div>
       </div>
     </div>
+    <style>
+      .auth-visual::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+      }
+      .auth-shell--familia .auth-visual::after {
+        background: linear-gradient(
+          135deg,
+          rgba(15, 81, 50, 0.72) 0%,
+          rgba(13, 99, 90, 0.45) 45%,
+          rgba(30, 64, 175, 0.35) 100%
+        );
+      }
+      .auth-shell--diretoria .auth-visual::after {
+        background: linear-gradient(
+          145deg,
+          rgba(15, 23, 42, 0.88) 0%,
+          rgba(49, 46, 129, 0.78) 50%,
+          rgba(30, 58, 138, 0.55) 100%
+        );
+      }
+    </style>
     <script>
       (function () {
         var input = document.getElementById("login-password");

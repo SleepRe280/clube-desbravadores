@@ -42,6 +42,13 @@ def create_app(config_class=Config):
     def load_user(user_id):
         return db.session.get(models.User, int(user_id))
 
+    @login_manager.unauthorized_handler
+    def _login_required_redirect():
+        from flask import redirect, request, url_for
+
+        portal = "diretoria" if request.blueprint == "admin" else "familia"
+        return redirect(url_for("auth.login", next=request.url, portal=portal))
+
     from app.auth import bp as auth_bp
 
     app.register_blueprint(auth_bp)
@@ -63,7 +70,7 @@ def create_app(config_class=Config):
             if current_user.is_admin():
                 return redirect(url_for("admin.dashboard"))
             return redirect(url_for("parent.home"))
-        return redirect(url_for("auth.login"))
+        return redirect(url_for("auth.login", portal="familia"))
 
     @app.route("/uploads/<path:rel_path>")
     def uploaded_file(rel_path):

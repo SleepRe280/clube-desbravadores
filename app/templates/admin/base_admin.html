@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>{% block title %}GestÃ£o{% endblock %} â€” Admin</title>
+    <title>{% block title %}Gestão{% endblock %} — Admin</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -23,7 +23,7 @@
 
     <header class="admin-topbar lg:hidden">
       <label for="admin-nav-toggle" class="admin-menu-btn" aria-label="Abrir ou fechar menu">&#9776;</label>
-      <span class="font-bold text-[var(--text-primary)] truncate">Painel â€” Diretoria</span>
+      <span class="font-bold text-[var(--text-primary)] truncate">Painel — Diretoria</span>
     </header>
 
     <label for="admin-nav-toggle" class="admin-overlay" aria-hidden="true"></label>
@@ -42,7 +42,7 @@
         <a
           href="{{ url_for('admin.dashboard') }}"
           class="block rounded-2xl px-3 py-2.5 min-h-[44px] flex items-center transition {% if request.endpoint == 'admin.dashboard' %}bg-[var(--nav-inicio-bg)] text-[var(--nav-inicio-fg)] font-semibold shadow-sm{% else %}text-[var(--text-secondary)] hover:bg-[var(--nav-inicio-bg)]/50{% endif %}"
-          >InÃ­cio & mapa</a
+          >Início e mapa</a
         >
         <a
           href="{{ url_for('admin.agenda_list') }}"
@@ -62,12 +62,12 @@
         <a
           href="{{ url_for('admin.parents_list') }}"
           class="block rounded-2xl px-3 py-2.5 min-h-[44px] flex items-center transition {% if request.endpoint in ['admin.parents_list', 'admin.parent_detail'] %}bg-[var(--nav-responsaveis-bg)] text-[var(--nav-responsaveis-fg)] font-semibold shadow-sm{% else %}text-[var(--text-secondary)] hover:bg-[var(--nav-responsaveis-bg)]/50{% endif %}"
-          >ResponsÃ¡veis</a
+          >Responsáveis</a
         >
         <a
           href="{{ url_for('admin.attendance_overview') }}"
           class="block rounded-2xl px-3 py-2.5 min-h-[44px] flex items-center transition {% if request.endpoint == 'admin.attendance_overview' %}bg-[var(--nav-presencas-bg)] text-[var(--nav-presencas-fg)] font-semibold shadow-sm{% else %}text-[var(--text-secondary)] hover:bg-[var(--nav-presencas-bg)]/50{% endif %}"
-          >PresenÃ§as</a
+          >Presenças</a
         >
         <a
           href="{{ url_for('admin.posts') }}"
@@ -77,7 +77,7 @@
         <a
           href="{{ url_for('admin.club_news_list') }}"
           class="block rounded-2xl px-3 py-2.5 min-h-[44px] flex items-center transition {% if 'club_news' in (request.endpoint or '') %}bg-[var(--nav-noticias-bg)] text-[var(--nav-noticias-fg)] font-semibold shadow-sm{% else %}text-[var(--text-secondary)] hover:bg-[var(--nav-noticias-bg)]/50{% endif %}"
-          >NotÃ­cias Desbravadores</a
+          >Notícias Desbravadores</a
         >
       </nav>
       <div class="p-4 border-t border-[var(--border-pastel)] text-xs text-[var(--text-secondary)] shrink-0 bg-[#fafafa]">
