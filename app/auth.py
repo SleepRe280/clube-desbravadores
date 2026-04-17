@@ -7,31 +7,9 @@ from flask_login import current_user, login_required, login_user, logout_user
 
 from app.email_util import send_simple_email
 from app.extensions import db
-from app.models import EmailConfirmationToken, PasswordResetToken, User
+from app.models import PasswordResetToken, User
 
 bp = Blueprint("auth", __name__)
-
-_CONFIRM_CODE_ALPHABET = "ABDEFGHJKLMNPQRSTUVWXYZ23456789"
-
-
-def _normalize_confirmation_code(raw: str) -> str:
-    s = (raw or "").upper().replace(" ", "").replace("-", "")
-    return "".join(c for c in s if c in _CONFIRM_CODE_ALPHABET)
-
-
-def _generate_confirmation_code() -> str:
-    for _ in range(64):
-        code = "".join(secrets.choice(_CONFIRM_CODE_ALPHABET) for _ in range(8))
-        if not EmailConfirmationToken.query.filter_by(confirmation_code=code).first():
-            return code
-    raise RuntimeError("Não foi possível gerar código de confirmação.")
-
-
-def _format_code_for_display(code: str) -> str:
-    c = (code or "").strip().upper()
-    if len(c) == 8:
-        return f"{c[:4]}-{c[4:]}"
-    return c
 
 
 def _login_next_url():
@@ -75,12 +53,6 @@ def login():
         password = request.form.get("password") or ""
         user = User.query.filter_by(email=email).first()
         if user and user.check_password(password):
-            if user.role == "parent" and not user.email_verified:
-                flash(
-                    "Confirme seu e-mail antes de entrar. Verifique a caixa de entrada ou o spam.",
-                    "warning",
-                )
-                return render_template("auth/login.html", next_url=_login_next_url())
             login_user(user, remember=True)
             next_url = _login_next_url()
             if next_url:
@@ -200,122 +172,30 @@ def register():
             return render_template("auth/register.html")
 
         user = User(
-            email=email, role="parent", full_name=full_name, email_verified=False
+            email=email, role="parent", full_name=full_name, email_verified=True
         )
         user.set_password(password)
         db.session.add(user)
-        db.session.flush()
-        EmailConfirmationToken.query.filter_by(user_id=user.id).delete()
-        ctoken = secrets.token_urlsafe(32)
-        confirm_code = _generate_confirmation_code()
-        conf_row = EmailConfirmationToken(
-            user_id=user.id,
-            token=ctoken,
-            confirmation_code=confirm_code,
-            expires_at=datetime.utcnow() + timedelta(hours=48),
-        )
-        db.session.add(conf_row)
         db.session.commit()
-
-        code_display = _format_code_for_display(confirm_code)
-        confirm_page = url_for("auth.confirm_registration_code", _external=True)
-        subj = "Código para confirmar seu cadastro — Duque De Caxias"
-        body = (
-            f"Olá, {full_name}!\n\n"
-            "Obrigado por se cadastrar no portal do clube de Desbravadores.\n\n"
-            "Para ativar sua conta de responsável, acesse o portal e digite o código abaixo "
-            f"na página de confirmação:\n{confirm_page}\n\n"
-            f"Seu código de confirmação (válido por 48 horas):\n\n"
-            f"    {code_display}\n\n"
-            "Você pode digitar com ou sem o traço. Use apenas letras e números em maiúsculas.\n\n"
-            "Depois de confirmar, você poderá entrar com seu e-mail e senha. "
-            "A diretoria associa seu filho à sua conta ao cadastrar o desbravador.\n\n"
-            "Se você não fez este cadastro, ignore este e-mail.\n"
+        flash(
+            "Conta criada. Você já pode entrar com seu e-mail e senha. "
+            "A diretoria associa seu filho à sua conta ao cadastrar o desbravador.",
+            "success",
         )
-        sent = send_simple_email(user.email, subj, body)
-        if sent:
-            flash(
-                "Enviamos um e-mail com o código de confirmação. "
-                "Digite o código na próxima tela (verifique também o spam).",
-                "success",
-            )
-        else:
-            if current_app.debug:
-                flash(
-                    f"Desenvolvimento — e-mail não enviado. Seu código: {code_display}. "
-                    "Digite-o na próxima tela.",
-                    "warning",
-                )
-            else:
-                flash(
-                    "Conta criada, mas o e-mail com o código não pôde ser enviado. "
-                    "Entre em contato com o clube ou tente novamente mais tarde.",
-                    "danger",
-                )
-                return redirect(url_for("auth.login"))
-        return redirect(url_for("auth.confirm_registration_code"))
+        return redirect(url_for("auth.login"))
 
     return render_template("auth/register.html")
 
 
 @bp.route("/confirmar-cadastro", methods=["GET", "POST"])
 def confirm_registration_code():
-    """Responsável digita o código recebido por e-mail para ativar a conta."""
-    if current_user.is_authenticated:
-        return redirect(url_for("index"))
-
-    if request.method == "POST":
-        normalized = _normalize_confirmation_code(request.form.get("code", ""))
-        if len(normalized) != 8:
-            flash("O código tem 8 caracteres (letras e números). Confira o e-mail e tente de novo.", "warning")
-            return render_template("auth/confirm_registration.html")
-
-        row = EmailConfirmationToken.query.filter_by(confirmation_code=normalized).first()
-        if not row or row.expires_at < datetime.utcnow():
-            flash("Código inválido ou expirado. Peça um novo cadastro ou fale com o clube.", "danger")
-            return render_template("auth/confirm_registration.html")
-
-        user = db.session.get(User, row.user_id)
-        if not user or user.role != "parent":
-            flash("Conta inválida.", "danger")
-            return redirect(url_for("auth.login"))
-
-        user.email_verified = True
-        db.session.delete(row)
-        db.session.commit()
-        flash(
-            "Cadastro confirmado. Agora você pode entrar com seu e-mail e senha. "
-            "A diretoria associa seu filho à sua conta ao cadastrar o desbravador.",
-            "success",
-        )
-        return redirect(url_for("auth.login"))
-
-    return render_template("auth/confirm_registration.html")
+    flash("O cadastro não exige mais confirmação por código. Use o login.", "info")
+    return redirect(url_for("auth.login"))
 
 
 @bp.route("/confirmar-email/<token>")
-def confirm_email(token):
-    if current_user.is_authenticated:
-        return redirect(url_for("index"))
-
-    row = EmailConfirmationToken.query.filter_by(token=token).first()
-    if not row or row.expires_at < datetime.utcnow():
-        flash("Link inválido ou expirado. Cadastre-se novamente ou fale com o clube.", "danger")
-        return redirect(url_for("auth.register"))
-
-    user = db.session.get(User, row.user_id)
-    if not user or user.role != "parent":
-        flash("Conta inválida.", "danger")
-        return redirect(url_for("auth.login"))
-
-    user.email_verified = True
-    db.session.delete(row)
-    db.session.commit()
-    flash(
-        "E-mail confirmado. Agora você pode entrar com sua senha. "
-        "A diretoria associa seu filho à sua conta ao editar o desbravador.",
-        "success",
-    )
+def confirm_email(_token):
+    flash("Confirmação por link não é mais necessária. Use o login com seu e-mail e senha.", "info")
     return redirect(url_for("auth.login"))
 
 

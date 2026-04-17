@@ -69,19 +69,3 @@ def ensure_users_email_verified_column(app):
     with engine.connect() as conn:
         conn.execute(text(ddl))
         conn.commit()
-
-
-def ensure_email_confirmation_code_column(app):
-    """Adiciona confirmation_code em email_confirmation_tokens (bases já existentes)."""
-    engine = db.engine
-    insp = inspect(engine)
-    try:
-        cols = {c["name"] for c in insp.get_columns("email_confirmation_tokens")}
-    except Exception:
-        return
-    if "confirmation_code" in cols:
-        return
-    ddl = "ALTER TABLE email_confirmation_tokens ADD COLUMN confirmation_code VARCHAR(10)"
-    with engine.connect() as conn:
-        conn.execute(text(ddl))
-        conn.commit()

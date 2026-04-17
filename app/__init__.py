@@ -89,15 +89,10 @@ def create_app(config_class=Config):
 
     with app.app_context():
         db.create_all()
-        from app.db_migrate import (
-            ensure_email_confirmation_code_column,
-            ensure_users_email_verified_column,
-            migrate_sqlite_schema,
-        )
+        from app.db_migrate import ensure_users_email_verified_column, migrate_sqlite_schema
 
         migrate_sqlite_schema(app)
         ensure_users_email_verified_column(app)
-        ensure_email_confirmation_code_column(app)
         _ensure_default_admin(app)
 
     @app.cli.command("create-admin")

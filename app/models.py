@@ -24,12 +24,6 @@ class User(db.Model, UserMixin):
     reset_tokens = db.relationship(
         "PasswordResetToken", backref="user", lazy="dynamic", cascade="all, delete-orphan"
     )
-    email_confirm_tokens = db.relationship(
-        "EmailConfirmationToken",
-        backref="user",
-        lazy="dynamic",
-        cascade="all, delete-orphan",
-    )
 
     def is_admin(self):
         return self.role == "admin"
@@ -46,16 +40,6 @@ class PasswordResetToken(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
     token = db.Column(db.String(64), unique=True, nullable=False, index=True)
-    expires_at = db.Column(db.DateTime, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-
-class EmailConfirmationToken(db.Model):
-    __tablename__ = "email_confirmation_tokens"
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
-    token = db.Column(db.String(64), unique=True, nullable=False, index=True)
-    confirmation_code = db.Column(db.String(10), unique=True, nullable=True, index=True)
     expires_at = db.Column(db.DateTime, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
