@@ -1,6 +1,6 @@
 {% from "parent/_nav_icons.html" import icon_feed, icon_agenda, icon_members, icon_news, icon_pay, icon_star, icon_account %}
 <!DOCTYPE html>
-<html lang="pt-BR" class="h-full parent-portal-html">
+<html lang="pt-BR" class="parent-portal-html">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -13,16 +13,8 @@
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap"
       rel="stylesheet"
     />
-    <style>
-      html,
-      body {
-        height: 100%;
-        min-height: 100%;
-        min-height: 100dvh;
-      }
-    </style>
   </head>
-  <body class="parent-app antialiased flex flex-col h-full min-h-[100dvh] text-slate-800 {% block parent_body_class %}{% endblock %}">
+  <body class="parent-app antialiased flex flex-col min-h-[100dvh] text-[var(--text-primary)] {% block parent_body_class %}{% endblock %}">
     <header class="parent-header shrink-0 z-30">
       <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
         <a href="{{ url_for('parent.home') }}" class="flex items-center gap-3 min-w-0 group">
@@ -65,54 +57,57 @@
     </main>
 
     <nav class="parent-bottom-nav parent-bottom-nav--modern" aria-label="Navegação principal">
-      <div class="max-w-6xl mx-auto px-0.5 sm:px-2 grid grid-cols-7 gap-px sm:gap-0.5 py-1.5 sm:py-2">
+      <div class="parent-bottom-nav__stripe" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </div>
+      <div class="parent-bottom-nav__inner">
         <a
           href="{{ url_for('parent.home') }}"
-          class="parent-nav-item flex flex-col items-center justify-center gap-0.5 sm:gap-1 rounded-xl sm:rounded-2xl px-0.5 sm:px-1 py-1 min-h-[48px] sm:min-h-[52px] font-semibold tracking-tight transition {% if request.endpoint == 'parent.home' %}parent-nav-item--active parent-nav-item--feed{% else %}text-slate-500 hover:bg-white/70 hover:text-slate-800{% endif %}"
+          class="parent-nav-item flex flex-col items-center justify-center gap-0.5 sm:gap-1 px-0.5 sm:px-1 py-1.5 min-h-[52px] sm:min-h-[58px] {% if request.endpoint == 'parent.home' %}parent-nav-item--active parent-nav-item--feed{% endif %}"
         >
-          {{ icon_feed('w-[22px] h-[22px] sm:w-6 sm:h-6') }}
+          <span class="parent-nav-icon parent-nav-icon--feed">{{ icon_feed('w-[20px] h-[20px] sm:w-[22px] sm:h-[22px]') }}</span>
           <span>Feed</span>
         </a>
         <a
           href="{{ url_for('parent.parent_agenda') }}"
-          class="parent-nav-item flex flex-col items-center justify-center gap-0.5 sm:gap-1 rounded-xl sm:rounded-2xl px-0.5 sm:px-1 py-1 min-h-[48px] sm:min-h-[52px] font-semibold tracking-tight transition {% if request.endpoint == 'parent.parent_agenda' %}parent-nav-item--active parent-nav-item--agenda{% else %}text-slate-500 hover:bg-white/70 hover:text-slate-800{% endif %}"
+          class="parent-nav-item flex flex-col items-center justify-center gap-0.5 sm:gap-1 px-0.5 sm:px-1 py-1.5 min-h-[52px] sm:min-h-[58px] {% if request.endpoint == 'parent.parent_agenda' %}parent-nav-item--active parent-nav-item--agenda{% endif %}"
         >
-          {{ icon_agenda('w-[22px] h-[22px] sm:w-6 sm:h-6') }}
+          <span class="parent-nav-icon parent-nav-icon--agenda">{{ icon_agenda('w-[20px] h-[20px] sm:w-[22px] sm:h-[22px]') }}</span>
           <span>Agenda</span>
         </a>
         <a
           href="{{ url_for('parent.club_directory') }}"
-          class="parent-nav-item flex flex-col items-center justify-center gap-0.5 sm:gap-1 rounded-xl sm:rounded-2xl px-0.5 sm:px-1 py-1 min-h-[48px] sm:min-h-[52px] font-semibold tracking-tight transition {% if request.endpoint == 'parent.club_directory' %}parent-nav-item--active parent-nav-item--members{% else %}text-slate-500 hover:bg-white/70 hover:text-slate-800{% endif %}"
+          class="parent-nav-item flex flex-col items-center justify-center gap-0.5 sm:gap-1 px-0.5 sm:px-1 py-1.5 min-h-[52px] sm:min-h-[58px] {% if request.endpoint == 'parent.club_directory' %}parent-nav-item--active parent-nav-item--members{% endif %}"
         >
-          {{ icon_members('w-[22px] h-[22px] sm:w-6 sm:h-6') }}
+          <span class="parent-nav-icon parent-nav-icon--members">{{ icon_members('w-[20px] h-[20px] sm:w-[22px] sm:h-[22px]') }}</span>
           <span class="leading-none text-center">Membros</span>
         </a>
         <a
           href="{{ url_for('parent.news_feed') }}"
-          class="parent-nav-item flex flex-col items-center justify-center gap-0.5 sm:gap-1 rounded-xl sm:rounded-2xl px-0.5 sm:px-1 py-1 min-h-[48px] sm:min-h-[52px] font-semibold tracking-tight transition {% if request.endpoint == 'parent.news_feed' %}parent-nav-item--active parent-nav-item--news{% else %}text-slate-500 hover:bg-white/70 hover:text-slate-800{% endif %}"
+          class="parent-nav-item flex flex-col items-center justify-center gap-0.5 sm:gap-1 px-0.5 sm:px-1 py-1.5 min-h-[52px] sm:min-h-[58px] {% if request.endpoint == 'parent.news_feed' %}parent-nav-item--active parent-nav-item--news{% endif %}"
         >
-          {{ icon_news('w-[22px] h-[22px] sm:w-6 sm:h-6') }}
+          <span class="parent-nav-icon parent-nav-icon--news">{{ icon_news('w-[20px] h-[20px] sm:w-[22px] sm:h-[22px]') }}</span>
           <span>Notícias</span>
         </a>
         <a
           href="{{ url_for('parent.parent_finance') }}"
-          class="parent-nav-item flex flex-col items-center justify-center gap-0.5 sm:gap-1 rounded-xl sm:rounded-2xl px-0.5 sm:px-1 py-1 min-h-[48px] sm:min-h-[52px] font-semibold tracking-tight transition {% if request.endpoint == 'parent.parent_finance' %}parent-nav-item--active parent-nav-item--pay{% else %}text-slate-500 hover:bg-white/70 hover:text-slate-800{% endif %}"
+          class="parent-nav-item flex flex-col items-center justify-center gap-0.5 sm:gap-1 px-0.5 sm:px-1 py-1.5 min-h-[52px] sm:min-h-[58px] {% if request.endpoint == 'parent.parent_finance' %}parent-nav-item--active parent-nav-item--pay{% endif %}"
         >
-          {{ icon_pay('w-[22px] h-[22px] sm:w-6 sm:h-6') }}
+          <span class="parent-nav-icon parent-nav-icon--pay">{{ icon_pay('w-[20px] h-[20px] sm:w-[22px] sm:h-[22px]') }}</span>
           <span class="leading-none text-center">Pagamentos</span>
         </a>
         <a
           href="{{ url_for('parent.club_directorate') }}"
-          class="parent-nav-item flex flex-col items-center justify-center gap-0.5 sm:gap-1 rounded-xl sm:rounded-2xl px-0.5 sm:px-1 py-1 min-h-[48px] sm:min-h-[52px] font-semibold tracking-tight transition {% if request.endpoint == 'parent.club_directorate' %}parent-nav-item--active parent-nav-item--lead{% else %}text-slate-500 hover:bg-white/70 hover:text-slate-800{% endif %}"
+          class="parent-nav-item flex flex-col items-center justify-center gap-0.5 sm:gap-1 px-0.5 sm:px-1 py-1.5 min-h-[52px] sm:min-h-[58px] {% if request.endpoint == 'parent.club_directorate' %}parent-nav-item--active parent-nav-item--lead{% endif %}"
         >
-          {{ icon_star('w-[22px] h-[22px] sm:w-6 sm:h-6') }}
+          <span class="parent-nav-icon parent-nav-icon--lead">{{ icon_star('w-[20px] h-[20px] sm:w-[22px] sm:h-[22px]') }}</span>
           <span class="leading-none text-center">Liderança</span>
         </a>
         <a
           href="{{ url_for('parent.account') }}"
-          class="parent-nav-item flex flex-col items-center justify-center gap-0.5 sm:gap-1 rounded-xl sm:rounded-2xl px-0.5 sm:px-1 py-1 min-h-[48px] sm:min-h-[52px] font-semibold tracking-tight transition {% if request.endpoint == 'parent.account' %}parent-nav-item--active parent-nav-item--account{% else %}text-slate-500 hover:bg-white/70 hover:text-slate-800{% endif %}"
+          class="parent-nav-item flex flex-col items-center justify-center gap-0.5 sm:gap-1 px-0.5 sm:px-1 py-1.5 min-h-[52px] sm:min-h-[58px] {% if request.endpoint == 'parent.account' %}parent-nav-item--active parent-nav-item--account{% endif %}"
         >
-          {{ icon_account('w-[22px] h-[22px] sm:w-6 sm:h-6') }}
+          <span class="parent-nav-icon parent-nav-icon--account">{{ icon_account('w-[20px] h-[20px] sm:w-[22px] sm:h-[22px]') }}</span>
           <span>Conta</span>
         </a>
       </div>

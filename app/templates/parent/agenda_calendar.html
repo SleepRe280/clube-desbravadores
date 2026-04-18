@@ -6,11 +6,11 @@
 
 <a href="{{ url_for('parent.home') }}" class="ui-link text-sm mb-4 inline-block">← Voltar ao feed</a>
 
-<div class="rounded-2xl bg-gradient-to-br from-amber-100/90 via-white to-sky-100/80 p-[1px] shadow-md border border-[var(--border-pastel)] mb-6">
+<div class="rounded-2xl p-[1px] shadow-md border border-[var(--border-pastel)] mb-6 bg-gradient-to-br from-emerald-100/80 via-white to-sky-100/75">
   <div class="rounded-2xl bg-white/95 px-4 py-4 sm:px-6 sm:py-5">
     <div class="flex flex-wrap justify-between items-start gap-3">
       <div>
-        <p class="text-[10px] font-bold uppercase tracking-widest text-amber-800/80">Somente leitura</p>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-[var(--club-green)] opacity-80">Somente leitura</p>
         <h1 class="text-xl sm:text-2xl font-bold text-[var(--text-primary)] mt-0.5">Agenda do clube</h1>
         <p class="text-[var(--text-secondary)] text-sm mt-1 max-w-md">
           O calendário mostra só se há evento no dia. Os detalhes aparecem abaixo. A diretoria cadastra os compromissos.
@@ -36,8 +36,8 @@
 </div>
 
 <div class="max-w-4xl">
-  <div class="rounded-2xl border border-[var(--border-pastel)] bg-white shadow-[var(--shadow-card)] overflow-hidden ring-1 ring-violet-100/60">
-    <div class="grid grid-cols-7 gap-px text-center text-[10px] sm:text-xs font-bold uppercase tracking-wide text-white bg-gradient-to-r from-amber-400 to-orange-400">
+  <div class="rounded-2xl border border-[var(--border-pastel)] bg-white shadow-[var(--shadow-card)] overflow-hidden ring-1 ring-sky-100/70">
+    <div class="grid grid-cols-7 gap-px text-center text-[10px] sm:text-xs font-bold uppercase tracking-wide text-white bg-gradient-to-r from-[#2e7d32] via-[#1565c0] to-[#c62828]">
       <div class="py-2 px-0.5">Seg</div>
       <div class="py-2 px-0.5">Ter</div>
       <div class="py-2 px-0.5">Qua</div>
@@ -51,7 +51,7 @@
       <div class="grid grid-cols-7 gap-1.5 sm:gap-2 mb-1.5 sm:mb-2 last:mb-0">
         {% for day in week %}
         {% if day == 0 %}
-        <div class="min-h-[4.5rem] sm:min-h-[5.25rem] rounded-xl bg-violet-50/30 border border-dashed border-violet-100"></div>
+        <div class="min-h-[4.5rem] sm:min-h-[5.25rem] rounded-xl bg-slate-50/80 border border-dashed border-slate-200/90"></div>
         {% else %}
         {% set dkey = iso_day(year, month, day) %}
         {% set is_sel = dkey == selected_iso %}
@@ -59,19 +59,19 @@
         {% set n_events = (events_by_date[dkey] | length) if dkey in events_by_date else 0 %}
         <a
           href="{{ url_for('parent.parent_agenda', year=year, month=month, selected=dkey) }}"
-          class="group relative min-h-[4.5rem] sm:min-h-[5.25rem] rounded-xl border-2 p-2 sm:p-2.5 flex flex-col transition-all duration-200 no-underline {% if is_sel %}border-violet-500 bg-gradient-to-b from-violet-50 to-white shadow-md ring-2 ring-violet-300/50 z-[1]{% elif is_today %}border-[#fbc02d] bg-[#fffde7] hover:border-amber-400{% else %}border-slate-200/90 bg-white hover:border-violet-300 hover:shadow-md{% endif %}"
+          class="group relative min-h-[4.5rem] sm:min-h-[5.25rem] rounded-xl border-2 p-2 sm:p-2.5 flex flex-col transition-all duration-200 no-underline {% if is_sel %}border-[#1565c0] bg-gradient-to-b from-sky-50 to-white shadow-md ring-2 ring-sky-200/60 z-[1]{% elif is_today %}border-[#fbc02d] bg-[#fffde7] hover:border-amber-400{% else %}border-slate-200/90 bg-white hover:border-sky-300 hover:shadow-md{% endif %}"
           title="Ver compromissos de {{ dkey }}"
         >
           <span
-            class="text-sm sm:text-base font-bold tabular-nums {% if is_sel %}text-violet-900{% elif is_today %}text-amber-900{% else %}text-[var(--text-primary)] group-hover:text-violet-800{% endif %}"
+            class="text-sm sm:text-base font-bold tabular-nums {% if is_sel %}text-[#0d47a1]{% elif is_today %}text-amber-900{% else %}text-[var(--text-primary)] group-hover:text-[#1565c0]{% endif %}"
             >{{ day }}</span
           >
           {% if n_events > 0 %}
           <div class="mt-auto flex items-center justify-center pt-1.5" aria-hidden="true">
-            <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 ring-2 ring-white shadow-sm"></span>
+            <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-gradient-to-br from-[#2e7d32] to-[#1565c0] ring-2 ring-white shadow-sm"></span>
             {% if n_events > 1 %}
             <span
-              class="ml-1 min-w-[1.1rem] h-[1.1rem] rounded-full bg-violet-600 text-[9px] font-bold text-white flex items-center justify-center tabular-nums"
+              class="ml-1 min-w-[1.1rem] h-[1.1rem] rounded-full bg-[#1565c0] text-[9px] font-bold text-white flex items-center justify-center tabular-nums"
               >{{ n_events }}</span
             >
             {% endif %}
@@ -87,19 +87,19 @@
   <p class="text-xs text-[var(--text-muted)] mt-3">Ponto = há programação neste dia (definida pela diretoria).</p>
 </div>
 
-<section class="mt-8 rounded-2xl border border-[var(--border-pastel)] bg-white shadow-[var(--shadow-card)] overflow-hidden">
-  <div class="px-4 py-4 sm:px-6 border-b border-violet-100 bg-gradient-to-r from-[#f3e5f5]/60 via-white to-[#e1f5fe]/50">
+<section class="mt-8 mb-2 rounded-2xl border border-[var(--border-pastel)] bg-white shadow-[var(--shadow-card)] overflow-hidden">
+  <div class="px-4 py-4 sm:px-6 border-b border-slate-100 bg-gradient-to-r from-emerald-50/70 via-white to-sky-50/80">
     <h2 class="text-lg font-bold text-[var(--text-primary)]">{{ selected_day.strftime('%d/%m/%Y') }}</h2>
     <p class="text-sm text-[var(--text-secondary)] mt-1">Compromissos do dia (visualização).</p>
   </div>
   <div class="p-4 sm:p-6 space-y-4">
     {% for ev in day_events %}
-    <article class="relative rounded-2xl border border-slate-200/80 bg-[#fafafa] p-4 sm:p-5 overflow-hidden">
-      <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-violet-500 to-fuchsia-500 rounded-l-2xl"></div>
+    <article class="relative rounded-2xl border border-slate-200/80 bg-[#fafafa] p-4 sm:p-5">
+      <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[#2e7d32] via-[#1565c0] to-[#c62828] rounded-l-2xl"></div>
       <div class="pl-3">
         <h3 class="font-bold text-[var(--text-primary)] text-base">{{ ev.title }}</h3>
         <p class="text-xs text-[var(--text-secondary)] mt-2 flex flex-wrap gap-2">
-          <span class="rounded-lg bg-violet-100 text-violet-900 px-2 py-0.5 font-semibold">{{ ev.event_date.strftime('%d/%m/%Y') }}</span>
+          <span class="rounded-lg bg-emerald-100 text-emerald-900 px-2 py-0.5 font-semibold">{{ ev.event_date.strftime('%d/%m/%Y') }}</span>
           {% if ev.event_time %}
           <span class="rounded-lg bg-sky-100 text-sky-900 px-2 py-0.5 font-medium tabular-nums">{{ ev.event_time[:5] }}</span>
           {% endif %}
