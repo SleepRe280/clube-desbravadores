@@ -1,3 +1,4 @@
+{% from "parent/_nav_icons.html" import icon_feed, icon_agenda, icon_members, icon_news, icon_pay, icon_star, icon_account %}
 <!DOCTYPE html>
 <html lang="pt-BR" class="h-full">
   <head>
@@ -9,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap"
       rel="stylesheet"
     />
     <style>
@@ -21,34 +22,31 @@
       }
     </style>
   </head>
-  <body class="parent-app antialiased flex flex-col h-full min-h-[100dvh] text-slate-800">
-    <header class="parent-header shrink-0 z-30 shadow-[0_1px_0_rgba(15,23,42,0.06)]">
-      <div class="w-full max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 py-2 sm:py-2.5 flex items-center gap-2 sm:gap-3">
-        <a href="{{ url_for('parent.home') }}" class="flex items-center gap-2 font-bold text-[var(--text-primary)] tracking-tight min-w-0">
+  <body class="parent-app antialiased flex flex-col h-full min-h-[100dvh] text-slate-800 {% block parent_body_class %}{% endblock %}">
+    <header class="parent-header shrink-0 z-30">
+      <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+        <a href="{{ url_for('parent.home') }}" class="flex items-center gap-3 min-w-0 group">
           <span
-            class="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#e91e63] via-[#4caf50] to-[#03a9f4] text-white text-[10px] sm:text-xs font-black shadow-md"
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-300 via-sky-400 to-rose-300 text-white text-xs font-extrabold tracking-tight shadow-lg shadow-slate-900/10 ring-2 ring-white/80"
             >DC</span
           >
-          <span class="hidden sm:block leading-tight text-left min-w-0">
-            <span class="block text-[10px] font-semibold uppercase tracking-widest text-[var(--text-muted)]">Duque De Caxias</span>
-            <span class="block text-xs sm:text-sm text-[var(--text-secondary)]">Portal família</span>
+          <span class="hidden sm:block min-w-0 text-left">
+            <span class="block text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">Duque De Caxias</span>
+            <span class="block text-sm font-medium text-slate-700">Portal família</span>
           </span>
         </a>
 
-        <div class="flex-1 min-w-0 flex justify-end items-center gap-1.5 sm:gap-3">
-          <p class="hidden md:block text-right min-w-0">
-            <span class="block text-xs text-slate-500 truncate max-w-[10rem] xl:max-w-xs">{{ current_user.full_name or 'Responsável' }}</span>
-            <span class="block text-[10px] text-slate-400 truncate max-w-[10rem] xl:max-w-xs">{{ current_user.email }}</span>
-          </p>
+        <div class="flex items-center gap-2 shrink-0">
+          <span class="hidden sm:block text-right max-w-[12rem] truncate text-sm font-medium text-slate-700" title="{{ current_user.full_name or current_user.email }}">{{ current_user.full_name or 'Responsável' }}</span>
           <a
             href="{{ url_for('auth.logout') }}"
-            class="shrink-0 inline-flex items-center justify-center gap-1 rounded-2xl border-2 border-[#f8bbd0] bg-[#ffebee] px-2.5 py-1.5 sm:px-3 sm:py-2 text-[11px] sm:text-sm font-semibold text-[#c2185b] shadow-sm hover:bg-[#fce4ec] min-h-[40px] transition"
-            title="Sair e voltar ao login"
+            class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white/90 text-rose-500 shadow-md shadow-slate-900/5 ring-1 ring-slate-200/80 hover:bg-rose-50 transition"
+            title="Sair"
+            aria-label="Sair"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 sm:h-4 sm:w-4 opacity-70 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
               <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
-            <span class="hidden sm:inline">Sair</span>
           </a>
         </div>
       </div>
@@ -63,56 +61,56 @@
       </div>
     </main>
 
-    <nav class="parent-bottom-nav parent-bottom-nav--compact" aria-label="Navegação principal">
-      <div class="max-w-6xl mx-auto px-0.5 grid grid-cols-7 gap-0.5 sm:gap-1 py-1 sm:py-1.5">
+    <nav class="parent-bottom-nav parent-bottom-nav--modern" aria-label="Navegação principal">
+      <div class="max-w-6xl mx-auto px-1 sm:px-2 grid grid-cols-7 gap-0.5 py-2">
         <a
           href="{{ url_for('parent.home') }}"
-          class="flex flex-col items-center justify-center gap-0 rounded-xl px-0.5 py-1 min-h-[40px] sm:min-h-[44px] text-[9px] sm:text-[10px] font-medium transition text-center leading-tight {% if request.endpoint == 'parent.home' %}text-[var(--nav-inicio-fg)] bg-[var(--nav-inicio-bg)]{% else %}text-[var(--text-secondary)] hover:bg-white/80{% endif %}"
+          class="parent-nav-item flex flex-col items-center justify-center gap-1 rounded-2xl px-1 py-1.5 min-h-[52px] text-[10px] sm:text-[11px] font-semibold tracking-tight transition {% if request.endpoint == 'parent.home' %}parent-nav-item--active parent-nav-item--feed{% else %}text-slate-500 hover:bg-white/70 hover:text-slate-800{% endif %}"
         >
-          <span class="text-sm sm:text-base leading-none" aria-hidden="true">⌂</span>
-          Feed
+          {{ icon_feed('w-[22px] h-[22px] sm:w-6 sm:h-6') }}
+          <span>Feed</span>
         </a>
         <a
           href="{{ url_for('parent.parent_agenda') }}"
-          class="flex flex-col items-center justify-center gap-0 rounded-xl px-0.5 py-1 min-h-[40px] sm:min-h-[44px] text-[9px] sm:text-[10px] font-medium transition text-center leading-tight {% if request.endpoint == 'parent.parent_agenda' %}text-[var(--nav-agenda-fg)] bg-[var(--nav-agenda-bg)]{% else %}text-[var(--text-secondary)] hover:bg-white/80{% endif %}"
+          class="parent-nav-item flex flex-col items-center justify-center gap-1 rounded-2xl px-1 py-1.5 min-h-[52px] text-[10px] sm:text-[11px] font-semibold tracking-tight transition {% if request.endpoint == 'parent.parent_agenda' %}parent-nav-item--active parent-nav-item--agenda{% else %}text-slate-500 hover:bg-white/70 hover:text-slate-800{% endif %}"
         >
-          <span class="text-sm sm:text-base leading-none" aria-hidden="true">📅</span>
-          Agenda
+          {{ icon_agenda('w-[22px] h-[22px] sm:w-6 sm:h-6') }}
+          <span>Agenda</span>
         </a>
         <a
           href="{{ url_for('parent.club_directory') }}"
-          class="flex flex-col items-center justify-center gap-0 rounded-xl px-0.5 py-1 min-h-[40px] sm:min-h-[44px] text-[9px] sm:text-[10px] font-medium transition text-center leading-tight {% if request.endpoint == 'parent.club_directory' %}text-[var(--nav-desbravadores-fg)] bg-[var(--nav-desbravadores-bg)]{% else %}text-[var(--text-secondary)] hover:bg-white/80{% endif %}"
+          class="parent-nav-item flex flex-col items-center justify-center gap-1 rounded-2xl px-1 py-1.5 min-h-[52px] text-[10px] sm:text-[11px] font-semibold tracking-tight transition {% if request.endpoint == 'parent.club_directory' %}parent-nav-item--active parent-nav-item--members{% else %}text-slate-500 hover:bg-white/70 hover:text-slate-800{% endif %}"
         >
-          <span class="text-sm sm:text-base leading-none" aria-hidden="true">👥</span>
-          Membros
+          {{ icon_members('w-[22px] h-[22px] sm:w-6 sm:h-6') }}
+          <span class="leading-none text-center">Membros</span>
         </a>
         <a
           href="{{ url_for('parent.news_feed') }}"
-          class="flex flex-col items-center justify-center gap-0 rounded-xl px-0.5 py-1 min-h-[40px] sm:min-h-[44px] text-[8px] sm:text-[10px] font-medium transition text-center leading-tight {% if request.endpoint == 'parent.news_feed' %}text-[var(--nav-noticias-fg)] bg-[var(--nav-noticias-bg)]{% else %}text-[var(--text-secondary)] hover:bg-white/80{% endif %}"
+          class="parent-nav-item flex flex-col items-center justify-center gap-1 rounded-2xl px-1 py-1.5 min-h-[52px] text-[9px] sm:text-[11px] font-semibold tracking-tight transition {% if request.endpoint == 'parent.news_feed' %}parent-nav-item--active parent-nav-item--news{% else %}text-slate-500 hover:bg-white/70 hover:text-slate-800{% endif %}"
         >
-          <span class="text-sm sm:text-base leading-none" aria-hidden="true">📰</span>
-          Notícias
+          {{ icon_news('w-[22px] h-[22px] sm:w-6 sm:h-6') }}
+          <span>Notícias</span>
         </a>
         <a
           href="{{ url_for('parent.parent_finance') }}"
-          class="flex flex-col items-center justify-center gap-0 rounded-xl px-0.5 py-1 min-h-[40px] sm:min-h-[44px] text-[8px] sm:text-[10px] font-medium transition text-center leading-tight {% if request.endpoint == 'parent.parent_finance' %}text-[var(--nav-finance-fg)] bg-[var(--nav-finance-bg)]{% else %}text-[var(--text-secondary)] hover:bg-white/80{% endif %}"
+          class="parent-nav-item flex flex-col items-center justify-center gap-1 rounded-2xl px-1 py-1.5 min-h-[52px] text-[9px] sm:text-[11px] font-semibold tracking-tight transition {% if request.endpoint == 'parent.parent_finance' %}parent-nav-item--active parent-nav-item--pay{% else %}text-slate-500 hover:bg-white/70 hover:text-slate-800{% endif %}"
         >
-          <span class="text-sm sm:text-base leading-none" aria-hidden="true">💰</span>
-          Pagamentos
+          {{ icon_pay('w-[22px] h-[22px] sm:w-6 sm:h-6') }}
+          <span class="leading-none text-center">Pagamentos</span>
         </a>
         <a
           href="{{ url_for('parent.club_directorate') }}"
-          class="flex flex-col items-center justify-center gap-0 rounded-xl px-0.5 py-1 min-h-[40px] sm:min-h-[44px] text-[9px] sm:text-[10px] font-medium transition text-center leading-tight {% if request.endpoint == 'parent.club_directorate' %}text-[var(--nav-diretoria-fg)] bg-[var(--nav-diretoria-bg)]{% else %}text-[var(--text-secondary)] hover:bg-white/80{% endif %}"
+          class="parent-nav-item flex flex-col items-center justify-center gap-1 rounded-2xl px-1 py-1.5 min-h-[52px] text-[9px] sm:text-[11px] font-semibold tracking-tight transition {% if request.endpoint == 'parent.club_directorate' %}parent-nav-item--active parent-nav-item--lead{% else %}text-slate-500 hover:bg-white/70 hover:text-slate-800{% endif %}"
         >
-          <span class="text-sm sm:text-base leading-none" aria-hidden="true">★</span>
-          Liderança
+          {{ icon_star('w-[22px] h-[22px] sm:w-6 sm:h-6') }}
+          <span class="leading-none text-center">Liderança</span>
         </a>
         <a
           href="{{ url_for('parent.account') }}"
-          class="flex flex-col items-center justify-center gap-0 rounded-xl px-0.5 py-1 min-h-[40px] sm:min-h-[44px] text-[9px] sm:text-[10px] font-medium transition text-center leading-tight {% if request.endpoint == 'parent.account' %}text-[var(--text-primary)] bg-[#ede7f6]{% else %}text-[var(--text-secondary)] hover:bg-white/80{% endif %}"
+          class="parent-nav-item flex flex-col items-center justify-center gap-1 rounded-2xl px-1 py-1.5 min-h-[52px] text-[10px] sm:text-[11px] font-semibold tracking-tight transition {% if request.endpoint == 'parent.account' %}parent-nav-item--active parent-nav-item--account{% else %}text-slate-500 hover:bg-white/70 hover:text-slate-800{% endif %}"
         >
-          <span class="text-sm sm:text-base leading-none" aria-hidden="true">⚙</span>
-          Conta
+          {{ icon_account('w-[22px] h-[22px] sm:w-6 sm:h-6') }}
+          <span>Conta</span>
         </a>
       </div>
     </nav>

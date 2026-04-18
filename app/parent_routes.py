@@ -24,13 +24,20 @@ from app.models import (
     Attendance,
     BoardPost,
     ClubNews,
+    CLUB_SETTING_PIX_KEY,
     DirectorateMember,
     MeetingDuque,
     Member,
     MemberFee,
+    get_club_setting_value,
 )
 
 bp = Blueprint("parent", __name__)
+
+
+def _format_date_long_pt(d: date) -> str:
+    return f"{d.day} de {MONTH_NAMES_PT[d.month]} de {d.year}"
+
 
 NEWS_LABELS = {
     "local": "Local",
@@ -65,13 +72,42 @@ def home():
     news_by_level = defaultdict(list)
     for n in news_items:
         news_by_level[n.level].append(n)
+
+    primary_child = children[0] if children else None
+    recent_activity = None
+    last_duques_delta = None
+    if primary_child:
+        recent_activity = (
+            ActivityRecord.query.filter_by(member_id=primary_child.id)
+            .order_by(ActivityRecord.recorded_at.desc(), ActivityRecord.id.desc())
+            .first()
+        )
+        last_duque_row = (
+            MeetingDuque.query.filter_by(member_id=primary_child.id)
+            .order_by(MeetingDuque.meeting_date.desc(), MeetingDuque.id.desc())
+            .first()
+        )
+        if last_duque_row and (last_duque_row.duques or 0) > 0:
+            last_duques_delta = int(last_duque_row.duques)
+
+    greeting_first = (
+        (current_user.full_name or "").strip().split()[0]
+        if (current_user.full_name or "").strip()
+        else "Responsável"
+    )
+
     return render_template(
         "parent/home.html",
         children=children,
+        primary_child=primary_child,
         duques_by_member=duques_by_member,
         board_posts=board_posts,
         news_by_level=dict(news_by_level),
         news_labels=NEWS_LABELS,
+        recent_activity=recent_activity,
+        last_duques_delta=last_duques_delta,
+        greeting_first=greeting_first,
+        format_date_long_pt=_format_date_long_pt,
     )
 
 
@@ -169,6 +205,7 @@ def account():
 def parent_finance():
     children = list(current_user.children)
     by_member = {c.id: c for c in children}
+    pix_key = get_club_setting_value(CLUB_SETTING_PIX_KEY)
     if not children:
         return render_template(
             "parent/finance.html",
@@ -177,6 +214,7 @@ def parent_finance():
             by_member=by_member,
             today=date.today(),
             format_brl=format_brl_cents,
+            pix_key=pix_key,
         )
     ids = [c.id for c in children]
     fees = (
@@ -191,6 +229,7 @@ def parent_finance():
         by_member=by_member,
         today=date.today(),
         format_brl=format_brl_cents,
+        pix_key=pix_key,
     )
 
 

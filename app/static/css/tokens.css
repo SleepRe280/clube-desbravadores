@@ -23,7 +23,11 @@
     radial-gradient(900px 700px at 86% 58%, rgb(230 220 255 / 0.70), transparent 55%),
     radial-gradient(900px 700px at 30% 78%, rgb(220 255 235 / 0.70), transparent 55%),
     linear-gradient(165deg, #f6f3fb 0%, #f0ecfb 35%, #eef7ff 70%, #fff8f0 100%);
-  --bg-parent: var(--bg-admin);
+  /* Portal família — gradiente pastel suave (verde, azul, rosa) */
+  --bg-parent: radial-gradient(100% 80% at 10% 0%, rgb(214 245 230 / 0.95), transparent 52%),
+    radial-gradient(90% 70% at 92% 8%, rgb(255 218 230 / 0.85), transparent 48%),
+    radial-gradient(85% 65% at 50% 95%, rgb(210 235 255 / 0.9), transparent 55%),
+    linear-gradient(168deg, #f0faf4 0%, #f5f0ff 38%, #eef6ff 72%, #fff5f8 100%);
   --bg-topbar: linear-gradient(135deg, rgb(255 235 238 / 0.95) 0%, rgb(232 245 233 / 0.95) 45%, rgb(227 242 253 / 0.95) 100%);
   --bg-soft: linear-gradient(135deg, rgb(255 255 255 / 0.55), rgb(255 255 255 / 0.30));
 

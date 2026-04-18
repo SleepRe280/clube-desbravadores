@@ -243,6 +243,25 @@ class FinanceLedgerEntry(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
+class ClubSetting(db.Model):
+    """Configurações globais do clube (uma linha por chave), ex.: chave PIX para pagamentos."""
+
+    __tablename__ = "club_settings"
+    key = db.Column(db.String(64), primary_key=True)
+    value = db.Column(db.Text, nullable=True)
+
+
+CLUB_SETTING_PIX_KEY = "pix_key"
+
+
+def get_club_setting_value(key: str, default: str = "") -> str:
+    row = db.session.get(ClubSetting, key)
+    if row is None or row.value is None:
+        return default
+    s = str(row.value).strip()
+    return s if s else default
+
+
 class MemberFee(db.Model):
     """Cobrança (ex.: mensalidade) ligada a um desbravador — pais veem só do(s) filho(s)."""
 

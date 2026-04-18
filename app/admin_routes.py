@@ -25,6 +25,8 @@ from app.models import (
     Attendance,
     BoardPost,
     ClubNews,
+    CLUB_SETTING_PIX_KEY,
+    ClubSetting,
     DirectorateMember,
     FinanceLedgerEntry,
     MeetingDuque,
@@ -32,6 +34,7 @@ from app.models import (
     MemberFee,
     PasswordResetToken,
     User,
+    get_club_setting_value,
 )
 from app.uploads_util import save_upload
 
@@ -1012,6 +1015,7 @@ def finance_dashboard():
         .all()
     )
     members = Member.query.order_by(Member.full_name).all()
+    pix_key = get_club_setting_value(CLUB_SETTING_PIX_KEY)
     return render_template(
         "admin/finance_dashboard.html",
         total_in=int(total_in),
@@ -1023,7 +1027,28 @@ def finance_dashboard():
         members=members,
         today=date.today(),
         format_brl=format_brl_cents,
+        pix_key=pix_key,
     )
+
+
+@bp.route("/financeiro/chave-pix", methods=["POST"])
+def finance_pix_key_save():
+    raw = (request.form.get("pix_key") or "").strip()
+    if len(raw) > 500:
+        flash("Chave PIX muito longa (máx. 500 caracteres).", "warning")
+        return redirect(url_for("admin.finance_dashboard"))
+    row = db.session.get(ClubSetting, CLUB_SETTING_PIX_KEY)
+    if raw:
+        if row:
+            row.value = raw
+        else:
+            db.session.add(ClubSetting(key=CLUB_SETTING_PIX_KEY, value=raw))
+    else:
+        if row:
+            db.session.delete(row)
+    db.session.commit()
+    flash("Chave PIX atualizada. Os responsáveis passam a ver a nova chave no portal família." if raw else "Chave PIX removida do portal família.", "success")
+    return redirect(url_for("admin.finance_dashboard"))
 
 
 @bp.route("/financeiro/lancamento", methods=["POST"])

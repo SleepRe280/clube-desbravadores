@@ -1,83 +1,159 @@
 {% extends "parent/base_parent.html" %}
 {% block title %}Feed{% endblock %}
+{% block parent_body_class %}parent-theme-feed{% endblock %}
 {% block content %}
-<section class="mb-6">
-  <h1 class="text-2xl font-bold text-slate-900">Olá{% if current_user.full_name %}, {{ current_user.full_name.split()[0] }}{% endif %}</h1>
-  <p class="text-slate-500 text-sm mt-1">Duque De Caxias — avisos, notícias e o desempenho do seu filho(a).</p>
+
+<section class="mb-10 pt-1">
+  <h1 class="text-[1.65rem] sm:text-3xl font-extrabold tracking-tight text-slate-900 leading-tight">
+    Olá, {{ greeting_first }}
+  </h1>
+  <p class="mt-3 text-[15px] sm:text-base text-slate-600 leading-relaxed max-w-xl">
+    Duque De Caxias — avisos, notícias e o desempenho do seu filho(a).
+  </p>
 </section>
 
-{% if children %}
-<section class="mb-8">
-  <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Meus filhos — desempenho</h2>
-  <div class="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 snap-x">
-    {% for c in children %}
-    <a
-      href="{{ url_for('parent.child_detail', member_id=c.id) }}"
-      class="snap-start shrink-0 w-[min(100%,148px)] max-w-[148px] rounded-2xl bg-white/95 border border-slate-200/90 shadow-sm p-3 sm:p-4 text-center hover:border-blue-300 transition"
-    >
-      {% if c.photo_filename %}
-      <img src="{{ url_for('uploaded_file', rel_path=c.photo_filename) }}" class="h-14 w-14 rounded-full object-cover mx-auto border-2 border-white shadow" alt="" />
+{% if primary_child %}
+{% set child_first = primary_child.full_name.strip().split()[0] %}
+{% set perf = primary_child.computed_overall_performance() %}
+{% set dq_total = duques_by_member.get(primary_child.id, 0) %}
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6 mb-12 items-stretch">
+  {# Cartão esquerdo — perfil #}
+  <a
+    href="{{ url_for('parent.child_detail', member_id=primary_child.id) }}"
+    class="group relative flex h-full min-h-[280px] flex-col overflow-hidden rounded-[1.75rem] bg-white/90 p-6 sm:p-8 shadow-[0_20px_50px_-20px_rgba(15,23,42,0.18)] ring-1 ring-white/80 backdrop-blur-md transition hover:shadow-[0_24px_60px_-18px_rgba(15,23,42,0.22)] hover:-translate-y-0.5"
+  >
+    <div class="pointer-events-none absolute -right-8 -top-8 h-40 w-40 rounded-full bg-gradient-to-br from-emerald-200/50 via-sky-200/40 to-rose-200/50 blur-2xl" aria-hidden="true"></div>
+    <div class="relative flex flex-1 flex-col items-center justify-center text-center">
+      {% if primary_child.photo_filename %}
+      <img
+        src="{{ url_for('uploaded_file', rel_path=primary_child.photo_filename) }}"
+        class="h-24 w-24 rounded-full object-cover ring-4 ring-white shadow-lg shadow-slate-900/10"
+        alt=""
+      />
       {% else %}
-      <div class="h-14 w-14 rounded-full bg-gradient-to-br from-red-200 via-green-200 to-blue-200 mx-auto flex items-center justify-center text-lg font-bold text-slate-700">
-        {{ c.full_name[0]|upper }}
+      <div
+        class="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 via-sky-400 to-rose-400 text-3xl font-extrabold text-white shadow-inner shadow-white/30 ring-4 ring-white"
+        aria-hidden="true"
+      >
+        {{ child_first[0]|upper }}
       </div>
       {% endif %}
-      <p class="font-semibold text-sm text-slate-800 mt-2 truncate">{{ c.full_name.split()[0] }}</p>
-      <p class="text-[10px] text-slate-500 truncate">{{ c.unit or 'Unidade' }}</p>
-      <p class="text-[10px] text-amber-800 font-semibold tabular-nums mt-1">{{ duques_by_member.get(c.id, 0) }} duques</p>
-      <div class="mt-2 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-        <div class="h-full rounded-full bg-gradient-to-r from-red-400 via-green-400 to-blue-400" style="width: {{ c.computed_overall_performance() }}%"></div>
+      <h2 class="mt-5 text-xl font-bold text-slate-900 tracking-tight">{{ primary_child.full_name.split()[0] }}</h2>
+      <p class="mt-1 text-sm font-medium text-slate-500">{{ primary_child.unit or 'Unidade' }}</p>
+      <p class="mt-4 inline-flex items-baseline gap-1 rounded-full bg-gradient-to-r from-amber-50 to-orange-50 px-4 py-1.5 text-sm font-bold tabular-nums text-amber-900 ring-1 ring-amber-200/60">
+        {{ dq_total }} <span class="text-xs font-semibold text-amber-800/90">duques</span>
+      </p>
+      <div class="mt-6 w-full max-w-[240px]">
+        <div class="flex justify-between text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">
+          <span>Progresso geral</span>
+          <span class="text-slate-600">{{ perf }}%</span>
+        </div>
+        <div class="h-3 w-full overflow-hidden rounded-full bg-slate-100/90 shadow-inner">
+          <div
+            class="h-full rounded-full bg-gradient-to-r from-emerald-400 via-sky-400 to-rose-400 transition-all duration-500 shadow-sm"
+            style="width: {{ perf }}%; min-width: {% if perf > 0 %}4px{% else %}0{% endif %};"
+          ></div>
+        </div>
       </div>
-      <p class="text-[10px] text-slate-500 mt-1">{{ c.computed_overall_performance() }}%</p>
-    </a>
-    {% endfor %}
+      <span class="mt-5 text-xs font-semibold text-sky-600 opacity-0 transition group-hover:opacity-100">Ver ficha completa →</span>
+    </div>
+  </a>
+
+  {# Cartão direito — atividade recente #}
+  <div class="relative flex h-full min-h-[280px] flex-col overflow-hidden rounded-[1.75rem] bg-white/90 p-6 sm:p-8 shadow-[0_20px_50px_-20px_rgba(15,23,42,0.18)] ring-1 ring-white/80 backdrop-blur-md">
+    <div class="pointer-events-none absolute -left-6 bottom-0 h-32 w-32 rounded-full bg-gradient-to-tr from-rose-200/40 to-transparent blur-2xl" aria-hidden="true"></div>
+    <div class="relative">
+      <h2 class="text-lg font-bold text-slate-900 tracking-tight">Atividade recente</h2>
+      {% if recent_activity %}
+      <p class="mt-1 text-xs font-medium text-slate-400">
+        {{ format_date_long_pt(recent_activity.recorded_at) }}
+      </p>
+      <p class="mt-5 text-[15px] leading-relaxed text-slate-700">
+        <span class="font-semibold text-slate-900">{{ child_first }}</span>
+        {% if recent_activity.completed %}
+        completou a missão
+        {% else %}
+        registrou progresso em
+        {% endif %}
+        <span class="text-slate-900 font-medium">“{{ recent_activity.title }}”</span>
+      </p>
+      {% else %}
+      <p class="mt-5 text-sm leading-relaxed text-slate-600">
+        Nenhuma atividade registrada ainda. Em breve a diretoria ou o clube publica as conquistas por aqui.
+      </p>
+      {% endif %}
+      {% if last_duques_delta %}
+      <p class="mt-5 inline-flex items-center rounded-2xl bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-700 ring-1 ring-emerald-200/80">
+        +{{ last_duques_delta }} duques
+      </p>
+      {% endif %}
+      <div class="mt-auto pt-8">
+        <a
+          href="{{ url_for('parent.account') }}"
+          class="inline-flex w-full sm:w-auto items-center justify-center rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-slate-900/25 ring-1 ring-white/10 transition hover:from-slate-800 hover:to-slate-700 min-h-[48px]"
+          title="Canal com a diretoria e dados da conta"
+        >
+          + Novo aviso
+        </a>
+      </div>
+    </div>
   </div>
-</section>
-{% else %}
-<div class="rounded-2xl border border-dashed border-slate-300 bg-white/80 p-5 text-center text-slate-500 text-sm mb-8">
-  Nenhum desbravador vinculado à sua conta. A diretoria faz o vínculo no painel.
+</div>
+
+{% if children|length > 1 %}
+<div class="mb-12 rounded-2xl border border-dashed border-slate-200/80 bg-white/40 px-4 py-3 text-center text-sm text-slate-600">
+  Você tem <strong class="text-slate-800">{{ children|length }} desbravadores</strong> vinculados.
+  <a href="{{ url_for('parent.child_detail', member_id=children[1].id) }}" class="font-semibold text-sky-700 hover:underline">Ver outro perfil</a>
+  ou explore a lista em <a href="{{ url_for('parent.club_directory') }}" class="font-semibold text-sky-700 hover:underline">Membros</a>.
 </div>
 {% endif %}
 
-<section class="mb-10">
-  <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Avisos do seu clube</h2>
-  <div class="space-y-4">
+{% else %}
+<div class="mb-12 rounded-[1.75rem] border border-dashed border-slate-300/80 bg-white/50 p-8 text-center text-slate-600 shadow-inner">
+  <p class="text-base font-medium text-slate-700">Nenhum desbravador vinculado à sua conta.</p>
+  <p class="mt-2 text-sm text-slate-500">A diretoria associa seu filho no painel — em seguida o progresso aparece aqui.</p>
+</div>
+{% endif %}
+
+<section class="mb-12">
+  <h2 class="text-xs font-extrabold uppercase tracking-[0.2em] text-slate-400 mb-5">Avisos do seu clube</h2>
+  <div class="space-y-5">
     {% for post in board_posts %}
-    <article class="rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden">
-      <div class="px-4 py-3 flex items-center gap-3 border-b border-slate-50 bg-amber-50/50">
-        <div class="h-9 w-9 rounded-full bg-amber-200 text-amber-900 flex items-center justify-center text-xs font-bold">C</div>
-        <div>
-          <p class="text-sm font-semibold text-slate-800">Duque De Caxias</p>
-          <p class="text-[11px] text-slate-500">{{ post.created_at.strftime('%d/%m/%Y') }}</p>
+    <article class="overflow-hidden rounded-[1.5rem] bg-white/95 shadow-[0_16px_40px_-20px_rgba(15,23,42,0.15)] ring-1 ring-slate-200/60 backdrop-blur-sm">
+      <div class="flex items-center gap-4 border-b border-slate-100/90 bg-gradient-to-r from-amber-50/90 via-white to-rose-50/40 px-5 py-4">
+        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-200 to-orange-100 text-sm font-extrabold text-amber-900 shadow-sm">DC</div>
+        <div class="min-w-0">
+          <p class="font-bold text-slate-900 truncate">Duque De Caxias</p>
+          <p class="text-xs font-medium text-slate-500">{{ post.created_at.strftime('%d/%m/%Y') }}</p>
         </div>
       </div>
-      <div class="px-4 py-3">
-        <h3 class="font-bold text-slate-900">{{ post.title }}</h3>
-        <p class="text-slate-600 text-sm mt-2 whitespace-pre-line leading-relaxed">{{ post.body }}</p>
+      <div class="px-5 py-5 sm:px-6 sm:py-6">
+        <h3 class="text-lg font-bold text-slate-900 tracking-tight">{{ post.title }}</h3>
+        <p class="mt-3 text-slate-600 text-[15px] leading-relaxed whitespace-pre-line">{{ post.body }}</p>
       </div>
     </article>
     {% else %}
-    <p class="text-slate-400 text-sm">Sem avisos do clube por enquanto.</p>
+    <p class="rounded-2xl border border-slate-200/60 bg-white/50 px-5 py-8 text-center text-sm text-slate-500">Sem avisos do clube por enquanto.</p>
     {% endfor %}
   </div>
 </section>
 
 {% for level in ['local', 'regional', 'estadual', 'mundial'] %}
 {% if news_by_level.get(level) %}
-<section class="mb-8">
-  <div class="flex items-center justify-between mb-3">
-    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ news_labels[level] }}</h2>
-    <a href="{{ url_for('parent.news_feed', nivel=level) }}" class="text-xs text-blue-600 hover:underline">Ver todas</a>
+<section class="mb-10">
+  <div class="flex items-center justify-between gap-3 mb-4">
+    <h2 class="text-xs font-extrabold uppercase tracking-[0.2em] text-slate-400">{{ news_labels[level] }}</h2>
+    <a href="{{ url_for('parent.news_feed', nivel=level) }}" class="text-xs font-semibold text-sky-600 hover:text-sky-800 hover:underline">Ver todas</a>
   </div>
-  <div class="space-y-3">
+  <div class="space-y-4">
     {% for n in news_by_level[level][:3] %}
-    <article class="rounded-xl bg-white border border-slate-200 p-4 shadow-sm">
+    <article class="rounded-2xl bg-white/90 border border-slate-200/50 p-5 shadow-[0_12px_32px_-18px_rgba(15,23,42,0.12)] backdrop-blur-sm">
       {% if n.image_filename %}
-      <img src="{{ url_for('uploaded_file', rel_path=n.image_filename) }}" class="w-full h-32 object-cover rounded-lg mb-2" alt="" />
+      <img src="{{ url_for('uploaded_file', rel_path=n.image_filename) }}" class="w-full h-36 object-cover rounded-xl mb-3 ring-1 ring-slate-100" alt="" />
       {% endif %}
-      <h3 class="font-semibold text-slate-900 text-sm">{{ n.title }}</h3>
-      <p class="text-slate-600 text-xs mt-1 line-clamp-3">{{ n.body }}</p>
-      <p class="text-[10px] text-slate-400 mt-2">{{ n.created_at.strftime('%d/%m/%Y') }}</p>
+      <h3 class="font-bold text-slate-900">{{ n.title }}</h3>
+      <p class="text-slate-600 text-sm mt-2 line-clamp-3 leading-relaxed">{{ n.body }}</p>
+      <p class="text-[11px] font-medium text-slate-400 mt-3">{{ n.created_at.strftime('%d/%m/%Y') }}</p>
     </article>
     {% endfor %}
   </div>
@@ -85,5 +161,7 @@
 {% endif %}
 {% endfor %}
 
-<p class="text-center text-xs text-slate-400 pb-4">Os membros do clube na aba Membros aparecem sem ficha completa (dados sensíveis só na área da diretoria).</p>
+<p class="text-center text-xs text-slate-400 pb-2 max-w-md mx-auto leading-relaxed">
+  Os membros na aba Membros aparecem sem ficha completa; dados sensíveis ficam só na diretoria.
+</p>
 {% endblock %}
