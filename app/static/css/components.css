@@ -327,15 +327,15 @@
 }
 
 .ui-chip--active {
-  background: linear-gradient(145deg, #1e293b 0%, #334155 100%);
-  color: #fff;
-  border-color: rgb(15 23 42 / 0.2);
-  box-shadow: var(--btn-shadow);
+  background: color-mix(in srgb, var(--pastel-mint) 92%, white);
+  color: var(--on-mint);
+  border-color: rgb(53 86 73 / 0.12);
+  box-shadow: 0 2px 10px -4px rgb(53 86 73 / 0.12);
 }
 
 .ui-chip--active:hover {
-  filter: brightness(1.05);
-  color: #fff;
+  filter: brightness(0.98);
+  color: var(--on-mint);
 }
 
 /* Links de ação em texto (mapa, “ver todas”) */
@@ -345,13 +345,13 @@
   gap: 0.25rem;
   font-weight: 600;
   font-size: 0.875rem;
-  color: #2563eb;
+  color: var(--on-baby-blue);
   text-decoration: none;
   transition: color 0.15s ease;
 }
 
 .ui-link:hover {
-  color: #1d4ed8;
+  color: var(--on-mint);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -430,10 +430,11 @@
 /* “Tailwind cards” (bg-white + rounded-2xl + border) → glass pastel */
 .admin-main .bg-white.rounded-2xl.border,
 .parent-panel .bg-white.rounded-2xl.border {
-  background: var(--surface-glass-strong) !important;
-  border-color: var(--border-pastel) !important;
+  background: linear-gradient(165deg, rgb(255 255 255 / 0.95) 0%, rgb(255 255 255 / 0.85) 100%) !important;
+  border-color: rgb(255 255 255 / 0.65) !important;
+  border-radius: var(--radius-2xl) !important;
   box-shadow: var(--shadow-card) !important;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(16px);
 }
 
 /* Chips / blocos sutis dentro de cards (bg-slate-50) */

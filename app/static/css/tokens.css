@@ -1,8 +1,23 @@
 /**
- * Design tokens — tema pastel (referência painel diretoria / desbravadores)
+ * Design tokens — tema pastel minimalista (diretoria + portal família)
  */
 :root {
-  /* Institucional suave */
+  /* Paleta pastel (tons claros e dessaturados) */
+  --pastel-mint: #cfe8d8;
+  --pastel-yellow: #f6e7b4;
+  --pastel-orange: #f4c7a1;
+  --pastel-rose: #f2c1c1;
+  --pastel-lavender: #d6cce8;
+  --pastel-baby-blue: #c9e0f2;
+
+  /* Textos sobre pastéis (contraste suave) */
+  --on-mint: #355649;
+  --on-yellow: #5c4f28;
+  --on-orange: #6b4f3a;
+  --on-rose: #6b4548;
+  --on-lavender: #4a3f5c;
+  --on-baby-blue: #3a4f62;
+
   --color-red: 233 30 99;
   --color-green: 76 175 80;
   --color-blue: 3 169 244;
@@ -10,61 +25,65 @@
   --color-amber: 251 192 45;
   --color-orange: 251 140 0;
 
-  /* Fundos */
-  --surface-page: #f6f3fb;
+  /* Fundo principal — degradê bege / cinza claro */
+  --bg-shell: linear-gradient(165deg, #f5f5f5 0%, #ececec 45%, #eaeaea 100%);
+  --bg-shell-soft: radial-gradient(900px 600px at 12% 0%, rgb(207 232 216 / 0.35), transparent 55%),
+    radial-gradient(700px 500px at 88% 100%, rgb(214 204 232 / 0.3), transparent 50%),
+    var(--bg-shell);
+
+  --surface-page: #fafafa;
   --surface-card: #ffffff;
-  --surface-muted: #faf8fc;
-  --surface-glass: rgb(255 255 255 / 0.88);
-  --surface-glass-strong: rgb(255 255 255 / 0.94);
+  --surface-muted: #f7f7f8;
+  --surface-glass: rgb(255 255 255 / 0.72);
+  --surface-glass-strong: rgb(255 255 255 / 0.88);
 
-  /* Fundo “colorido” (bem próximo da referência) */
-  --bg-admin: radial-gradient(1200px 800px at 12% 6%, rgb(255 220 230 / 0.85), transparent 55%),
-    radial-gradient(900px 700px at 74% 10%, rgb(210 235 255 / 0.75), transparent 52%),
-    radial-gradient(900px 700px at 86% 58%, rgb(230 220 255 / 0.70), transparent 55%),
-    radial-gradient(900px 700px at 30% 78%, rgb(220 255 235 / 0.70), transparent 55%),
-    linear-gradient(165deg, #f6f3fb 0%, #f0ecfb 35%, #eef7ff 70%, #fff8f0 100%);
-  /* Portal família — gradiente pastel suave (verde, azul, rosa) */
-  --bg-parent: radial-gradient(100% 80% at 10% 0%, rgb(214 245 230 / 0.95), transparent 52%),
-    radial-gradient(90% 70% at 92% 8%, rgb(255 218 230 / 0.85), transparent 48%),
-    radial-gradient(85% 65% at 50% 95%, rgb(210 235 255 / 0.9), transparent 55%),
-    linear-gradient(168deg, #f0faf4 0%, #f5f0ff 38%, #eef6ff 72%, #fff5f8 100%);
-  --bg-topbar: linear-gradient(135deg, rgb(255 235 238 / 0.95) 0%, rgb(232 245 233 / 0.95) 45%, rgb(227 242 253 / 0.95) 100%);
-  --bg-soft: linear-gradient(135deg, rgb(255 255 255 / 0.55), rgb(255 255 255 / 0.30));
+  --bg-admin: var(--bg-shell-soft);
+  --bg-parent: var(--bg-shell-soft);
 
-  /* Pastéis por seção (admin nav) */
-  --nav-inicio-bg: #e8f5e9;
-  --nav-inicio-fg: #2e7d32;
-  --nav-agenda-bg: #fff8e1;
-  --nav-agenda-fg: #f57f17;
-  --nav-desbravadores-bg: #fff3e0;
-  --nav-desbravadores-fg: #e65100;
-  --nav-diretoria-bg: #f3e5f5;
-  --nav-diretoria-fg: #6a1b9a;
-  --nav-responsaveis-bg: #e8eaf6;
-  --nav-responsaveis-fg: #3949ab;
-  --nav-presencas-bg: #e1f5fe;
-  --nav-presencas-fg: #0277bd;
-  --nav-avisos-bg: #ffebee;
-  --nav-avisos-fg: #c2185b;
-  --nav-noticias-bg: #e0f7fa;
-  --nav-noticias-fg: #00838f;
-  --nav-finance-bg: #e0f2f1;
-  --nav-finance-fg: #00695c;
+  /* Topbar portal família */
+  --bg-topbar: linear-gradient(180deg, rgb(255 255 255 / 0.88) 0%, rgb(250 250 250 / 0.92) 100%);
+  --bg-soft: linear-gradient(135deg, rgb(255 255 255 / 0.55), rgb(255 255 255 / 0.28));
 
-  /* Texto */
-  --text-primary: #2d2d44;
-  --text-secondary: #5c5c78;
-  --text-muted: #8a8aa3;
+  /* Sidebar / navegação — destaques por seção (hover e ícones) */
+  --nav-inicio-bg: var(--pastel-mint);
+  --nav-inicio-fg: var(--on-mint);
+  --nav-agenda-bg: var(--pastel-yellow);
+  --nav-agenda-fg: var(--on-yellow);
+  --nav-desbravadores-bg: var(--pastel-orange);
+  --nav-desbravadores-fg: var(--on-orange);
+  --nav-diretoria-bg: var(--pastel-lavender);
+  --nav-diretoria-fg: var(--on-lavender);
+  --nav-responsaveis-bg: var(--pastel-baby-blue);
+  --nav-responsaveis-fg: var(--on-baby-blue);
+  --nav-presencas-bg: #b9dcc8;
+  --nav-presencas-fg: var(--on-mint);
+  --nav-avisos-bg: var(--pastel-rose);
+  --nav-avisos-fg: var(--on-rose);
+  --nav-noticias-bg: #d4e8f5;
+  --nav-noticias-fg: var(--on-baby-blue);
+  --nav-finance-bg: #e8ddd4;
+  --nav-finance-fg: #4a433c;
 
-  --border-pastel: #e8e4f0;
-  --border-subtle: #e8e4f0;
-  --shadow-card: 0 18px 60px -18px rgb(45 45 68 / 0.18);
-  --shadow-nav: 0 -8px 32px rgb(45 45 68 / 0.08);
-  --shadow-glass: 0 18px 55px -22px rgb(45 45 68 / 0.20);
+  /* Item ativo na sidebar (diretoria) — verde menta suave */
+  --nav-sidebar-active-bg: var(--pastel-mint);
+  --nav-sidebar-active-fg: var(--on-mint);
+  --nav-sidebar-active-ring: rgb(53 86 73 / 0.12);
+
+  /* Texto global */
+  --text-primary: #3a3a45;
+  --text-secondary: #656575;
+  --text-muted: #8e8e9a;
+
+  --border-pastel: rgb(0 0 0 / 0.06);
+  --border-subtle: #e8e8ec;
+  --shadow-card: 0 10px 40px -12px rgb(55 55 75 / 0.1), 0 4px 16px -8px rgb(55 55 75 / 0.06);
+  --shadow-nav: 0 -6px 28px -6px rgb(55 55 75 / 0.08);
+  --shadow-glass: 0 12px 48px -16px rgb(55 55 75 / 0.12);
 
   --space-section: clamp(1rem, 3vw, 2rem);
   --radius-lg: clamp(0.875rem, 2vw, 1.125rem);
-  --radius-xl: clamp(1rem, 2.5vw, 1.25rem);
+  --radius-xl: clamp(1.125rem, 2.5vw, 1.5rem);
+  --radius-2xl: clamp(1.25rem, 3vw, 1.75rem);
 
   --text-title: clamp(1.25rem, 2.5vw + 0.5rem, 1.75rem);
   --text-body: clamp(0.875rem, 0.5vw + 0.8rem, 1rem);
@@ -75,13 +94,11 @@
 
   --tap-min: 44px;
 
-  /* Botões — sombras e raios consistentes */
   --btn-radius: 0.875rem;
   --btn-radius-lg: 1rem;
-  --btn-shadow: 0 4px 14px -4px rgb(15 23 42 / 0.18);
-  --btn-shadow-hover: 0 8px 22px -6px rgb(15 23 42 / 0.22);
-  --btn-focus-ring: 0 0 0 3px rgb(59 130 246 / 0.35);
+  --btn-shadow: 0 4px 14px -4px rgb(55 55 75 / 0.12);
+  --btn-shadow-hover: 0 8px 22px -6px rgb(55 55 75 / 0.14);
+  --btn-focus-ring: 0 0 0 3px rgb(207 232 216 / 0.65);
 
-  /* Portal família — folga inferior para a barra fixa + área segura (iOS/Android) */
   --parent-content-bottom-space: calc(6.25rem + env(safe-area-inset-bottom, 0px));
 }

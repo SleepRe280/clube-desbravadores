@@ -26,10 +26,13 @@
     <header class="parent-header shrink-0 z-30">
       <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
         <a href="{{ url_for('parent.home') }}" class="flex items-center gap-3 min-w-0 group">
-          <span
-            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-300 via-sky-400 to-rose-300 text-white text-xs font-extrabold tracking-tight shadow-lg shadow-slate-900/10 ring-2 ring-white/80"
-            >DC</span
-          >
+          <img
+            src="{{ url_for('static', filename='img/portal-logo-desbravadores.png') }}"
+            width="48"
+            height="48"
+            alt="Desbravadores"
+            class="h-11 w-11 sm:h-12 sm:w-12 shrink-0 object-contain rounded-2xl bg-white/95 shadow-lg shadow-slate-900/10 ring-2 ring-white/90"
+          />
           <span class="hidden sm:block min-w-0 text-left">
             <span class="block text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">Duque De Caxias</span>
             <span class="block text-sm font-medium text-slate-700">Portal família</span>

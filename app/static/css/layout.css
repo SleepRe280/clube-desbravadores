@@ -37,13 +37,13 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1rem;
-  background: var(--bg-topbar);
-  border-bottom: 1px solid var(--border-pastel);
+  background: rgb(255 255 255 / 0.85);
+  border-bottom: 1px solid var(--border-subtle);
   position: sticky;
   top: 0;
   z-index: 50;
   min-height: var(--tap-min);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
 }
 
 @media (min-width: 1024px) {
@@ -81,7 +81,7 @@
   transform: scale(0.96);
 }
 
-/* Links da sidebar — base suave (cores ativas continuam por utilitário Tailwind no HTML) */
+/* Links da sidebar — ícone colorido + item ativo em menta */
 .admin-nav-link {
   text-decoration: none;
   transition:
@@ -91,8 +91,64 @@
     transform 0.12s ease;
 }
 
-.admin-nav-link:hover {
+.admin-nav-link:hover:not(.admin-nav-link--active) {
   transform: translateX(2px);
+  background: rgb(207 232 216 / 0.22);
+}
+
+.admin-nav-link--active {
+  background: var(--nav-sidebar-active-bg) !important;
+  color: var(--nav-sidebar-active-fg) !important;
+  font-weight: 600;
+  box-shadow:
+    0 0 0 1px var(--nav-sidebar-active-ring),
+    0 6px 20px -8px rgb(53 86 73 / 0.1);
+}
+
+.admin-nav-icon {
+  flex-shrink: 0;
+  width: 2.375rem;
+  height: 2.375rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-lg);
+  font-size: 1.125rem;
+  line-height: 1;
+  transition: transform 0.15s ease;
+}
+
+.admin-nav-link--active .admin-nav-icon {
+  background: rgb(255 255 255 / 0.55);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.06);
+}
+
+.admin-nav-icon--inicio {
+  background: color-mix(in srgb, var(--pastel-mint) 92%, white);
+}
+.admin-nav-icon--agenda {
+  background: color-mix(in srgb, var(--pastel-yellow) 92%, white);
+}
+.admin-nav-icon--desbravadores {
+  background: color-mix(in srgb, var(--pastel-orange) 90%, white);
+}
+.admin-nav-icon--diretoria {
+  background: color-mix(in srgb, var(--pastel-lavender) 90%, white);
+}
+.admin-nav-icon--responsaveis {
+  background: color-mix(in srgb, var(--pastel-baby-blue) 90%, white);
+}
+.admin-nav-icon--presencas {
+  background: color-mix(in srgb, var(--pastel-mint) 75%, var(--pastel-baby-blue));
+}
+.admin-nav-icon--financeiro {
+  background: color-mix(in srgb, var(--pastel-rose) 75%, white);
+}
+.admin-nav-icon--avisos {
+  background: color-mix(in srgb, var(--pastel-rose) 88%, white);
+}
+.admin-nav-icon--noticias {
+  background: color-mix(in srgb, var(--pastel-baby-blue) 88%, white);
 }
 
 .admin-sidebar .ui-btn--logout {
@@ -100,10 +156,10 @@
   min-height: var(--tap-min);
   border-radius: var(--btn-radius-lg);
   font-weight: 600;
-  background: linear-gradient(180deg, #fff5f7 0%, #ffe4e9 100%);
-  color: #be123c;
-  border: 1.5px solid rgb(251 207 232 / 0.95);
-  box-shadow: 0 4px 16px -8px rgb(190 18 60 / 0.25);
+  background: color-mix(in srgb, var(--pastel-rose) 55%, white);
+  color: var(--on-rose);
+  border: 1px solid color-mix(in srgb, var(--pastel-rose) 70%, white);
+  box-shadow: 0 4px 14px -6px rgb(107 69 72 / 0.12);
   transition:
     background 0.18s ease,
     box-shadow 0.18s ease,
@@ -111,9 +167,9 @@
 }
 
 .admin-sidebar .ui-btn--logout:hover {
-  background: linear-gradient(180deg, #ffe4e9 0%, #fecdd3 100%);
-  border-color: #fda4af;
-  box-shadow: 0 6px 20px -8px rgb(190 18 60 / 0.3);
+  background: color-mix(in srgb, var(--pastel-rose) 72%, white);
+  border-color: color-mix(in srgb, var(--pastel-rose) 85%, white);
+  box-shadow: 0 6px 18px -6px rgb(107 69 72 / 0.14);
 }
 
 .admin-sidebar .ui-btn--logout:active {
@@ -160,14 +216,14 @@
   width: min(17rem, 88vw);
   height: 100%;
   height: 100dvh;
-  background: linear-gradient(180deg, rgb(255 255 255 / 0.92), rgb(255 255 255 / 0.82));
-  border-right: 1px solid var(--border-pastel);
+  background: linear-gradient(180deg, #fdfdfd 0%, #f6f6f7 100%);
+  border-right: 1px solid var(--border-subtle);
   transform: translateX(-100%);
   transition: transform 0.25s ease;
   display: flex;
   flex-direction: column;
-  box-shadow: 4px 0 24px rgb(15 23 42 / 0.08);
-  backdrop-filter: blur(14px);
+  box-shadow: 4px 0 32px rgb(55 55 75 / 0.06);
+  backdrop-filter: blur(16px);
 }
 
 .admin-nav-toggle:checked ~ .admin-sidebar {
@@ -195,11 +251,11 @@
 @media (min-width: 1024px) {
   .admin-main {
     margin: 1.25rem;
-    border-radius: var(--radius-xl);
-    border: 1px solid var(--border-pastel);
-    background: var(--surface-glass);
+    border-radius: var(--radius-2xl);
+    border: 1px solid rgb(255 255 255 / 0.65);
+    background: linear-gradient(145deg, rgb(255 255 255 / 0.78) 0%, rgb(255 255 255 / 0.62) 100%);
     box-shadow: var(--shadow-glass);
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(18px);
   }
 }
 
@@ -223,9 +279,9 @@
 
 .parent-header {
   flex-shrink: 0;
-  border-bottom: 1px solid var(--border-pastel);
+  border-bottom: 1px solid var(--border-subtle);
   background: var(--bg-topbar);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(18px);
 }
 
 .parent-main-wrap {
@@ -250,10 +306,10 @@
 
 .parent-panel {
   flex: 1;
-  border-radius: var(--radius-xl);
-  border: 1px solid var(--border-pastel);
-  background: var(--surface-glass);
-  backdrop-filter: blur(10px);
+  border-radius: var(--radius-2xl);
+  border: 1px solid rgb(255 255 255 / 0.55);
+  background: linear-gradient(160deg, rgb(255 255 255 / 0.82) 0%, rgb(255 255 255 / 0.68) 100%);
+  backdrop-filter: blur(14px);
   box-shadow: var(--shadow-card);
   padding: clamp(0.875rem, 2.5vw, 1.75rem);
 }
@@ -270,8 +326,8 @@
 }
 
 .parent-theme-feed .parent-header {
-  background: rgb(255 255 255 / 0.55);
-  border-bottom-color: rgb(232 228 245 / 0.6);
+  background: rgb(255 255 255 / 0.72);
+  border-bottom-color: var(--border-subtle);
 }
 
 .parent-bottom-nav {
@@ -281,9 +337,9 @@
   right: 0;
   z-index: 40;
   padding-bottom: env(safe-area-inset-bottom, 0);
-  background: rgb(255 255 255 / 0.94);
-  backdrop-filter: blur(12px);
-  border-top: 1px solid var(--border-pastel);
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.94) 0%, rgb(248 248 249 / 0.98) 100%);
+  backdrop-filter: blur(18px);
+  border-top: 1px solid var(--border-subtle);
   box-shadow: var(--shadow-nav);
 }
 
@@ -303,43 +359,44 @@
 }
 
 .parent-bottom-nav--modern {
-  border-top-left-radius: 1.25rem;
-  border-top-right-radius: 1.25rem;
-  background: rgb(255 255 255 / 0.82);
-  box-shadow: 0 -12px 40px -8px rgb(45 45 68 / 0.12);
-  border-top: 1px solid rgb(255 255 255 / 0.7);
+  border-top-left-radius: 1.35rem;
+  border-top-right-radius: 1.35rem;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.92) 0%, rgb(250 250 251 / 0.96) 100%);
+  box-shadow: 0 -8px 36px -10px rgb(55 55 75 / 0.1);
+  border-top: 1px solid rgb(255 255 255 / 0.85);
+  backdrop-filter: blur(16px);
 }
 
 .parent-nav-item--active {
   color: var(--text-primary);
 }
 .parent-nav-item--feed.parent-nav-item--active {
-  background: linear-gradient(145deg, rgb(224 245 230 / 0.95), rgb(200 235 215 / 0.5));
-  color: #166534;
+  background: color-mix(in srgb, var(--pastel-mint) 88%, white);
+  color: var(--on-mint);
 }
 .parent-nav-item--agenda.parent-nav-item--active {
-  background: linear-gradient(145deg, rgb(224 242 254 / 0.95), rgb(186 230 253 / 0.45));
-  color: #0369a1;
+  background: color-mix(in srgb, var(--pastel-yellow) 90%, white);
+  color: var(--on-yellow);
 }
 .parent-nav-item--members.parent-nav-item--active {
-  background: linear-gradient(145deg, rgb(255 237 213 / 0.95), rgb(254 215 170 / 0.45));
-  color: #c2410c;
+  background: color-mix(in srgb, var(--pastel-orange) 88%, white);
+  color: var(--on-orange);
 }
 .parent-nav-item--news.parent-nav-item--active {
-  background: linear-gradient(145deg, rgb(224 242 254 / 0.95), rgb(207 250 254 / 0.5));
-  color: #0e7490;
+  background: color-mix(in srgb, var(--pastel-baby-blue) 88%, white);
+  color: var(--on-baby-blue);
 }
 .parent-nav-item--pay.parent-nav-item--active {
-  background: linear-gradient(145deg, rgb(204 251 241 / 0.95), rgb(167 243 208 / 0.45));
-  color: #047857;
+  background: color-mix(in srgb, var(--pastel-rose) 85%, white);
+  color: var(--on-rose);
 }
 .parent-nav-item--lead.parent-nav-item--active {
-  background: linear-gradient(145deg, rgb(243 232 255 / 0.95), rgb(233 213 255 / 0.5));
-  color: #7c3aed;
+  background: color-mix(in srgb, var(--pastel-lavender) 88%, white);
+  color: var(--on-lavender);
 }
 .parent-nav-item--account.parent-nav-item--active {
-  background: linear-gradient(145deg, rgb(241 245 249 / 0.95), rgb(226 232 240 / 0.6));
-  color: #334155;
+  background: color-mix(in srgb, var(--pastel-mint) 45%, #e8e8ec);
+  color: var(--text-primary);
 }
 
 .parent-nav-item {

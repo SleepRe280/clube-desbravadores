@@ -112,7 +112,13 @@
     {% for post in board_posts %}
     <article class="overflow-hidden rounded-[1.5rem] bg-white/95 shadow-[0_16px_40px_-20px_rgba(15,23,42,0.15)] ring-1 ring-slate-200/60 backdrop-blur-sm">
       <div class="flex items-center gap-4 border-b border-slate-100/90 bg-gradient-to-r from-amber-50/90 via-white to-rose-50/40 px-5 py-4">
-        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-200 to-orange-100 text-sm font-extrabold text-amber-900 shadow-sm">DC</div>
+        <img
+          src="{{ url_for('static', filename='img/portal-logo-desbravadores.png') }}"
+          width="48"
+          height="48"
+          alt=""
+          class="h-12 w-12 shrink-0 object-contain rounded-2xl bg-white/90 shadow-sm ring-1 ring-amber-100/80"
+        />
         <div class="min-w-0">
           <p class="font-bold text-slate-900 truncate">Duque De Caxias</p>
           <p class="text-xs font-medium text-slate-500">{{ post.created_at.strftime('%d/%m/%Y') }}</p>
