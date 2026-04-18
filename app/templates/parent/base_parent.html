@@ -1,6 +1,6 @@
 {% from "parent/_nav_icons.html" import icon_feed, icon_agenda, icon_members, icon_news, icon_pay, icon_star, icon_account %}
 <!DOCTYPE html>
-<html lang="pt-BR" class="h-full">
+<html lang="pt-BR" class="h-full parent-portal-html">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -40,7 +40,7 @@
           <span class="hidden sm:block text-right max-w-[12rem] truncate text-sm font-medium text-slate-700" title="{{ current_user.full_name or current_user.email }}">{{ current_user.full_name or 'Responsável' }}</span>
           <a
             href="{{ url_for('auth.logout') }}"
-            class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white/90 text-rose-500 shadow-md shadow-slate-900/5 ring-1 ring-slate-200/80 hover:bg-rose-50 transition"
+            class="ui-btn ui-btn--icon ui-btn--icon-rose"
             title="Sair"
             aria-label="Sair"
           >
@@ -62,52 +62,52 @@
     </main>
 
     <nav class="parent-bottom-nav parent-bottom-nav--modern" aria-label="Navegação principal">
-      <div class="max-w-6xl mx-auto px-1 sm:px-2 grid grid-cols-7 gap-0.5 py-2">
+      <div class="max-w-6xl mx-auto px-0.5 sm:px-2 grid grid-cols-7 gap-px sm:gap-0.5 py-1.5 sm:py-2">
         <a
           href="{{ url_for('parent.home') }}"
-          class="parent-nav-item flex flex-col items-center justify-center gap-1 rounded-2xl px-1 py-1.5 min-h-[52px] text-[10px] sm:text-[11px] font-semibold tracking-tight transition {% if request.endpoint == 'parent.home' %}parent-nav-item--active parent-nav-item--feed{% else %}text-slate-500 hover:bg-white/70 hover:text-slate-800{% endif %}"
+          class="parent-nav-item flex flex-col items-center justify-center gap-0.5 sm:gap-1 rounded-xl sm:rounded-2xl px-0.5 sm:px-1 py-1 min-h-[48px] sm:min-h-[52px] font-semibold tracking-tight transition {% if request.endpoint == 'parent.home' %}parent-nav-item--active parent-nav-item--feed{% else %}text-slate-500 hover:bg-white/70 hover:text-slate-800{% endif %}"
         >
           {{ icon_feed('w-[22px] h-[22px] sm:w-6 sm:h-6') }}
           <span>Feed</span>
         </a>
         <a
           href="{{ url_for('parent.parent_agenda') }}"
-          class="parent-nav-item flex flex-col items-center justify-center gap-1 rounded-2xl px-1 py-1.5 min-h-[52px] text-[10px] sm:text-[11px] font-semibold tracking-tight transition {% if request.endpoint == 'parent.parent_agenda' %}parent-nav-item--active parent-nav-item--agenda{% else %}text-slate-500 hover:bg-white/70 hover:text-slate-800{% endif %}"
+          class="parent-nav-item flex flex-col items-center justify-center gap-0.5 sm:gap-1 rounded-xl sm:rounded-2xl px-0.5 sm:px-1 py-1 min-h-[48px] sm:min-h-[52px] font-semibold tracking-tight transition {% if request.endpoint == 'parent.parent_agenda' %}parent-nav-item--active parent-nav-item--agenda{% else %}text-slate-500 hover:bg-white/70 hover:text-slate-800{% endif %}"
         >
           {{ icon_agenda('w-[22px] h-[22px] sm:w-6 sm:h-6') }}
           <span>Agenda</span>
         </a>
         <a
           href="{{ url_for('parent.club_directory') }}"
-          class="parent-nav-item flex flex-col items-center justify-center gap-1 rounded-2xl px-1 py-1.5 min-h-[52px] text-[10px] sm:text-[11px] font-semibold tracking-tight transition {% if request.endpoint == 'parent.club_directory' %}parent-nav-item--active parent-nav-item--members{% else %}text-slate-500 hover:bg-white/70 hover:text-slate-800{% endif %}"
+          class="parent-nav-item flex flex-col items-center justify-center gap-0.5 sm:gap-1 rounded-xl sm:rounded-2xl px-0.5 sm:px-1 py-1 min-h-[48px] sm:min-h-[52px] font-semibold tracking-tight transition {% if request.endpoint == 'parent.club_directory' %}parent-nav-item--active parent-nav-item--members{% else %}text-slate-500 hover:bg-white/70 hover:text-slate-800{% endif %}"
         >
           {{ icon_members('w-[22px] h-[22px] sm:w-6 sm:h-6') }}
           <span class="leading-none text-center">Membros</span>
         </a>
         <a
           href="{{ url_for('parent.news_feed') }}"
-          class="parent-nav-item flex flex-col items-center justify-center gap-1 rounded-2xl px-1 py-1.5 min-h-[52px] text-[9px] sm:text-[11px] font-semibold tracking-tight transition {% if request.endpoint == 'parent.news_feed' %}parent-nav-item--active parent-nav-item--news{% else %}text-slate-500 hover:bg-white/70 hover:text-slate-800{% endif %}"
+          class="parent-nav-item flex flex-col items-center justify-center gap-0.5 sm:gap-1 rounded-xl sm:rounded-2xl px-0.5 sm:px-1 py-1 min-h-[48px] sm:min-h-[52px] font-semibold tracking-tight transition {% if request.endpoint == 'parent.news_feed' %}parent-nav-item--active parent-nav-item--news{% else %}text-slate-500 hover:bg-white/70 hover:text-slate-800{% endif %}"
         >
           {{ icon_news('w-[22px] h-[22px] sm:w-6 sm:h-6') }}
           <span>Notícias</span>
         </a>
         <a
           href="{{ url_for('parent.parent_finance') }}"
-          class="parent-nav-item flex flex-col items-center justify-center gap-1 rounded-2xl px-1 py-1.5 min-h-[52px] text-[9px] sm:text-[11px] font-semibold tracking-tight transition {% if request.endpoint == 'parent.parent_finance' %}parent-nav-item--active parent-nav-item--pay{% else %}text-slate-500 hover:bg-white/70 hover:text-slate-800{% endif %}"
+          class="parent-nav-item flex flex-col items-center justify-center gap-0.5 sm:gap-1 rounded-xl sm:rounded-2xl px-0.5 sm:px-1 py-1 min-h-[48px] sm:min-h-[52px] font-semibold tracking-tight transition {% if request.endpoint == 'parent.parent_finance' %}parent-nav-item--active parent-nav-item--pay{% else %}text-slate-500 hover:bg-white/70 hover:text-slate-800{% endif %}"
         >
           {{ icon_pay('w-[22px] h-[22px] sm:w-6 sm:h-6') }}
           <span class="leading-none text-center">Pagamentos</span>
         </a>
         <a
           href="{{ url_for('parent.club_directorate') }}"
-          class="parent-nav-item flex flex-col items-center justify-center gap-1 rounded-2xl px-1 py-1.5 min-h-[52px] text-[9px] sm:text-[11px] font-semibold tracking-tight transition {% if request.endpoint == 'parent.club_directorate' %}parent-nav-item--active parent-nav-item--lead{% else %}text-slate-500 hover:bg-white/70 hover:text-slate-800{% endif %}"
+          class="parent-nav-item flex flex-col items-center justify-center gap-0.5 sm:gap-1 rounded-xl sm:rounded-2xl px-0.5 sm:px-1 py-1 min-h-[48px] sm:min-h-[52px] font-semibold tracking-tight transition {% if request.endpoint == 'parent.club_directorate' %}parent-nav-item--active parent-nav-item--lead{% else %}text-slate-500 hover:bg-white/70 hover:text-slate-800{% endif %}"
         >
           {{ icon_star('w-[22px] h-[22px] sm:w-6 sm:h-6') }}
           <span class="leading-none text-center">Liderança</span>
         </a>
         <a
           href="{{ url_for('parent.account') }}"
-          class="parent-nav-item flex flex-col items-center justify-center gap-1 rounded-2xl px-1 py-1.5 min-h-[52px] text-[10px] sm:text-[11px] font-semibold tracking-tight transition {% if request.endpoint == 'parent.account' %}parent-nav-item--active parent-nav-item--account{% else %}text-slate-500 hover:bg-white/70 hover:text-slate-800{% endif %}"
+          class="parent-nav-item flex flex-col items-center justify-center gap-0.5 sm:gap-1 rounded-xl sm:rounded-2xl px-0.5 sm:px-1 py-1 min-h-[48px] sm:min-h-[52px] font-semibold tracking-tight transition {% if request.endpoint == 'parent.account' %}parent-nav-item--active parent-nav-item--account{% else %}text-slate-500 hover:bg-white/70 hover:text-slate-800{% endif %}"
         >
           {{ icon_account('w-[22px] h-[22px] sm:w-6 sm:h-6') }}
           <span>Conta</span>

@@ -137,15 +137,9 @@
             </p>
           </div>
           <div class="flex gap-3 text-sm shrink-0">
-            <a
-              href="{{ url_for('admin.agenda_edit', eid=ev.id) }}"
-              class="rounded-lg border border-indigo-200 bg-indigo-50 text-indigo-800 px-3 py-1.5 font-semibold hover:bg-indigo-100 transition text-xs sm:text-sm"
-              >Editar</a
-            >
+            <a href="{{ url_for('admin.agenda_edit', eid=ev.id) }}" class="ui-btn ui-btn--sm ui-btn--accent-violet">Editar</a>
             <form method="post" action="{{ url_for('admin.agenda_delete', eid=ev.id) }}" class="inline" onsubmit="return confirm('Excluir este evento?');">
-              <button type="submit" class="rounded-lg border border-red-200 bg-red-50 text-red-700 px-3 py-1.5 font-semibold hover:bg-red-100 transition text-xs sm:text-sm">
-                Excluir
-              </button>
+              <button type="submit" class="ui-btn ui-btn--sm ui-btn--danger-soft">Excluir</button>
             </form>
           </div>
         </div>

@@ -58,12 +58,66 @@
   justify-content: center;
   min-width: var(--tap-min);
   min-height: var(--tap-min);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-subtle);
-  background: var(--surface-card);
+  border-radius: var(--btn-radius-lg);
+  border: 1px solid var(--border-pastel);
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.98), rgb(250 250 252 / 0.95));
   cursor: pointer;
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   line-height: 1;
+  color: var(--text-primary);
+  box-shadow: 0 2px 10px -4px rgb(15 23 42 / 0.12);
+  transition:
+    background 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.12s ease;
+}
+
+.admin-menu-btn:hover {
+  background: #fff;
+  box-shadow: 0 4px 16px -6px rgb(15 23 42 / 0.16);
+}
+
+.admin-menu-btn:active {
+  transform: scale(0.96);
+}
+
+/* Links da sidebar — base suave (cores ativas continuam por utilitário Tailwind no HTML) */
+.admin-nav-link {
+  text-decoration: none;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.12s ease;
+}
+
+.admin-nav-link:hover {
+  transform: translateX(2px);
+}
+
+.admin-sidebar .ui-btn--logout {
+  width: 100%;
+  min-height: var(--tap-min);
+  border-radius: var(--btn-radius-lg);
+  font-weight: 600;
+  background: linear-gradient(180deg, #fff5f7 0%, #ffe4e9 100%);
+  color: #be123c;
+  border: 1.5px solid rgb(251 207 232 / 0.95);
+  box-shadow: 0 4px 16px -8px rgb(190 18 60 / 0.25);
+  transition:
+    background 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.12s ease;
+}
+
+.admin-sidebar .ui-btn--logout:hover {
+  background: linear-gradient(180deg, #ffe4e9 0%, #fecdd3 100%);
+  border-color: #fda4af;
+  box-shadow: 0 6px 20px -8px rgb(190 18 60 / 0.3);
+}
+
+.admin-sidebar .ui-btn--logout:active {
+  transform: scale(0.98);
 }
 
 /* Overlay: só quando menu aberto (irmão do checkbox) */
@@ -183,12 +237,14 @@
   max-width: 80rem;
   margin-left: auto;
   margin-right: auto;
-  padding: 0.75rem clamp(0.5rem, 2.5vw, 1.75rem) 5.25rem;
+  /* Evita que a última seção (ex.: “Reuniões”) fique sob a barra fixa */
+  padding: 0.75rem clamp(0.5rem, 2.5vw, 1.75rem) var(--parent-content-bottom-space);
+  box-sizing: border-box;
 }
 
 @media (min-width: 640px) {
   .parent-main-wrap {
-    padding: 1rem clamp(0.75rem, 3vw, 2rem) 5.75rem;
+    padding: 1rem clamp(0.75rem, 3vw, 2rem) var(--parent-content-bottom-space);
   }
 }
 
@@ -229,6 +285,16 @@
   backdrop-filter: blur(12px);
   border-top: 1px solid var(--border-pastel);
   box-shadow: var(--shadow-nav);
+}
+
+.parent-bottom-nav .parent-nav-item > span:not([class*="sr-only"]) {
+  display: block;
+  max-width: 100%;
+  line-height: 1.15;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: clamp(0.5625rem, 2.1vw, 0.6875rem);
 }
 
 .parent-bottom-nav--compact {
@@ -276,6 +342,23 @@
   color: #334155;
 }
 
+.parent-nav-item {
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+}
+
+.parent-nav-item:not(.parent-nav-item--active):hover {
+  transform: translateY(-1px);
+}
+
+.parent-header .ui-btn--icon-rose:focus-visible {
+  outline: none;
+  box-shadow: var(--btn-shadow), var(--btn-focus-ring);
+}
+
 /* ---------- Utilitários de largura / overflow ---------- */
 .table-responsive {
   width: 100%;
@@ -285,4 +368,9 @@
 
 .container-readable {
   max-width: 65ch;
+}
+
+/* Rolagem: últimos blocos não ficam escondidos atrás da barra */
+html.parent-portal-html {
+  scroll-padding-bottom: var(--parent-content-bottom-space);
 }

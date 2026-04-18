@@ -74,4 +74,14 @@
   --bp-xl: 80rem;
 
   --tap-min: 44px;
+
+  /* Botões — sombras e raios consistentes */
+  --btn-radius: 0.875rem;
+  --btn-radius-lg: 1rem;
+  --btn-shadow: 0 4px 14px -4px rgb(15 23 42 / 0.18);
+  --btn-shadow-hover: 0 8px 22px -6px rgb(15 23 42 / 0.22);
+  --btn-focus-ring: 0 0 0 3px rgb(59 130 246 / 0.35);
+
+  /* Portal família — folga inferior para a barra fixa + área segura (iOS/Android) */
+  --parent-content-bottom-space: calc(6.25rem + env(safe-area-inset-bottom, 0px));
 }

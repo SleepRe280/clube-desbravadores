@@ -1,7 +1,7 @@
 {% extends "admin/base_admin.html" %}
 {% block title %}Responsável — {{ parent_user.full_name or parent_user.email }}{% endblock %}
 {% block content %}
-<a href="{{ url_for('admin.parents_list') }}" class="text-sm text-slate-600 hover:underline">← Lista de responsáveis</a>
+<a href="{{ url_for('admin.parents_list') }}" class="ui-link ui-link--subtle text-sm">← Lista de responsáveis</a>
 <h1 class="text-2xl font-bold mt-4">{{ parent_user.full_name or 'Sem nome' }}</h1>
 <p class="text-slate-600 text-sm mt-1">{{ parent_user.email }}</p>
 <p class="text-xs text-slate-400 mt-1">Conta criada em {{ parent_user.created_at.strftime('%d/%m/%Y %H:%M') }}</p>
@@ -17,7 +17,7 @@
         <form method="post" class="inline" onsubmit="return confirm('Remover vínculo deste desbravador?');">
           <input type="hidden" name="action" value="unlink" />
           <input type="hidden" name="member_id" value="{{ m.id }}" />
-          <button type="submit" class="text-red-600 hover:underline text-xs font-medium">Desvincular</button>
+          <button type="submit" class="ui-btn ui-btn--sm ui-btn--text-danger">Desvincular</button>
         </form>
       </li>
       {% endfor %}
@@ -45,9 +45,7 @@
           {% endfor %}
         </select>
       </div>
-      <button type="submit" class="rounded-lg bg-blue-600 text-white px-4 py-2 text-sm font-semibold hover:bg-blue-700">
-        Vincular a este responsável
-      </button>
+      <button type="submit" class="ui-btn ui-btn--info">Vincular a este responsável</button>
     </form>
     {% else %}
     <p class="text-amber-700 text-sm mt-4">Todos os desbravadores já têm responsável ou não há membros cadastrados.</p>
@@ -67,9 +65,7 @@
     class="mt-4"
     onsubmit="return confirm('Excluir permanentemente esta conta de responsável? Esta ação não pode ser desfeita.');"
   >
-    <button type="submit" class="rounded-lg border border-red-300 bg-white text-red-800 px-4 py-2 text-sm font-semibold hover:bg-red-100">
-      Excluir conta do responsável
-    </button>
+    <button type="submit" class="ui-btn ui-btn--danger-soft">Excluir conta do responsável</button>
   </form>
 </section>
 {% endblock %}

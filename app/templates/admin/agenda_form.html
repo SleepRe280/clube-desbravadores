@@ -19,9 +19,9 @@
     <label class="block text-sm font-medium text-slate-700 mb-1">Detalhes</label>
     <textarea name="body" rows="5" class="w-full rounded-lg border border-slate-300 px-3 py-2">{{ ev.body if ev else '' }}</textarea>
   </div>
-  <div class="flex gap-3">
-    <button type="submit" class="rounded-lg bg-indigo-600 text-white px-5 py-2 text-sm font-semibold">Salvar</button>
-    <a href="{{ url_for('admin.agenda_list', year=back_year, month=back_month) }}" class="rounded-lg border border-slate-300 px-5 py-2 text-sm">Voltar ao calendário</a>
+  <div class="flex flex-wrap gap-3">
+    <button type="submit" class="ui-btn ui-btn--indigo">Salvar</button>
+    <a href="{{ url_for('admin.agenda_list', year=back_year, month=back_month) }}" class="ui-btn ui-btn--outline">Voltar ao calendário</a>
   </div>
 </form>
 {% endblock %}

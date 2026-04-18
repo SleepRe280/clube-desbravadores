@@ -27,9 +27,9 @@
     {% endif %}
     <input type="file" name="image" accept="image/*" class="mt-2 w-full text-sm" />
   </div>
-  <div class="flex gap-3">
-    <button type="submit" class="rounded-xl bg-sky-600 text-white px-6 py-2.5 font-semibold">Salvar</button>
-    <a href="{{ url_for('admin.club_news_list') }}" class="rounded-xl border px-6 py-2.5">Voltar</a>
+  <div class="flex flex-wrap gap-3">
+    <button type="submit" class="ui-btn ui-btn--info">Salvar</button>
+    <a href="{{ url_for('admin.club_news_list') }}" class="ui-btn ui-btn--outline">Voltar</a>
   </div>
 </form>
 {% endblock %}

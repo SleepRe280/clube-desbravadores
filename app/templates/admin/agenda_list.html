@@ -6,9 +6,7 @@
     <h1 class="text-2xl font-bold text-slate-900">Agenda do clube</h1>
     <p class="text-slate-600 text-sm mt-1">Tarefas e compromissos visíveis aos responsáveis no app.</p>
   </div>
-  <a href="{{ url_for('admin.agenda_new') }}" class="rounded-xl bg-indigo-600 text-white px-4 py-2 text-sm font-semibold hover:bg-indigo-700"
-    >Novo evento</a
-  >
+  <a href="{{ url_for('admin.agenda_new') }}" class="ui-btn ui-btn--indigo">Novo evento</a>
 </div>
 <div class="mt-6 space-y-3">
   {% for ev in events %}
@@ -22,9 +20,9 @@
       {% if ev.body %}<p class="text-slate-600 text-sm mt-2 whitespace-pre-line">{{ ev.body }}</p>{% endif %}
     </div>
     <div class="flex gap-2 shrink-0">
-      <a href="{{ url_for('admin.agenda_edit', eid=ev.id) }}" class="text-sm text-blue-600 hover:underline">Editar</a>
+      <a href="{{ url_for('admin.agenda_edit', eid=ev.id) }}" class="ui-btn ui-btn--sm ui-btn--outline">Editar</a>
       <form method="post" action="{{ url_for('admin.agenda_delete', eid=ev.id) }}" onsubmit="return confirm('Excluir este evento?');">
-        <button type="submit" class="text-sm text-red-600 hover:underline">Excluir</button>
+        <button type="submit" class="ui-btn ui-btn--sm ui-btn--danger-soft">Excluir</button>
       </form>
     </div>
   </div>

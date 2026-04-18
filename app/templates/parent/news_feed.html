@@ -4,17 +4,9 @@
 <h1 class="text-2xl font-bold text-slate-900">Notícias</h1>
 <p class="text-slate-500 text-sm mt-1">Desbravadores: local, regional, estadual e mundial.</p>
 <div class="flex flex-wrap gap-2 mt-4">
-  <a
-    href="{{ url_for('parent.news_feed') }}"
-    class="px-3 py-1.5 rounded-full text-xs font-medium {% if not active_level %}bg-slate-900 text-white{% else %}bg-white border border-slate-200 text-slate-600{% endif %}"
-    >Todas</a
-  >
+  <a href="{{ url_for('parent.news_feed') }}" class="ui-chip {% if not active_level %}ui-chip--active{% endif %}">Todas</a>
   {% for code, label in news_labels.items() %}
-  <a
-    href="{{ url_for('parent.news_feed', nivel=code) }}"
-    class="px-3 py-1.5 rounded-full text-xs font-medium {% if active_level == code %}bg-blue-600 text-white{% else %}bg-white border border-slate-200 text-slate-600{% endif %}"
-    >{{ label }}</a
-  >
+  <a href="{{ url_for('parent.news_feed', nivel=code) }}" class="ui-chip {% if active_level == code %}ui-chip--active{% endif %}">{{ label }}</a>
   {% endfor %}
 </div>
 <div class="mt-6 space-y-4">

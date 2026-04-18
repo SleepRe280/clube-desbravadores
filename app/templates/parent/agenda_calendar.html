@@ -4,7 +4,7 @@
 {% macro iso_day(y, m, d) -%}{{ y }}-{% if m < 10 %}0{% endif %}{{ m }}-{% if d < 10 %}0{% endif %}{{ d }}{%- endmacro %}
 {% set selected_iso = selected_day.isoformat() %}
 
-<a href="{{ url_for('parent.home') }}" class="text-sm font-medium text-[var(--nav-agenda-fg)] hover:underline mb-4 inline-block">← Voltar ao feed</a>
+<a href="{{ url_for('parent.home') }}" class="ui-link text-sm mb-4 inline-block">← Voltar ao feed</a>
 
 <div class="rounded-2xl bg-gradient-to-br from-amber-100/90 via-white to-sky-100/80 p-[1px] shadow-md border border-[var(--border-pastel)] mb-6">
   <div class="rounded-2xl bg-white/95 px-4 py-4 sm:px-6 sm:py-5">
@@ -19,14 +19,14 @@
       <div class="flex flex-wrap items-center gap-2">
         <a
           href="{{ url_for('parent.parent_agenda', year=prev_y, month=prev_m, selected=nav_sel_prev) }}"
-          class="rounded-xl border border-slate-200 bg-[#fff8e1] px-3 py-2 text-sm font-bold text-amber-900 min-h-[44px] inline-flex items-center hover:bg-[#ffecb3] transition"
+          class="ui-btn ui-btn--amber px-4 min-w-[3rem]"
           aria-label="Mês anterior"
           >←</a
         >
         <span class="font-bold text-[var(--text-primary)] px-1 min-w-[10rem] text-center">{{ month_label }}</span>
         <a
           href="{{ url_for('parent.parent_agenda', year=next_y, month=next_m, selected=nav_sel_next) }}"
-          class="rounded-xl border border-slate-200 bg-[#fff8e1] px-3 py-2 text-sm font-bold text-amber-900 min-h-[44px] inline-flex items-center hover:bg-[#ffecb3] transition"
+          class="ui-btn ui-btn--amber px-4 min-w-[3rem]"
           aria-label="Próximo mês"
           >→</a
         >

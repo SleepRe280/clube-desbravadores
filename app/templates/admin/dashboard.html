@@ -10,22 +10,22 @@
   <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
     <p class="text-xs font-semibold text-red-600 uppercase">Desbravadores</p>
     <p class="text-3xl font-bold text-slate-900 mt-1">{{ n_members }}</p>
-    <a href="{{ url_for('admin.members') }}" class="text-sm text-blue-600 mt-2 inline-block hover:underline">Lista completa</a>
+    <a href="{{ url_for('admin.members') }}" class="ui-link mt-2 inline-block">Lista completa</a>
   </div>
   <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
     <p class="text-xs font-semibold text-green-600 uppercase">Responsáveis</p>
     <p class="text-3xl font-bold text-slate-900 mt-1">{{ n_parents }}</p>
-    <a href="{{ url_for('admin.parents_list') }}" class="text-sm text-blue-600 mt-2 inline-block hover:underline">Vínculos</a>
+    <a href="{{ url_for('admin.parents_list') }}" class="ui-link mt-2 inline-block">Vínculos</a>
   </div>
   <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
     <p class="text-xs font-semibold text-violet-600 uppercase">Diretoria</p>
     <p class="text-3xl font-bold text-slate-900 mt-1">{{ n_dir }}</p>
-    <a href="{{ url_for('admin.directorate_list') }}" class="text-sm text-blue-600 mt-2 inline-block hover:underline">Equipe</a>
+    <a href="{{ url_for('admin.directorate_list') }}" class="ui-link mt-2 inline-block">Equipe</a>
   </div>
   <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
     <p class="text-xs font-semibold text-sky-600 uppercase">Notícias WD</p>
     <p class="text-3xl font-bold text-slate-900 mt-1">{{ n_news }}</p>
-    <a href="{{ url_for('admin.club_news_list') }}" class="text-sm text-blue-600 mt-2 inline-block hover:underline">Gerir</a>
+    <a href="{{ url_for('admin.club_news_list') }}" class="ui-link mt-2 inline-block">Gerir</a>
   </div>
 </div>
 
@@ -38,7 +38,7 @@
     <p class="text-sm text-slate-600 mt-1">
       Cobranças em aberto: <strong class="text-slate-900 tabular-nums">{{ format_brl(finance_pending_fees) }}</strong>
     </p>
-    <a href="{{ url_for('admin.finance_dashboard') }}" class="text-sm text-blue-600 font-medium mt-3 inline-block hover:underline">Abrir monitoramento financeiro</a>
+    <a href="{{ url_for('admin.finance_dashboard') }}" class="ui-link mt-3 inline-block">Abrir monitoramento financeiro</a>
   </div>
 </div>
 
@@ -87,7 +87,7 @@
       </div>
       {% endfor %}
     </div>
-    <a href="{{ url_for('admin.directorate_list') }}" class="text-sm text-blue-600 mt-4 inline-block hover:underline">Editar equipe</a>
+    <a href="{{ url_for('admin.directorate_list') }}" class="ui-link mt-4 inline-block">Editar equipe</a>
     {% else %}
     <p class="text-slate-500 text-sm">Cadastre líderes em Equipe da diretoria.</p>
     {% endif %}
@@ -106,6 +106,6 @@
     <li class="text-slate-500 text-sm">Nenhum aviso.</li>
     {% endfor %}
   </ul>
-  <a href="{{ url_for('admin.post_new') }}" class="text-sm text-green-700 font-medium hover:underline mt-3 inline-block">Novo aviso</a>
+  <a href="{{ url_for('admin.post_new') }}" class="ui-link mt-3 inline-block">Novo aviso</a>
 </div>
 {% endblock %}

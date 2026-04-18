@@ -175,8 +175,8 @@
   </div>
 
   <div class="flex flex-wrap gap-3">
-    <button type="submit" class="rounded-lg bg-slate-900 text-white px-6 py-2.5 text-sm font-semibold">Salvar ficha</button>
-    <a href="{{ url_for('admin.members') }}" class="rounded-lg border border-slate-300 px-6 py-2.5 text-sm">Voltar à lista</a>
+    <button type="submit" class="ui-btn ui-btn--primary">Salvar ficha</button>
+    <a href="{{ url_for('admin.members') }}" class="ui-btn ui-btn--outline">Voltar à lista</a>
   </div>
 </form>
 
@@ -187,7 +187,7 @@
   class="mt-8 max-w-3xl pt-6 border-t border-red-100"
   onsubmit="return confirm('Excluir permanentemente este desbravador e presenças, caderno e duques? Esta ação não pode ser desfeita.');"
 >
-  <button type="submit" class="text-sm font-semibold text-red-600 hover:text-red-800 hover:underline">Excluir desbravador do sistema</button>
+  <button type="submit" class="ui-btn ui-btn--text-danger">Excluir desbravador do sistema</button>
 </form>
 {% endif %}
 

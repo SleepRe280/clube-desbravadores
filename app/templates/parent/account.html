@@ -5,18 +5,11 @@
 <p class="text-slate-500 text-sm mt-1">{{ current_user.full_name or 'Responsável' }}</p>
 <p class="text-xs text-slate-400 mt-0.5 break-all">{{ current_user.email }}</p>
 
-<div class="mt-8 space-y-3">
-  <a
-    href="{{ url_for('auth.change_password') }}"
-    class="flex items-center justify-between rounded-2xl bg-white border border-slate-200 px-4 py-4 shadow-sm hover:border-blue-200"
-  >
+<div class="mt-8 space-y-3 max-w-md">
+  <a href="{{ url_for('auth.change_password') }}" class="ui-btn ui-btn--outline ui-btn--between">
     <span class="font-medium text-slate-800">Alterar senha</span>
-    <span class="text-slate-400">›</span>
+    <span class="text-slate-400" aria-hidden="true">›</span>
   </a>
-  <a
-    href="{{ url_for('auth.logout') }}"
-    class="flex items-center justify-center rounded-2xl border border-red-200 text-red-700 py-3 font-medium text-sm hover:bg-red-50"
-    >Sair</a
-  >
+  <a href="{{ url_for('auth.logout') }}" class="ui-btn ui-btn--danger-soft ui-btn--block">Sair</a>
 </div>
 {% endblock %}

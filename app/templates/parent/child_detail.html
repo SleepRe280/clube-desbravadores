@@ -1,7 +1,7 @@
 {% extends "parent/base_parent.html" %}
 {% block title %}{{ member.full_name }}{% endblock %}
 {% block content %}
-<a href="{{ url_for('parent.home') }}" class="text-sm text-blue-600 hover:underline mb-4 inline-block">← Voltar ao feed</a>
+<a href="{{ url_for('parent.home') }}" class="ui-link text-sm mb-4 inline-block">← Voltar ao feed</a>
 
 <div class="flex items-start gap-4 mb-6">
   {% if member.photo_filename %}
