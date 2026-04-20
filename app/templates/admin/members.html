@@ -8,7 +8,54 @@
   </div>
   <a href="{{ url_for('admin.member_new') }}" class="ui-btn ui-btn--primary">Novo membro</a>
 </div>
-<div class="table-responsive mt-6 rounded-2xl border border-slate-200/90 shadow-sm bg-white overflow-hidden">
+<div class="mt-6 space-y-3 md:hidden">
+  {% for m in members %}
+  <article class="rounded-2xl border border-slate-200/90 shadow-sm bg-white p-4">
+    <div class="flex items-start justify-between gap-3">
+      <div class="min-w-0">
+        <h2 class="font-semibold text-slate-900 leading-tight">{{ m.full_name }}</h2>
+        <p class="text-xs text-slate-600 mt-1">{{ m.unit or '—' }}</p>
+      </div>
+      <span
+        class="inline-flex items-center max-w-[140px] truncate rounded-lg bg-gradient-to-br from-emerald-50 via-teal-50/80 to-cyan-50 border border-emerald-100/90 text-emerald-900 text-[11px] font-semibold px-2 py-1 shadow-sm"
+        title="{{ m.notebook_current or 'Sem caderno' }}"
+        >{{ m.notebook_current or '—' }}</span
+      >
+    </div>
+    <div class="grid grid-cols-2 gap-2 mt-3 text-xs">
+      <div class="rounded-lg bg-slate-50 border border-slate-100 px-2.5 py-2">
+        <p class="text-slate-500">CPF</p>
+        <p class="text-slate-700 font-mono mt-0.5">{% if m.cpf %}{{ format_cpf_display(m.cpf) }}{% else %}—{% endif %}</p>
+      </div>
+      <div class="rounded-lg bg-slate-50 border border-slate-100 px-2.5 py-2">
+        <p class="text-slate-500">Responsável</p>
+        <p class="text-slate-700 truncate mt-0.5" title="{{ m.parent.email if m.parent else '' }}">
+          {{ m.parent.email if m.parent else '—' }}
+        </p>
+      </div>
+    </div>
+    <div class="mt-3">
+      <div class="flex items-center gap-2">
+        <div class="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
+          <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full" style="width: {{ m.computed_overall_performance() }}%"></div>
+        </div>
+        <span class="text-xs text-slate-500 tabular-nums">{{ m.computed_overall_performance() }}%</span>
+      </div>
+    </div>
+    <div class="mt-4 grid grid-cols-2 gap-2">
+      <a href="{{ url_for('admin.member_edit', id=m.id) }}" class="ui-btn ui-btn--sm ui-btn--accent-violet">Ficha</a>
+      <a href="{{ url_for('admin.member_activity', id=m.id) }}" class="ui-btn ui-btn--sm ui-btn--accent-emerald">Caderno</a>
+      <a href="{{ url_for('admin.member_attendance', id=m.id) }}" class="ui-btn ui-btn--sm ui-btn--accent-sky">Presença</a>
+      <form method="post" action="{{ url_for('admin.member_delete', id=m.id) }}" onsubmit="return confirm('Excluir este desbravador? Esta ação não pode ser desfeita.');">
+        <button type="submit" class="ui-btn ui-btn--sm ui-btn--danger-soft w-full">Excluir</button>
+      </form>
+    </div>
+  </article>
+  {% else %}
+  <div class="rounded-2xl border border-slate-200 bg-white px-4 py-10 text-center text-slate-500">Nenhum membro cadastrado.</div>
+  {% endfor %}
+</div>
+<div class="table-responsive mt-6 rounded-2xl border border-slate-200/90 shadow-sm bg-white overflow-hidden hidden md:block">
   <table class="min-w-[800px] w-full text-sm">
     <thead class="bg-gradient-to-b from-slate-50 to-slate-100/80 text-slate-600 border-b border-slate-200">
       <tr>

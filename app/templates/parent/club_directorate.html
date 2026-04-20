@@ -5,17 +5,17 @@
 <p class="text-slate-500 text-sm mt-2">Diretoria e líderes do clube — cadastro voltado ao ministério.</p>
 <div class="mt-6 space-y-4">
   {% for d in team %}
-  <div class="rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden flex gap-4 p-4">
+  <div class="rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden flex flex-col sm:flex-row gap-4 p-4">
     {% if d.photo_filename %}
-    <img src="{{ url_for('uploaded_file', rel_path=d.photo_filename) }}" class="h-20 w-20 rounded-xl object-cover shrink-0" alt="" />
+    <img src="{{ url_for('uploaded_file', rel_path=d.photo_filename) }}" class="h-20 w-20 rounded-xl object-cover shrink-0 mx-auto sm:mx-0" alt="" />
     {% else %}
-    <div class="h-20 w-20 rounded-xl bg-violet-100 text-violet-800 flex items-center justify-center text-2xl font-bold shrink-0">
+    <div class="h-20 w-20 rounded-xl bg-violet-100 text-violet-800 flex items-center justify-center text-2xl font-bold shrink-0 mx-auto sm:mx-0">
       {{ d.full_name[0]|upper }}
     </div>
     {% endif %}
-    <div class="min-w-0 flex-1">
-      <p class="font-bold text-slate-900">{{ d.full_name }}</p>
-      <p class="text-violet-700 text-sm font-medium mt-0.5">{{ d.cargo }}</p>
+    <div class="min-w-0 flex-1 text-center sm:text-left">
+      <p class="font-bold text-slate-900 break-words">{{ d.full_name }}</p>
+      <p class="text-violet-700 text-sm font-medium mt-0.5 break-words">{{ d.cargo }}</p>
       {% if d.bio %}
       <p class="text-slate-600 text-sm mt-2 leading-relaxed">{{ d.bio }}</p>
       {% endif %}

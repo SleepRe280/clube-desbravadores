@@ -1,12 +1,17 @@
 {% extends "parent/base_parent.html" %}
 {% block title %}Notícias{% endblock %}
 {% block content %}
-<h1 class="text-2xl font-bold text-slate-900">Notícias</h1>
-<p class="text-slate-500 text-sm mt-1">Desbravadores: local, regional, estadual e mundial.</p>
+<h1 class="text-2xl font-bold text-slate-900">Comunicados do clube</h1>
+<p class="text-slate-500 text-sm mt-1">Avisos e notícias em uma única linha do tempo, com filtros.</p>
 <div class="flex flex-wrap gap-2 mt-4">
-  <a href="{{ url_for('parent.news_feed') }}" class="ui-chip {% if not active_level %}ui-chip--active{% endif %}">Todas</a>
+  <a href="{{ url_for('parent.news_feed', nivel=active_level) }}" class="ui-chip {% if active_type == 'todos' %}ui-chip--active{% endif %}">Tudo</a>
+  <a href="{{ url_for('parent.news_feed', tipo='avisos', nivel=active_level) }}" class="ui-chip {% if active_type == 'avisos' %}ui-chip--active{% endif %}">Só avisos</a>
+  <a href="{{ url_for('parent.news_feed', tipo='noticias', nivel=active_level) }}" class="ui-chip {% if active_type == 'noticias' %}ui-chip--active{% endif %}">Só notícias</a>
+</div>
+<div class="flex flex-wrap gap-2 mt-3">
+  <a href="{{ url_for('parent.news_feed', tipo=active_type) }}" class="ui-chip {% if not active_level %}ui-chip--active{% endif %}">Todos os níveis</a>
   {% for code, label in news_labels.items() %}
-  <a href="{{ url_for('parent.news_feed', nivel=code) }}" class="ui-chip {% if active_level == code %}ui-chip--active{% endif %}">{{ label }}</a>
+  <a href="{{ url_for('parent.news_feed', nivel=code, tipo=active_type) }}" class="ui-chip {% if active_level == code %}ui-chip--active{% endif %}">{{ label }}</a>
   {% endfor %}
 </div>
 <div class="mt-6 space-y-4">
@@ -14,8 +19,8 @@
   <article class="rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden">
     <div class="px-4 py-2 bg-slate-50 border-b border-slate-100">
       <span
-        class="text-[10px] font-bold uppercase tracking-wide {% if n.level == 'mundial' %}text-indigo-600{% elif n.level == 'estadual' %}text-blue-600{% elif n.level == 'regional' %}text-green-600{% else %}text-amber-700{% endif %}"
-        >{{ news_labels.get(n.level, n.level) }}</span
+        class="text-[10px] font-bold uppercase tracking-wide {% if n.kind == 'post' %}text-amber-700{% elif n.level == 'mundial' %}text-indigo-600{% elif n.level == 'estadual' %}text-blue-600{% elif n.level == 'regional' %}text-green-600{% else %}text-amber-700{% endif %}"
+        >{{ n.label }}</span
       >
     </div>
     {% if n.image_filename %}
@@ -24,11 +29,11 @@
     <div class="p-4">
       <h2 class="font-bold text-slate-900">{{ n.title }}</h2>
       <p class="text-slate-600 text-sm mt-2 whitespace-pre-line leading-relaxed">{{ n.body }}</p>
-      <p class="text-[10px] text-slate-400 mt-3">{{ n.created_at.strftime('%d/%m/%Y') }}</p>
+      <p class="text-[10px] text-slate-400 mt-3">{{ n.created_at.strftime('%d/%m/%Y %H:%M') }}</p>
     </div>
   </article>
   {% else %}
-  <p class="text-slate-500 text-sm text-center py-10">Nenhuma notícia neste filtro.</p>
+  <p class="text-slate-500 text-sm text-center py-10">Nenhum comunicado neste filtro.</p>
   {% endfor %}
 </div>
 {% endblock %}

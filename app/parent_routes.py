@@ -1,5 +1,5 @@
 from collections import defaultdict
-from datetime import date
+from datetime import date, datetime
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
@@ -184,14 +184,56 @@ def club_directorate():
 @bp.route("/noticias")
 def news_feed():
     level = (request.args.get("nivel") or "").strip()
-    q = ClubNews.query.order_by(ClubNews.created_at.desc())
-    if level in NEWS_LABELS:
-        q = q.filter_by(level=level)
-    items = q.limit(50).all()
+    tipo = (request.args.get("tipo") or "").strip().lower()
+    active_level = level if level in NEWS_LABELS else None
+    active_type = tipo if tipo in {"todos", "avisos", "noticias"} else "todos"
+
+    posts = []
+    if active_type in {"todos", "avisos"}:
+        posts = BoardPost.query.order_by(BoardPost.created_at.desc()).limit(60).all()
+
+    news_query = ClubNews.query.order_by(ClubNews.created_at.desc())
+    if active_level:
+        news_query = news_query.filter_by(level=active_level)
+    news_items = news_query.limit(80).all() if active_type in {"todos", "noticias"} else []
+
+    merged_items = []
+    for p in posts:
+        merged_items.append(
+            {
+                "kind": "post",
+                "title": p.title,
+                "body": p.body,
+                "created_at": p.created_at,
+                "label": "Aviso do clube",
+                "level": None,
+                "image_filename": None,
+            }
+        )
+    for n in news_items:
+        merged_items.append(
+            {
+                "kind": "news",
+                "title": n.title,
+                "body": n.body,
+                "created_at": n.created_at,
+                "label": NEWS_LABELS.get(n.level, "Notícia"),
+                "level": n.level,
+                "image_filename": n.image_filename,
+            }
+        )
+
+    merged_items.sort(
+        key=lambda item: item["created_at"] or datetime.min,
+        reverse=True,
+    )
+    merged_items = merged_items[:80]
+
     return render_template(
         "parent/news_feed.html",
-        items=items,
-        active_level=level if level in NEWS_LABELS else None,
+        items=merged_items,
+        active_level=active_level,
+        active_type=active_type,
         news_labels=NEWS_LABELS,
     )
 

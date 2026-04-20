@@ -817,7 +817,13 @@ def attendance_delete(member_id, att_id):
 @bp.route("/publicacoes")
 def posts():
     rows = BoardPost.query.order_by(BoardPost.created_at.desc()).all()
-    return render_template("admin/posts.html", posts=rows)
+    news_rows = ClubNews.query.order_by(ClubNews.created_at.desc()).all()
+    return render_template(
+        "admin/posts.html",
+        posts=rows,
+        news_list=news_rows,
+        levels=NEWS_LEVELS,
+    )
 
 
 @bp.route("/publicacoes/nova", methods=["GET", "POST"])
@@ -916,7 +922,13 @@ def _apply_directorate_form(d: DirectorateMember, form, files) -> None:
 @bp.route("/noticias-desbravadores")
 def club_news_list():
     rows = ClubNews.query.order_by(ClubNews.created_at.desc()).all()
-    return render_template("admin/club_news_list.html", news_list=rows, levels=NEWS_LEVELS)
+    posts_rows = BoardPost.query.order_by(BoardPost.created_at.desc()).all()
+    return render_template(
+        "admin/club_news_list.html",
+        news_list=rows,
+        posts=posts_rows,
+        levels=NEWS_LEVELS,
+    )
 
 
 @bp.route("/noticias-desbravadores/nova", methods=["GET", "POST"])

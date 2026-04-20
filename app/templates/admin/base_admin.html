@@ -81,12 +81,7 @@
         <a
           href="{{ url_for('admin.posts') }}"
           class="admin-nav-link flex items-center gap-2.5 rounded-2xl px-3 py-2.5 min-h-[44px] {% if request.endpoint in ['admin.posts', 'admin.post_new'] %}admin-nav-link--active{% else %}text-[var(--text-secondary)]{% endif %}"
-          ><span class="admin-nav-icon admin-nav-icon--avisos" aria-hidden="true">📢</span><span>Avisos do clube</span></a
-        >
-        <a
-          href="{{ url_for('admin.club_news_list') }}"
-          class="admin-nav-link flex items-center gap-2.5 rounded-2xl px-3 py-2.5 min-h-[44px] {% if 'club_news' in (request.endpoint or '') %}admin-nav-link--active{% else %}text-[var(--text-secondary)]{% endif %}"
-          ><span class="admin-nav-icon admin-nav-icon--noticias" aria-hidden="true">📰</span><span>Notícias Desbravadores</span></a
+          ><span class="admin-nav-icon admin-nav-icon--avisos" aria-hidden="true">📢</span><span>Comunicados</span></a
         >
       </nav>
       <div class="p-4 border-t border-[var(--border-subtle)] text-xs text-[var(--text-secondary)] shrink-0 bg-[#f8f8f9]">
