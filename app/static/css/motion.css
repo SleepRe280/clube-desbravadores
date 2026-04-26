@@ -1,0 +1,181 @@
+/**
+ * Animações e microinterações — respeita prefers-reduced-motion via .reduce-motion (classe no html)
+ */
+
+@keyframes app-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes flash-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes flash-out {
+  to {
+    opacity: 0;
+    transform: translateX(8px) scale(0.98);
+  }
+}
+
+@keyframes nav-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+html:not(.reduce-motion) .admin-main--enter {
+  animation: app-fade-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+html:not(.reduce-motion) .parent-main--enter {
+  animation: app-fade-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+html:not(.reduce-motion) .auth-panel--enter {
+  animation: app-fade-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
+}
+
+/* ---------- Flash ---------- */
+.flash-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.flash-msg {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border-radius: var(--radius-lg);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.45;
+  box-shadow: 0 4px 20px -8px rgb(15 23 42 / 0.12);
+  transition: box-shadow 0.2s ease;
+}
+
+html:not(.reduce-motion) .flash-msg[data-flash-ready] {
+  animation: flash-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.flash-msg.flash-msg--dismissing {
+  pointer-events: none;
+}
+
+html:not(.reduce-motion) .flash-msg.flash-msg--dismissing {
+  animation: flash-out 0.28s ease forwards;
+}
+
+.reduce-motion .flash-msg.flash-msg--dismissing {
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.flash-msg__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.flash-msg__close {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.25rem;
+  min-height: 2.25rem;
+  margin: -0.25rem -0.35rem -0.25rem 0;
+  border: none;
+  border-radius: var(--btn-radius);
+  background: rgb(255 255 255 / 0.55);
+  color: inherit;
+  cursor: pointer;
+  font-size: 1.25rem;
+  line-height: 1;
+  opacity: 0.75;
+  transition:
+    opacity 0.15s ease,
+    background 0.15s ease,
+    transform 0.12s ease;
+}
+
+.flash-msg__close:hover {
+  opacity: 1;
+  background: rgb(255 255 255 / 0.85);
+}
+
+.flash-msg__close:active {
+  transform: scale(0.92);
+}
+
+/* ---------- Header portal (scroll) ---------- */
+.parent-header {
+  transition:
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.parent-header--scrolled {
+  box-shadow: 0 8px 28px -12px rgb(21 101 192 / 0.12);
+  border-bottom-color: rgb(226 232 240 / 0.95);
+}
+
+/* ---------- Barra inferior — indicador ativo ---------- */
+.parent-bottom-nav__inner {
+  position: relative;
+}
+
+html:not(.reduce-motion) .parent-nav-item--active .parent-nav-icon {
+  animation: nav-pulse 0.55s cubic-bezier(0.22, 1, 0.36, 1) 1 both;
+}
+
+/* ---------- Auth shell ---------- */
+.auth-shell {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-shell {
+    scroll-behavior: auto;
+  }
+}
+
+.auth-visual img {
+  transition: transform 8s ease-out;
+}
+
+html:not(.reduce-motion) .auth-shell.is-ready .auth-visual img {
+  transform: scale(1);
+}
+
+.auth-visual img {
+  transform: scale(1.06);
+}
+
+/* ---------- Form focus (acessibilidade + visual) ---------- */
+html.js input:not([type="hidden"]):focus-visible,
+html.js select:focus-visible,
+html.js textarea:focus-visible {
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}

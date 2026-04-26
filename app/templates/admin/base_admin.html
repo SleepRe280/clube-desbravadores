@@ -18,6 +18,7 @@
         letter-spacing: -0.01em;
       }
     </style>
+    {% block head_extra %}{% endblock %}
   </head>
   <body class="admin-shell">
     <input type="checkbox" id="admin-nav-toggle" class="admin-nav-toggle" aria-hidden="true" tabindex="-1" />
@@ -94,5 +95,7 @@
       {% include "partials/flash.html" %}
       {% block content %}{% endblock %}
     </main>
+    {% block page_scripts %}{% endblock %}
+    {% include "partials/site_scripts.html" %}
   </body>
 </html>

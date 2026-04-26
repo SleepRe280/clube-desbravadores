@@ -2,7 +2,7 @@
 <html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Criar conta</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
     <script src="https://cdn.tailwindcss.com"></script>
@@ -18,18 +18,22 @@
         color: var(--text-primary);
         background: linear-gradient(165deg, #f5f3fa 0%, #e8f5e9 50%, #fff8e1 100%);
         min-height: 100vh;
+        min-height: 100dvh;
       }
     </style>
   </head>
-  <body class="p-6">
-    <div class="max-w-md mx-auto pt-6">
+  <body class="p-4 sm:p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+    <div class="max-w-md mx-auto pt-4 sm:pt-6">
       <a href="{{ url_for('auth.login') }}" class="text-[#0277bd] text-sm font-semibold hover:underline">← Login</a>
       <h1 class="text-2xl font-bold mt-6 text-[var(--text-primary)]">Criar conta de responsável</h1>
       <p class="text-[var(--text-secondary)] text-sm mt-2">
         Após registrar, você já poderá <strong>entrar no portal</strong> com e-mail e senha. A diretoria associa seu
         filho à conta ao cadastrar o desbravador.
       </p>
-      <div class="mt-6 bg-white rounded-3xl border border-[var(--border-pastel)] shadow-[var(--shadow-card)] p-8">
+      <div
+        data-auth-panel
+        class="mt-6 bg-white rounded-3xl border border-[var(--border-pastel)] shadow-[var(--shadow-card)] p-6 sm:p-8"
+      >
         {% include "partials/flash.html" %}
         <form method="post" class="space-y-4">
           <div>
@@ -81,5 +85,6 @@
         });
       })();
     </script>
+    {% include "partials/site_scripts.html" %}
   </body>
 </html>

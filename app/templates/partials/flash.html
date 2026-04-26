@@ -1,15 +1,17 @@
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
-    <div class="space-y-2 mb-4">
+    <div class="flash-stack mb-4" role="region" aria-label="Mensagens do sistema">
       {% for category, message in messages %}
         <div
-          class="rounded-lg px-4 py-3 text-sm font-medium
+          data-flash
+          class="flash-msg
           {% if category == 'success' %}bg-emerald-100 text-emerald-900 border border-emerald-200
           {% elif category == 'danger' %}bg-red-100 text-red-900 border border-red-200
           {% elif category == 'warning' %}bg-amber-100 text-amber-900 border border-amber-200
           {% else %}bg-slate-100 text-slate-800 border border-slate-200{% endif %}"
         >
-          {{ message }}
+          <span class="flash-msg__text">{{ message }}</span>
+          <button type="button" class="flash-msg__close" aria-label="Fechar mensagem">×</button>
         </div>
       {% endfor %}
     </div>

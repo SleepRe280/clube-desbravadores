@@ -242,6 +242,11 @@ def dashboard():
         .scalar()
         or 0
     )
+    recent_members = (
+        Member.query.order_by(Member.id.desc())
+        .limit(8)
+        .all()
+    )
     return render_template(
         "admin/dashboard.html",
         n_members=n_members,
@@ -255,6 +260,7 @@ def dashboard():
         finance_total_in=int(total_in),
         finance_total_out=int(total_out),
         finance_pending_fees=int(pending_fees),
+        recent_members=recent_members,
         format_brl=format_brl_cents,
     )
 

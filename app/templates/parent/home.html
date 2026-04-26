@@ -8,7 +8,7 @@
     Olá, {{ greeting_first }}
   </h1>
   <p class="mt-3 text-[15px] sm:text-base text-slate-600 leading-relaxed max-w-xl">
-    Duque De Caxias — avisos, notícias e o desempenho do seu filho(a).
+    Desbravadores — avisos, notícias e o desempenho do seu filho(a).
   </p>
 </section>
 
@@ -107,20 +107,24 @@
 {% endif %}
 
 <section class="mb-12">
-  <h2 class="text-xs font-extrabold uppercase tracking-[0.2em] text-slate-400 mb-5">Avisos do seu clube</h2>
+  <div class="flex items-center justify-between gap-3 mb-5">
+    <h2 class="text-xs font-extrabold uppercase tracking-[0.2em] text-slate-400">Avisos e notícias</h2>
+    <a href="{{ url_for('parent.news_feed') }}" class="ui-link text-xs">Abrir central</a>
+  </div>
+
   <div class="space-y-5">
     {% for post in board_posts %}
     <article class="overflow-hidden rounded-[1.5rem] bg-white/95 shadow-[0_16px_40px_-20px_rgba(15,23,42,0.15)] ring-1 ring-slate-200/60 backdrop-blur-sm">
-      <div class="flex items-center gap-4 border-b border-slate-100/90 bg-gradient-to-r from-amber-50/90 via-white to-rose-50/40 px-5 py-4">
+      <div class="flex items-center gap-4 border-b border-slate-100/90 bg-gradient-to-r from-slate-100/85 via-white to-slate-100/70 px-5 py-4">
         <img
           src="{{ url_for('static', filename='img/portal-logo-desbravadores.png') }}"
           width="48"
           height="48"
           alt=""
-          class="h-12 w-12 shrink-0 object-contain rounded-2xl bg-white/90 shadow-sm ring-1 ring-amber-100/80"
+          class="h-12 w-12 shrink-0 object-contain rounded-2xl bg-white/90 shadow-sm ring-1 ring-slate-200/80"
         />
         <div class="min-w-0">
-          <p class="font-bold text-slate-900 truncate">Duque De Caxias</p>
+          <p class="font-bold text-slate-900 truncate">Aviso interno</p>
           <p class="text-xs font-medium text-slate-500">{{ post.created_at.strftime('%d/%m/%Y') }}</p>
         </div>
       </div>
@@ -129,34 +133,31 @@
         <p class="mt-3 text-slate-600 text-[15px] leading-relaxed whitespace-pre-line">{{ post.body }}</p>
       </div>
     </article>
-    {% else %}
-    <p class="rounded-2xl border border-slate-200/60 bg-white/50 px-5 py-8 text-center text-sm text-slate-500">Sem avisos do clube por enquanto.</p>
     {% endfor %}
-  </div>
-</section>
 
-{% for level in ['local', 'regional', 'estadual', 'mundial'] %}
-{% if news_by_level.get(level) %}
-<section class="mb-10">
-  <div class="flex items-center justify-between gap-3 mb-4">
-    <h2 class="text-xs font-extrabold uppercase tracking-[0.2em] text-slate-400">{{ news_labels[level] }}</h2>
-    <a href="{{ url_for('parent.news_feed', nivel=level) }}" class="ui-link text-xs">Ver todas</a>
-  </div>
-  <div class="space-y-4">
-    {% for n in news_by_level[level][:3] %}
-    <article class="rounded-2xl bg-white/90 border border-slate-200/50 p-5 shadow-[0_12px_32px_-18px_rgba(15,23,42,0.12)] backdrop-blur-sm">
+    {% for level in ['local', 'regional', 'mundial'] %}
+    {% for n in news_by_level.get(level, [])[:3] %}
+    <article class="rounded-2xl bg-white/92 border border-slate-200/60 p-5 shadow-[0_12px_32px_-18px_rgba(15,23,42,0.12)] backdrop-blur-sm">
+      <div class="flex items-center justify-between gap-3 mb-3">
+        <p class="text-[11px] font-bold uppercase tracking-[0.12em] text-slate-500">{{ news_labels[level] }}</p>
+        <p class="text-[11px] font-medium text-slate-400">{{ n.created_at.strftime('%d/%m/%Y') }}</p>
+      </div>
       {% if n.image_filename %}
       <img src="{{ url_for('uploaded_file', rel_path=n.image_filename) }}" class="w-full h-36 object-cover rounded-xl mb-3 ring-1 ring-slate-100" alt="" />
       {% endif %}
       <h3 class="font-bold text-slate-900">{{ n.title }}</h3>
       <p class="text-slate-600 text-sm mt-2 line-clamp-3 leading-relaxed">{{ n.body }}</p>
-      <p class="text-[11px] font-medium text-slate-400 mt-3">{{ n.created_at.strftime('%d/%m/%Y') }}</p>
     </article>
     {% endfor %}
+    {% endfor %}
+
+    {% if (board_posts|length == 0) and (news_by_level.get('local', [])|length == 0) and (news_by_level.get('regional', [])|length == 0) and (news_by_level.get('mundial', [])|length == 0) %}
+    <p class="rounded-2xl border border-slate-200/60 bg-white/50 px-5 py-8 text-center text-sm text-slate-500">
+      Sem avisos e notícias no momento.
+    </p>
+    {% endif %}
   </div>
 </section>
-{% endif %}
-{% endfor %}
 
 <p class="text-center text-xs text-slate-400 pb-2 max-w-md mx-auto leading-relaxed">
   Os membros na aba Membros aparecem sem ficha completa; dados sensíveis ficam só na diretoria.

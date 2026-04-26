@@ -40,6 +40,25 @@
   </div>
 </div>
 
+<div class="grid lg:grid-cols-2 gap-6 mt-8">
+  <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+    <h2 class="font-semibold text-slate-900 mb-1">Composição financeira</h2>
+    <p class="text-xs text-slate-500 mb-4">Entradas, saídas e cobranças pendentes.</p>
+    <div class="relative min-h-[220px]">
+      <canvas id="financeDonutChart" aria-label="Composição financeira"></canvas>
+    </div>
+    <p id="financeDonutEmpty" class="text-sm text-slate-500 mt-3 hidden">Sem movimentação para exibir no gráfico.</p>
+  </div>
+  <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+    <h2 class="font-semibold text-slate-900 mb-1">Resumo em barras</h2>
+    <p class="text-xs text-slate-500 mb-4">Comparativo dos totais atuais.</p>
+    <div class="relative min-h-[220px]">
+      <canvas id="financeBarChart" aria-label="Resumo financeiro em barras"></canvas>
+    </div>
+    <p id="financeBarEmpty" class="text-sm text-slate-500 mt-3 hidden">Sem dados para comparar no momento.</p>
+  </div>
+</div>
+
 <div class="grid lg:grid-cols-2 gap-8 mt-10">
   <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
     <h2 class="font-semibold text-slate-900 mb-4">Novo lançamento no caixa</h2>
@@ -189,4 +208,90 @@
   <p class="text-slate-500 text-sm">Nenhum lançamento ainda.</p>
   {% endif %}
 </div>
+{% endblock %}
+
+{% block page_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  (function () {
+    if (typeof Chart === "undefined") return;
+
+    var finIn = {{ total_in | tojson }};
+    var finOut = {{ total_out | tojson }};
+    var finPending = {{ pending_fees | tojson }};
+    var hasAny = finIn + finOut + finPending > 0;
+    var font = '"Plus Jakarta Sans", system-ui, sans-serif';
+
+    var donutCanvas = document.getElementById("financeDonutChart");
+    var donutEmpty = document.getElementById("financeDonutEmpty");
+    if (donutCanvas && hasAny) {
+      new Chart(donutCanvas, {
+        type: "doughnut",
+        data: {
+          labels: ["Entradas", "Saídas", "A receber"],
+          datasets: [
+            {
+              data: [finIn, finOut, finPending],
+              backgroundColor: ["rgba(46, 125, 50, 0.85)", "rgba(198, 40, 40, 0.82)", "rgba(21, 101, 192, 0.82)"],
+              borderColor: "rgba(255, 255, 255, 0.95)",
+              borderWidth: 2
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: "58%",
+          plugins: {
+            legend: {
+              position: "bottom",
+              labels: {
+                font: { family: font, size: 11 },
+                usePointStyle: true,
+                padding: 14
+              }
+            }
+          }
+        }
+      });
+    } else if (donutEmpty) {
+      donutEmpty.classList.remove("hidden");
+    }
+
+    var barCanvas = document.getElementById("financeBarChart");
+    var barEmpty = document.getElementById("financeBarEmpty");
+    if (barCanvas && hasAny) {
+      new Chart(barCanvas, {
+        type: "bar",
+        data: {
+          labels: ["Entradas", "Saídas", "A receber"],
+          datasets: [
+            {
+              data: [finIn, finOut, finPending],
+              backgroundColor: ["rgba(46, 125, 50, 0.78)", "rgba(198, 40, 40, 0.78)", "rgba(21, 101, 192, 0.78)"],
+              borderRadius: 8,
+              maxBarThickness: 56
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { font: { family: font, size: 11 } }
+            },
+            x: {
+              ticks: { font: { family: font, size: 11 } }
+            }
+          }
+        }
+      });
+    } else if (barEmpty) {
+      barEmpty.classList.remove("hidden");
+    }
+  })();
+</script>
 {% endblock %}
